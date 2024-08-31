@@ -1,0 +1,27 @@
+.layout {
+  display: flex;
+  height: 100vh;
+  position: relative;
+}
+
+.content {
+  flex: 1;
+  background-color: white;
+  padding: 20px;
+  transition: margin-left 0.3s ease;
+}
+
+// Media Query para pantallas pequeñas 
+@media (max-width: 768px) {
+  .layout {
+    flex-direction: column;
+  }
+
+  .content {
+    margin-left: 0;
+  }
+
+  .sidebar {
+    width: 100%;
+  }
+}

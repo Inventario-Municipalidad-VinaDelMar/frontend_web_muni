@@ -1,0 +1,90 @@
+.side-bar {
+  background-color: rgb(0, 168, 219);
+  height: 100%;
+  padding: 20px;
+  margin-right: 10px;
+  overflow: hidden;
+  position: relative;
+}
+
+.side-bar.collapsed {
+  width: 60px;
+  padding: 20px 5px;
+}
+
+.side-bar img {
+  filter: drop-shadow(0 1px 1px #000000);
+  width: 200px;
+  height: 200px;
+  object-fit: cover;
+  margin-bottom: 10px;
+}
+
+.side-bar.collapsed img {
+  opacity: 0;
+}
+
+.side-bar .categorias,
+.side-bar .logout {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  cursor: pointer;
+  position: relative; 
+  margin:10px;
+  z-index: 1;
+}
+
+.side-bar.collapsed .categorias,
+.side-bar.collapsed .logout {
+  justify-content: center;
+  margin:0px;
+}
+
+//activación de div con color cuando pasa el mouse (sólo cuando está normal)
+.side-bar:not(.collapsed) .categorias:hover{
+  background-color: #54c6ff;
+  border-radius: 10px;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+.side-bar.collapsed .categorias:hover{
+  border-radius: 10px;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+  transform: scale(0.9);
+}
+
+//seleccion sidebar - selección activa
+.side-bar .categorias.active,
+.side-bar .logout.active {
+  background-color: #54c6ff;
+  border-radius: 10px;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+  position: relative;
+}
+
+//list icon de sidebar normal
+.side-bar div:first-child {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+// list icon de sidebar collapsed
+.side-bar.collapsed div:first-child {
+  justify-content: center;
+  padding: 10px 0; 
+}
+
+.side-bar:not(.collapsed) .logout:hover{
+  background-color: rgb(77, 118, 163);
+  border-radius: 10px;
+  width: 50%;
+}
+
+.bi.bi-box-arrow-left {
+  font-size: 11px;
+}
