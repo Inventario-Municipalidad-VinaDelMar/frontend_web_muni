@@ -5,6 +5,7 @@
   margin-right: 10px;
   overflow: hidden;
   position: relative;
+  box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }
 
 .side-bar.collapsed {
@@ -24,9 +25,19 @@
   opacity: 0;
 }
 
-.side-bar .categorias,
+.side-bar .categorias {
+  display: flex;
+  align-items: center;
+  padding: 15px 20px;
+  cursor: pointer;
+  position: relative; 
+  margin:5px;
+  z-index: 1;
+}
+
 .side-bar .logout {
   display: flex;
+  justify-content: center;
   align-items: center;
   padding: 15px 20px;
   cursor: pointer;
@@ -82,7 +93,9 @@
 .side-bar:not(.collapsed) .logout:hover{
   background-color: rgb(77, 118, 163);
   border-radius: 10px;
-  width: 50%;
+  transform: scale(0.9);
+  
+  
 }
 
 .bi.bi-box-arrow-left {

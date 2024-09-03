@@ -1,9 +1,10 @@
 import { Component } from '@angular/core';
+import { TablaInventarioComponent } from "../tabla-inventario/tabla-inventario.component";
 
 @Component({
   selector: 'app-inventario',
   standalone: true,
-  imports: [],
+  imports: [TablaInventarioComponent],
   templateUrl: './inventario.component.html',
   styleUrl: './inventario.component.scss'
 })

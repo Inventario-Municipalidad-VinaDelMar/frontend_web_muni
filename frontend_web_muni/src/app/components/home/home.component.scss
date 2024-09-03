@@ -1,0 +1,55 @@
+.semana {
+  display: flex;
+  justify-content: space-around; /* Espacia uniformemente los elementos */
+  align-items: center; /* Alinea verticalmente los elementos */
+  padding: 20px;
+  background-color: #f9f9f9; /* Color de fondo de la barra */
+  border-radius: 15px;
+  margin: 20px 0;
+}
+
+.semana > div {
+  flex: none; /* Los elementos no crecen más allá de su contenido */
+  text-align: center;
+  background-color: #e0e0e0; /* Fondo de cada día */
+  padding: 20px 15px;
+  border-radius: 15px;
+  position: relative; 
+  margin: 2px;/* Para posicionar la bolita en el día actual */
+}
+
+.semana > div.active {
+  background-color: #c8c8c8; /* Fondo del día activo */
+}
+
+
+.plan-futuro {
+  font-weight: bold;
+  cursor: pointer;
+  color: #666;
+  margin-left: 10px;
+}
+
+.fecha {
+  margin-top: 5px;
+  font-size: 0.9rem;
+  color: #666;
+}
+
+.istoday {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+.istoday > div {
+  flex: none;
+  text-align: center;
+  padding: 10px;
+}
+
+.hoy {
+  margin-top: -48px;
+  width: 90%;
+  font-weight:400;
+}

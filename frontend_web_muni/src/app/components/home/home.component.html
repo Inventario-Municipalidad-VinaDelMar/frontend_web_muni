@@ -1,1 +1,45 @@
-<p>home works!</p>
+<div class="contenido">
+    PLANIFICACIÓN DE ESTA SEMANA
+    
+    <div class="semana mt-4">
+      <div *ngFor="let day of daysOfWeek" 
+           class="p-2 flex-fill" 
+           [class.active]="day.isToday" 
+           (click)="setActive($event)">
+        <h2>{{ day.day }}</h2>
+        <h6>{{day.date}}</h6>
+      </div>
+      <div class="plan-futuro" (click)="redirectToPlanificacion()">&#62;&#62;&#62;</div>
+    
+    </div>
+    <div class="istoday">
+      <div *ngFor="let day of daysOfWeek" class="p-2 flex-fill">
+        <h6 *ngIf="day.isToday" class="hoy">Hoy</h6>
+        <p-button label="Submit"></p-button>
+      </div>
+    </div>
+    
+    
+    
+    
+
+  </div>
+  
+  
+  <div class="row">
+    <div class="col-6">
+        <div class="contenido">
+  
+            Lista de recientes
+        
+        </div>
+    </div>
+    <div class="col-6">
+        <div class="contenido">
+  
+            Alertas de vencimiento
+        
+        </div>
+    </div>
+  </div>
+  

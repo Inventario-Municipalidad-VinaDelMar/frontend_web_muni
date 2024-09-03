@@ -5,3 +5,27 @@
 body{
     margin: 0;
 }
+.contenido{ 
+    text-align: center;
+    margin-top: 10px;
+    border-radius: 10px;
+    padding: 10px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+}
+
+@layer reset, primeng;
+@layer reset{
+    button{
+    &:focus{
+        box-shadow: none;
+    }
+    }
+}
+tbody, td, tfoot, th, thead, tr{
+    text-align: center;
+}
+
+th{
+    background-color: rgb(195, 224, 255);
+}

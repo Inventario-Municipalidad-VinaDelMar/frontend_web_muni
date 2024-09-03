@@ -1,0 +1,54 @@
+<div class="card">
+    <p-table [value]="categorias" dataKey="id" [expandedRowKeys]="expandedRows" class="custom-table">
+        <ng-template pTemplate="caption">
+            <div class="flex flex-wrap justify-content-end gap-2">
+                <p-button label="Expandir todo" icon="pi pi-plus" text (onClick)="expandAll()"></p-button>
+                <p-button label="Cerrar todo" icon="pi pi-minus" text (onClick)="collapseAll()"></p-button>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="width: 5rem"></th>
+                <th>Categoria</th>
+                <th>Cantidad TOTAL</th>
+                <th>Fecha más próxima</th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-categoria let-expanded="expanded">
+            <tr [ngClass]="{ 'expanded-row': expanded }">
+                <td>
+                    <p-button type="button" pRipple [pRowToggler]="categoria" [text]="true" [rounded]="true" [plain]="true"
+                        [icon]="expanded ? 'pi pi-angle-down' : 'pi pi-angle-right'"></p-button>
+                </td>
+                <td>{{ categoria.nombre }}</td>
+                <td>{{ calcularCantidadTotal(categoria) }}</td>
+                <td>{{ calcularFechaProxima(categoria)| date:'dd-MM-yyyy' }}</td>
+                <td colspan="3"></td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="rowexpansion" let-categoria>
+            <tr>
+                <td colspan="5">
+                    <div class="p-3 expanded-content">
+                        <p-table [value]="categoria.tandas" dataKey="id">
+                            <ng-template pTemplate="header">
+                                <tr>
+                                    <th>Producto</th>
+                                    <th>Cantidad</th>
+                                    <th>Fecha de expiración</th>
+                                </tr>
+                            </ng-template>
+                            <ng-template pTemplate="body" let-tanda>
+                                <tr>
+                                    <td>{{ tanda.producto }}</td>
+                                    <td>{{ tanda.cantidadActual }}</td>
+                                    <td>{{ tanda.fechaVencimiento | date:'dd-MM-yyyy' }}</td>
+                                </tr>
+                            </ng-template>
+                        </p-table>
+                    </div>
+                </td>
+            </tr>
+        </ng-template>
+    </p-table>
+</div>
