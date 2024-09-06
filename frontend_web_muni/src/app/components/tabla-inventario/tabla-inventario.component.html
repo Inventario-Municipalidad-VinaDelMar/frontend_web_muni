@@ -1,22 +1,35 @@
 <div class="card">
-    <p-table [value]="categorias" dataKey="id" [expandedRowKeys]="expandedRows" class="custom-table">
+    <p-table [value]="categorias" dataKey="id" [expandedRowKeys]="expandedRows" class="custom-table" [paginator]="true" [rows]="10">
         <ng-template pTemplate="caption">
             <div class="flex flex-wrap justify-content-end gap-2">
                 <p-button label="Expandir todo" icon="pi pi-plus" text (onClick)="expandAll()"></p-button>
                 <p-button label="Cerrar todo" icon="pi pi-minus" text (onClick)="collapseAll()"></p-button>
             </div>
         </ng-template>
+        
         <ng-template pTemplate="header">
             <tr>
                 <th style="width: 5rem"></th>
-                <th>Categoria</th>
-                <th>Cantidad TOTAL</th>
-                <th>Productos por vencer</th> 
+                <th pSortableColumn="nombre" pFilterField="nombre">
+                    Categoria
+                    <p-sortIcon field="nombre"></p-sortIcon>
+                    <p-columnFilter field="nombre" matchMode="contains" placeholder="Buscar categoría"></p-columnFilter>
+                </th>
+                <th pSortableColumn="cantidadTotal">
+                    Cantidad TOTAL
+                    <p-sortIcon field="cantidadTotal"></p-sortIcon>
+                    <p-columnFilter field="cantidadTotal" type="numeric" placeholder="Filtrar cantidad"></p-columnFilter>
+                </th>
+                <th pSortableColumn="productosPorVencer">
+                    Productos por vencer
+                    <p-sortIcon field="productosPorVencer"></p-sortIcon>
+                    <p-columnFilter field="productosPorVencer" type="numeric" placeholder="Filtrar por vencer"></p-columnFilter>
+                </th>
             </tr>
         </ng-template>
+        
         <ng-template pTemplate="body" let-categoria let-expanded="expanded">
-            <!-- Agrega clases dinámicas para colorear las filas -->
-            <tr [ngClass]="{ 'expanded-row': expanded, 'custom-row-color': categoria.cantidadTotal > 100 }">
+            <tr [ngClass]="{ 'expanded-row': expanded, 'custom-row-color': calcularCantidadTotal(categoria) > 100 }">
                 <td>
                     <p-button type="button" pRipple [pRowToggler]="categoria" [text]="true" [rounded]="true" [plain]="true"
                         [icon]="expanded ? 'pi pi-angle-down' : 'pi pi-angle-right'"></p-button>
@@ -27,9 +40,9 @@
                     <span [ngClass]="{'highlight-number': calcularCantidadPorVencer(categoria) > 0,'highlight-number-zero': calcularCantidadPorVencer(categoria) === 0}">
                     {{ calcularCantidadPorVencer(categoria) }}</span> Producto(s) próximos a vencer
                 </td>
-                
             </tr>
         </ng-template>
+        
         <ng-template pTemplate="rowexpansion" let-categoria>
             <tr>
                 <td colspan="5" class="expanded-body">
@@ -37,21 +50,20 @@
                         <p-table [value]="categoria.tandas" dataKey="id">
                             <ng-template pTemplate="header">
                                 <tr>
-                                    <th>Producto</th>
-                                    <th>Cantidad</th>
-                                    <th>Fecha de expiración</th>
+                                    <th pSortableColumn="producto">Producto <p-sortIcon field="producto"></p-sortIcon></th>
+                                    <th pSortableColumn="cantidadActual">Cantidad <p-sortIcon field="cantidadActual"></p-sortIcon></th>
+                                    <th pSortableColumn="fechaVencimiento">Fecha de expiración <p-sortIcon field="fechaVencimiento"></p-sortIcon></th>
                                     <th>Bodega</th>
                                     <th>Ubicación</th>
                                 </tr>
                             </ng-template>
                             <ng-template pTemplate="body" let-tanda>
-                                <!-- Colorea filas de tandas según condición -->
                                 <tr [ngClass]="{ 'tanda-warning': tanda.cantidadActual < 50 }">
                                     <td>{{ tanda.producto }}</td>
                                     <td>{{ tanda.cantidadActual }}</td>
                                     <td>{{ tanda.fechaVencimiento | date:'dd-MM-yyyy' }}</td>
-                                    <td>{{ tanda.bodega}}</td>
-                                    <td>{{ tanda.ubicacion}}</td>
+                                    <td>{{ tanda.bodega }}</td>
+                                    <td>{{ tanda.ubicacion }}</td>
                                 </tr>
                             </ng-template>
                         </p-table>

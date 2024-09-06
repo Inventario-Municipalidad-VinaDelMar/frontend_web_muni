@@ -5,7 +5,11 @@ import { ButtonModule } from 'primeng/button'; // Importación del módulo de bo
 import { TagModule } from 'primeng/tag'; // Importación del módulo de etiquetas
 import { ToastModule } from 'primeng/toast'; // Importación del módulo de notificaciones
 import { InventarioService } from '../../services/inventario.service'; // Importa tu servicio
-
+import { InputTextModule } from 'primeng/inputtext';
+import { DropdownModule } from 'primeng/dropdown';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { SliderModule } from 'primeng/slider';
+import { FormsModule } from '@angular/forms';
 // Definición de interfaces para tipos de datos
 interface Tanda {
   id: string;
@@ -23,6 +27,8 @@ interface Categoria {
   nombre: string;
   urlImagen: string;
   tandas: Tanda[];
+  cantidadTotal?: number; // Propiedad opcional
+  productosPorVencer?: number; // Propiedad opcional
 }
 
 @Component({
@@ -35,7 +41,12 @@ interface Categoria {
     TableModule, // Asegúrate de importar los módulos de PrimeNG aquí
     ButtonModule,
     TagModule,
-    ToastModule
+    ToastModule,
+    InputTextModule,
+    DropdownModule,
+    MultiSelectModule,
+    SliderModule,
+    FormsModule
   ]
 })
 export class TablaInventarioComponent implements OnInit {
@@ -46,9 +57,15 @@ export class TablaInventarioComponent implements OnInit {
 
   ngOnInit() {
     this.inventarioService.getCategorias().subscribe(data => {
-      // Ordenar las tandas por fecha de vencimiento
       data.forEach((categoria: Categoria) => {
+        // Ordenar las tandas por fecha de vencimiento
         categoria.tandas.sort((a: Tanda, b: Tanda) => new Date(a.fechaVencimiento).getTime() - new Date(b.fechaVencimiento).getTime());
+        
+        // Calcular la cantidad total de productos en la categoría
+        categoria.cantidadTotal = this.calcularCantidadTotal(categoria);
+        
+        // Calcular cuántos productos están próximos a vencer
+        categoria.productosPorVencer = this.calcularCantidadPorVencer(categoria);
       });
   
       // Ordenar las categorías por nombre alfabéticamente
@@ -97,5 +114,16 @@ export class TablaInventarioComponent implements OnInit {
       return diffDias <= dosSemanas;
     }).length;
   }
-  
+  categorias2: any[] = []; // Lista de categorías
+  filterCategory: string = ''; // Filtro de texto para nombre de categoría
+    filterCantidadTotal: number | null = null; // Filtro numérico para cantidad total
+    filterProductosPorVencer: number | null = null; // Filtro numérico para productos por vencer
+
+  onFilter() {
+    this.categorias2 = this.categorias.filter(categoria => {
+        return (this.filterCategory ? categoria.nombre.toLowerCase().includes(this.filterCategory.toLowerCase()) : true) &&
+               (this.filterCantidadTotal !== null ? categoria.cantidadTotal === this.filterCantidadTotal : true) &&
+               (this.filterProductosPorVencer !== null ? categoria.productosPorVencer === this.filterProductosPorVencer : true);
+    });
+}
 }
