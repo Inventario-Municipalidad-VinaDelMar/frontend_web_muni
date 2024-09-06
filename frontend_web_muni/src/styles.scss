@@ -13,19 +13,43 @@ body{
     background-color: rgb(255, 255, 255);
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }
+@layer reset {
+    button:focus {
+      box-shadow: none;
+    }
+  }
 
-@layer reset, primeng;
-@layer reset{
-    button{
-    &:focus{
-        box-shadow: none;
-    }
-    }
-}
-tbody, td, tfoot, th, thead, tr{
+/* Estilo para la tabla principal */
+tbody, tfoot, th, thead, tr {
+    background-color: #948bff;
     text-align: center;
+    border-width: 1px;
 }
 
-th{
-    background-color: rgb(195, 224, 255);
+td {
+    text-align: center;
+    background-color: #8fdfe2;
+}
+.expanded-row {
+    border: 2px solid #2c2857;
+}
+
+/* Estilo para la tabla en la expansión */
+.expanded-content p-table td {
+    background-color: #ffffff;
+}
+
+.expanded-content p-table tr {
+    border: none;
+}
+
+/*fondo de la expansión*/
+.expanded-body{
+    background-color: #e1feff;
+}
+.highlight-number {
+    font-weight: bold;
+    color: #080808; /* Color destacado para el número */
+    font-size: 1; /* Tamaño de fuente más grande */
+    margin-right: 0.5em; /* Espacio entre el número y el texto */
 }

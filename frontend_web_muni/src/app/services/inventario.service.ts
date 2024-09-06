@@ -288,15 +288,16 @@ export class InventarioService {
     return this.categoriasSubject.asObservable();
   }
 
-  addTandaToCategoria(tanda: any) {
+  addTandaToCategoria(tanda: any): Observable<void> {
     const categoria = this.categorias.find(c => c.id === tanda.categoria);
     if (categoria) {
       categoria.tandas.push(tanda);
       this.categoriasSubject.next(this.categorias);
     }
+    return of();  // Retorna un Observable vacío
   }
 
-  updateTanda(tanda: any) {
+  updateTanda(tanda: any): Observable<void> {
     const categoria = this.categorias.find(c => c.id === tanda.categoria);
     if (categoria) {
       const tandaToUpdate = categoria.tandas.find(t => t.id === tanda.id);
@@ -305,5 +306,6 @@ export class InventarioService {
         this.categoriasSubject.next(this.categorias);
       }
     }
+    return of();  // Retorna un Observable vacío
   }
 }

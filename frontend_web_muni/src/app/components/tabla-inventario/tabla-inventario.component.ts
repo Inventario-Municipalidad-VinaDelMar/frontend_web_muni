@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { TableModule } from 'primeng/table'; // Importación del módulo de tabla
 import { ButtonModule } from 'primeng/button'; // Importación del módulo de botón
@@ -27,6 +27,7 @@ interface Categoria {
 
 @Component({
   selector: 'app-tabla-inventario',
+  encapsulation: ViewEncapsulation.None,
   templateUrl: './tabla-inventario.component.html',
   standalone: true,
   imports: [
@@ -86,6 +87,15 @@ export class TablaInventarioComponent implements OnInit {
     const fechaProxima = fechas.reduce((min, fecha) => fecha < min ? fecha : min);
     
     return fechaProxima.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+  }
+  calcularCantidadPorVencer(categoria: Categoria): number {
+    const dosSemanas = 14; // Número de días para 2 semanas
+    const hoy = new Date();
+    return categoria.tandas.filter(tanda => {
+      const fechaVencimiento = new Date(tanda.fechaVencimiento);
+      const diffDias = (fechaVencimiento.getTime() - hoy.getTime()) / (1000 * 3600 * 24);
+      return diffDias <= dosSemanas;
+    }).length;
   }
   
 }
