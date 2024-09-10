@@ -10,21 +10,22 @@
         <ng-template pTemplate="header">
             <tr>
                 <th style="width: 5rem"></th>
-                <th pSortableColumn="nombre" pFilterField="nombre">
+                <th pSortableColumn="nombre" pFilterField="filterCategory">
                     Categoria
                     <p-sortIcon field="nombre"></p-sortIcon>
-                    <p-columnFilter field="nombre" matchMode="contains" placeholder="Buscar categoría"></p-columnFilter>
+                    <p-columnFilter field="filterCategory" matchMode="contains" placeholder="Buscar categoría" (ngModelChange)="onFilter()"></p-columnFilter>
                 </th>
-                <th pSortableColumn="cantidadTotal">
+                <th pSortableColumn="cantidadTotal" pFilterField="filterCantidadTotal">
                     Cantidad TOTAL
                     <p-sortIcon field="cantidadTotal"></p-sortIcon>
-                    <p-columnFilter field="cantidadTotal" type="numeric" placeholder="Filtrar cantidad"></p-columnFilter>
+                    <p-columnFilter field="filterCantidadTotal" type="numeric" placeholder="Filtrar cantidad" (ngModelChange)="onFilter()"></p-columnFilter>
                 </th>
-                <th pSortableColumn="productosPorVencer">
+                <th pSortableColumn="productosPorVencer" pFilterField="filterProductosPorVencer">
                     Productos por vencer
                     <p-sortIcon field="productosPorVencer"></p-sortIcon>
-                    <p-columnFilter field="productosPorVencer" type="numeric" placeholder="Filtrar por vencer"></p-columnFilter>
+                    <p-columnFilter field="filterProductosPorVencer" type="numeric" placeholder="Filtrar por vencer" (ngModelChange)="onFilter()"></p-columnFilter>
                 </th>
+                
             </tr>
         </ng-template>
         
