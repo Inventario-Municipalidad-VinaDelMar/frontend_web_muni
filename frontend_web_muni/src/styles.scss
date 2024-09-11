@@ -2,10 +2,11 @@
 @import "primeng/resources/primeng.css";
 @import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
 
-body{
+body {
     margin: 0;
 }
-.contenido{ 
+
+.contenido { 
     text-align: center;
     margin-top: 10px;
     border-radius: 10px;
@@ -13,28 +14,33 @@ body{
     background-color: rgb(255, 255, 255);
     box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
 }
+
 @layer reset {
     button:focus {
       box-shadow: none;
     }
-  }
+}
 
-/* Estilo para la tabla principal */
 tbody, tfoot, th, thead, tr {
-    background-color: #948bff;
+    background-color: #0077B6;
     text-align: center;
     border-width: 1px;
 }
 
-td {
-    text-align: center;
-    background-color: #8fdfe2;
+.custom-table {
+    border-spacing: 0 10px; /* Ajustar el espaciado entre las celdas */
 }
+
+td {
+    padding: 15px; /* Aumentar el padding para más espacio dentro de las celdas */
+    text-align: center;
+    background-color: #CAF0F8;
+}
+
 .expanded-row {
     border: 2px solid #2c2857;
 }
 
-/* Estilo para la tabla en la expansión */
 .expanded-content p-table td {
     background-color: #ffffff;
 }
@@ -43,13 +49,20 @@ td {
     border: none;
 }
 
-/*fondo de la expansión*/
-.expanded-body{
-    background-color: #e1feff;
+.expanded-body {
+    background-color: #f2fdff;
 }
+
 .highlight-number {
     font-weight: bold;
     color: #080808; /* Color destacado para el número */
-    font-size: 1; /* Tamaño de fuente más grande */
+    font-size: 1em; /* Tamaño de fuente más grande */
     margin-right: 0.5em; /* Espacio entre el número y el texto */
+}
+th{
+    color:white;
+}
+
+.botones-expandir{
+    color:#000000;
 }

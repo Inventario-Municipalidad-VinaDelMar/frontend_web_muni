@@ -60,21 +60,61 @@ export class TablaInventarioComponent implements OnInit {
     // Obtener todas las categorías
     this.socketService.getAllCategorias();
   
+    // Escuchar evento para nueva tanda creada
+    this.socketService.listenTandaCreate().subscribe((data: unknown) => {
+      const nuevaTanda = data as Tanda;
+      console.log(`Nueva tanda creada`, nuevaTanda);
+  
+      // Buscar la categoría correspondiente por ID y agregar la nueva tanda
+      this.categorias = this.categorias.map(cat => {
+        if (cat.id === nuevaTanda.categoria) {
+          return {
+            ...cat,
+            tandas: [...(cat.tandas || []), nuevaTanda] // Añadir nueva tanda a la lista existente
+          };
+        }
+        return cat;
+      });
+  
+      // Actualizar la lista filtrada
+      this.categorias2 = [...this.categorias];
+    });
+  
+    // Escuchar evento de cambio de stock de la categoría
+    this.socketService.listenStockCategoriaChanged().subscribe((data: unknown) => {
+      const categoriaActualizada = data as Categoria;
+      console.log(`Categoría actualizada:`, categoriaActualizada);
+  
+      // Actualizar el stock de la categoría correspondiente
+      this.categorias = this.categorias.map(cat => {
+        if (cat.id === categoriaActualizada.id) {
+          return {
+            ...cat,
+            stock: categoriaActualizada.stock // Actualizar el stock con el nuevo valor
+          };
+        }
+        return cat;
+      });
+  
+      // Actualizar la lista filtrada
+      this.categorias2 = [...this.categorias];
+    });
+  
+    // Cargar categorías y sus tandas
     this.socketService.onLoadAllCategorias().subscribe((categorias: Categoria[]) => {
       console.log('Categorías recibidas:', categorias);
       this.categorias = categorias;
       this.categorias2 = categorias; // Inicializar también el filtro
   
-      // Obtener tandas para cada categoría
+      // Para cada categoría, cargar las tandas correspondientes
       this.categorias.forEach(categoria => {
         console.log(categoria.id);
-  
-        // Solicitar tandas por categoría
         this.socketService.getTandasByCategoriaId(categoria.id);
   
-        // Escuchar tandas por categoría
+        // Escuchar las tandas por categoría
         this.socketService.onLoadTandasByCategoriaId(categoria.id).subscribe((tandas: Tanda[]) => {
           console.log(`Tandas recibidas para la categoría ${categoria.id}:`, tandas);
+          
   
           // Actualizar las tandas de la categoría actual
           this.categorias = this.categorias.map(cat => {
@@ -90,8 +130,14 @@ export class TablaInventarioComponent implements OnInit {
           // Refrescar la lista filtrada
           this.categorias2 = [...this.categorias];
         });
+        
       });
+      
     });
+  }
+  
+  ngOnDestroy() {
+    console.log("se fue de la pagina")
   }
   
   

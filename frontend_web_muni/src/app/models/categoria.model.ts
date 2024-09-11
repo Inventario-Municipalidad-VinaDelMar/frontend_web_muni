@@ -7,4 +7,5 @@ export interface Categoria {
     tandas: Tanda[];
     cantidadTotal?: number; // Propiedad opcional
     productosPorVencer?: number; // Propiedad opcional
+    stock?:number;
   }

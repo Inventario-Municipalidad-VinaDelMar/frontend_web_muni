@@ -18,8 +18,29 @@ export class SocketInventarioService {
     return this.socket.fromEvent('disconnect');
   }
 
+  // Desconectar Loads en duros (que no necesitan valores diferentes para ingresar)
+  disconnectAll(): void {
+    this.socket.off('newTandaCreated');
+    this.socket.off('stockCategoriaChange');
+    this.socket.off('loadAllCategorias');
+    console.log('sockets desconectados...')
+  }
+
+  disconnectTandas(categoriaId:string){
+
+    this.socket.off(categoriaId+'-tanda');
+    console.log('mató la tanda: '+categoriaId+'-tanda')
+  }
+
   getAllCategorias() {
     this.socket.emit('getAllCategorias');
+  }
+
+  listenTandaCreate() {
+    return this.socket.fromEvent('newTandaCreated');
+  }
+  listenStockCategoriaChanged() {
+    return this.socket.fromEvent('stockCategoriaChange');
   }
 
   // Escuchar el evento que devuelve las categorías
