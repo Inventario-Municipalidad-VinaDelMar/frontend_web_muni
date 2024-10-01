@@ -1,44 +1,29 @@
 <div class="contenido">
-    PLANIFICACIÓN DE ESTA SEMANA
-    
-    <div class="semana mt-4">
-      <div *ngFor="let day of daysOfWeek" 
-           class="p-2 flex-fill" 
-           [class.active]="day.isToday" 
-           (click)="setActive($event)">
+  <h1>PLANIFICACIÓN SEMANAL</h1>
+  <div class="semana mt-4">
+    <div *ngFor="let day of daysOfWeek" 
+         class="day-container" 
+         [class.active]="day.isToday" 
+         (click)="setActive($event)">
+      <div class="day">
         <h2>{{ day.day }}</h2>
-        <h6>{{day.date}}</h6>
-      </div>
-      <div class="plan-futuro" (click)="redirectToPlanificacion()">&#62;&#62;&#62;</div>
-    
-    </div>
-    <div class="istoday">
-      <div *ngFor="let day of daysOfWeek" class="p-2 flex-fill">
+        <h6 class="fecha">{{ day.date }}</h6>
         <h6 *ngIf="day.isToday" class="hoy">Hoy</h6>
       </div>
     </div>
-    
-    
-    
-    
+    <div class="plan-futuro" (click)="redirectToPlanificacion()">&#62;&#62;&#62;</div>
+  </div>
+</div>
 
-  </div>
-  
-  
-  <div class="row">
-    <div class="col-6">
-        <div class="contenido">
-  
-            Lista de recientes
-        
-        </div>
+<div class="row">
+<div class="col-6">
+    <div class="contenido">
+        Lista de recientes
     </div>
-    <div class="col-6">
-        <div class="contenido">
-  
-            Alertas de vencimiento
-        
-        </div>
+</div>
+<div class="col-6">
+    <div class="contenido">
+        Alertas de vencimiento
     </div>
-  </div>
-  
+</div>
+</div>

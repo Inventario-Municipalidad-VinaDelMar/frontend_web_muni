@@ -21,48 +21,67 @@ body {
     }
 }
 
-tbody, tfoot, th, thead, tr {
-    background-color: #0077B6;
+/* Definición del efecto de carga para celdas de la tabla */
+.loading-placeholder {
+    color: transparent; /* El texto es invisible, pero sigue ocupando el mismo espacio */
+    background: linear-gradient(90deg, rgba(240, 240, 240, 0.5) 25%, rgba(230, 230, 230, 0.8) 50%, rgba(240, 240, 240, 0.5) 75%);
+    background-size: 300% 100%; /* Mayor tamaño para un desplazamiento más suave */
+    animation: shimmer 5s infinite ease-in-out;
+  }
+  
+  /* Suavizado del desplazamiento del efecto de carga */
+  @keyframes shimmer {
+    0% {
+      background-position: 300% 0;
+    }
+    100% {
+      background-position: -300% 0;
+    }
+  }
+  
+  /* Ajuste de la altura de la tabla durante la carga */
+  .contenido .p-datatable .p-datatable-tbody > tr > td.loading-placeholder {
+    height: 50px; /* Aumenta la altura de las celdas para el efecto */
+  }
+  
+  /* Tabla personalizada */
+  .custom-table {
+    border: 1px solid #dcdcdc; /* Borde ligero */
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  }
+  
+  /* Ajuste de encabezados y filas */
+  th, td {
+    font-family: 'Arial', sans-serif; /* Fuente más suave */
     text-align: center;
-    border-width: 1px;
-}
-
-.custom-table {
-    border-spacing: 0 10px; /* Ajustar el espaciado entre las celdas */
-}
-
-td {
-    padding: 15px; /* Aumentar el padding para más espacio dentro de las celdas */
-    text-align: center;
-    background-color: #CAF0F8;
-}
-
-.expanded-row {
-    border: 2px solid #2c2857;
-}
-
-.expanded-content p-table td {
-    background-color: #ffffff;
-}
-
-.expanded-content p-table tr {
-    border: none;
-}
-
-.expanded-body {
-    background-color: #f2fdff;
-}
-
-.highlight-number {
-    font-weight: bold;
-    color: #080808; /* Color destacado para el número */
-    font-size: 1em; /* Tamaño de fuente más grande */
-    margin-right: 0.5em; /* Espacio entre el número y el texto */
-}
-th{
-    color:white;
-}
-
-.botones-expandir{
-    color:#000000;
-}
+  }
+  
+  /* Encabezado de la tabla */
+  th {
+    background-color: #0077B6; /* Fondo azul para encabezados */
+    color: white; /* Texto blanco */
+  }
+  
+  /* Fondo alterno para filas de la tabla */
+  tbody tr:nth-child(even) td {
+    background-color: #EAF4FA; /* Azul claro */
+  }
+  
+  /* Estilo adicional para celdas en filas expandidas */
+  .expanded-content p-table td {
+    background-color: #ffffff; /* Fondo blanco para detalles */
+  }
+  
+  /* Estilo para las filas expandibles */
+  .expanded-row {
+    border: 2px solid #0077B6; /* Borde azul para resaltar */
+  }
+  
+  /* Clase para resaltar números */
+  .highlight-number {
+    font-size: 1em;
+    margin-right: 0.5em;
+    font-weight: bold; /* Números destacados */
+    color: #0077B6; /* Color azul para resaltado */
+  }
+  

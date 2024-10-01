@@ -1,80 +1,74 @@
-<div class="card">
-    <p-table [value]="categorias" dataKey="id" [expandedRowKeys]="expandedRows" class="custom-table" [paginator]="true" [rows]="10">
-        <ng-template pTemplate="caption">
-            <div class="flex flex-wrap justify-content-end gap-2">
-                <p-button label="Expandir todo" icon="pi pi-plus" text (onClick)="expandAll()"></p-button>
-                <p-button label="Cerrar todo" icon="pi pi-minus" text (onClick)="collapseAll()"></p-button>
+<div class="contenido">
+    <!-- Removemos el spinner de carga -->
+    <p-table 
+      [value]="categorias2" 
+      [tableStyle]="{ 'min-width': '70rem' }" 
+      dataKey="id" 
+      [resizableColumns]="true" 
+      [expandedRowKeys]="expandedRows" 
+      [paginator]="true" 
+      [rows]="10"
+      styleClass="custom-table p-datatable-gridlines">
+
+      <!-- Encabezado de la tabla -->
+      <ng-template pTemplate="header">
+        <tr>
+          <th pResizableColumn class="th">Nombre de la Categoría</th>
+          <th pResizableColumn class="th">Cantidad Total</th>
+          <th pResizableColumn class="th">Productos por Vencer</th>
+          <th pResizableColumn class="th">Acciones</th>
+        </tr>
+      </ng-template>
+
+      <!-- Cuerpo de la tabla con efecto de carga en las celdas -->
+      <ng-template pTemplate="body" let-categoria>
+        <tr class="tr">
+          <td class="td" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
+            {{ isLoading ? '' : categoria.nombre }}
+          </td>
+          <td class="td highlight-number" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
+            {{ isLoading ? '' : calcularCantidadTotal(categoria) }}
+          </td>
+          <td class="td highlight-number" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
+            {{ isLoading ? '' : calcularCantidadPorVencer(categoria) }}
+          </td>
+          <td class="td" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
+            <button *ngIf="!isLoading" pButton label="Expandir" class="botones-expandir" icon="pi pi-plus" (click)="expandedRows[categoria.id] = !expandedRows[categoria.id]"></button>
+          </td>
+        </tr>
+
+        <!-- Fila expandida que muestra detalles de las tandas (sin efecto de carga) -->
+        <tr *ngIf="expandedRows[categoria.id]" class="expanded-row">
+          <td colspan="5" class="expanded-body">
+            <div class="expanded-content">
+              <p-table [value]="categoria.tandas" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-gridlines">
+                <ng-template pTemplate="header">
+                  <tr>
+                    <th class="th">Producto</th>
+                    <th class="th">Cantidad Actual</th>
+                    <th class="th">Fecha de Vencimiento</th>
+                  </tr>
+                </ng-template>
+                <ng-template pTemplate="body" let-tanda>
+                  <tr>
+                    <td class="td">{{ tanda.producto }}</td>
+                    <td class="td">{{ tanda.cantidadActual }}</td>
+                    <td class="td">{{ tanda.fechaVencimiento | date: 'yyyy-MM-dd' }}</td>
+                  </tr>
+                </ng-template>
+              </p-table>
             </div>
-        </ng-template>
-        
-        <ng-template pTemplate="header">
-            <tr>
-                <th style="width: 5rem"></th>
-                <th pSortableColumn="nombre" pFilterField="filterCategory">
-                    Categoria
-                    <p-sortIcon field="nombre"></p-sortIcon>
-                    
-                </th>
-                <th pSortableColumn="cantidadTotal" pFilterField="filterCantidadTotal">
-                    Cantidad TOTAL
-                    <p-sortIcon field="cantidadTotal"></p-sortIcon>
-                    
-                </th>
-                <th pSortableColumn="productosPorVencer" pFilterField="filterProductosPorVencer">
-                    Productos por vencer
-                    <p-sortIcon field="productosPorVencer"></p-sortIcon>
-                    
-                </th>
-                
-            </tr>
-        </ng-template>
-        
-        <ng-template pTemplate="body" let-categoria let-expanded="expanded">
-            <tr [ngClass]="{ 'expanded-row': expanded, 'custom-row-color': calcularCantidadTotal(categoria) > 100 }">
-                <td>
-                    <p-button type="button" pRipple [pRowToggler]="categoria" [text]="true" [rounded]="true" [plain]="true"
-                        [icon]="expanded ? 'pi pi-angle-down' : 'pi pi-angle-right'"></p-button>
-                </td>
-                <td>{{ categoria.nombre }}</td>
-                <td>{{ calcularCantidadTotal(categoria) }}</td>
-                <td>
-                    <span [ngClass]="{'highlight-number': calcularCantidadPorVencer(categoria) > 0,'highlight-number-zero': calcularCantidadPorVencer(categoria) === 0}">
-                    {{ calcularCantidadPorVencer(categoria) }}</span> Producto(s) próximos a vencer
-                </td>
-            </tr>
-        </ng-template>
-        
-        <ng-template pTemplate="rowexpansion" let-categoria>
-            <tr>
-                <td colspan="5" class="expanded-body">
-                    <div class="p-3 expanded-content">
-                        <p-table [value]="categoria.tandas" dataKey="id">
-                            <ng-template pTemplate="header">
-                                <tr *ngIf="categoria.tandas.length === 0">
-                                    <td colspan="5" style="text-align: center;">No hay elementos</td>
-                                </tr>
-                                <tr *ngIf="categoria.tandas.length > 0">
-                                    <th pSortableColumn="producto">Producto <p-sortIcon field="producto"></p-sortIcon></th>
-                                    <th pSortableColumn="cantidadActual">Cantidad <p-sortIcon field="cantidadActual"></p-sortIcon></th>
-                                    <th pSortableColumn="fechaVencimiento">Fecha de expiración <p-sortIcon field="fechaVencimiento"></p-sortIcon></th>
-                                    <th>Bodega</th>
-                                    <th>Ubicación</th>
-                                </tr>
-                                
-                            </ng-template>
-                            <ng-template pTemplate="body" let-tanda>
-                                <tr [ngClass]="{ 'tanda-warning': tanda.cantidadActual < 50 }">
-                                    <td>{{ tanda.producto }}</td>
-                                    <td>{{ tanda.cantidadActual }}</td>
-                                    <td>{{ tanda.fechaVencimiento | date:'dd-MM-yyyy' }}</td>
-                                    <td>{{ tanda.bodega }}</td>
-                                    <td>{{ tanda.ubicacion }}</td>
-                                </tr>
-                            </ng-template>
-                        </p-table>
-                    </div>
-                </td>
-            </tr>
-        </ng-template>
+          </td>
+        </tr>
+      </ng-template>
+
+      <!-- Pie de la tabla -->
+      <ng-template pTemplate="footer">
+        <tr>
+          <td colspan="5">
+            Total Categorías: {{ categorias2.length }}
+          </td>
+        </tr>
+      </ng-template>
     </p-table>
-</div>
+  </div>

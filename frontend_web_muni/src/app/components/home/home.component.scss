@@ -1,27 +1,46 @@
+.contenido {
+  padding: 20px; /* Añadir padding si es necesario */
+  border-radius: 15px; /* Redondear bordes */
+  background-color: #ffffff; /* Fondo blanco para el contenido */
+  border: 2px solid #4fc1ff; 
+}
+
 .semana {
   display: flex;
-  justify-content: space-around; /* Espacia uniformemente los elementos */
+  justify-content: space-between; /* Espacia uniformemente los elementos */
   align-items: center; /* Alinea verticalmente los elementos */
   padding: 20px;
-  background-color: #f9f9f9; /* Color de fondo de la barra */
   border-radius: 15px;
   margin: 20px 0;
+  background-clip: padding-box; /* Evitar que el fondo del borde se extienda */
+  border: 2px solid #def4ff; 
+  box-shadow: 0 0 20px rgba(228, 246, 255, 0.8), 0 0 40px rgba(241, 250, 255, 0.6);
 }
 
-.semana > div {
-  flex: none; /* Los elementos no crecen más allá de su contenido */
+.semana::before {
+  position: absolute;
+  top: -5px; /* Ajusta la posición del borde superior */
+  left: -5px; /* Ajusta la posición del borde izquierdo */
+  right: -5px; /* Ajusta la posición del borde derecho */
+  bottom: -5px; /* Ajusta la posición del borde inferior */
+  border-radius: 15px; /* Redondear bordes */
+}
+
+.day-container {
+  flex: 1; /* Permite que todos los elementos crezcan y ocupen el mismo espacio */
   text-align: center;
-  background-color: #e0e0e0; /* Fondo de cada día */
+  background-color: #c5edff; /* Fondo de cada día */
   padding: 20px 15px;
   border-radius: 15px;
+  margin: 2px; /* Espaciado entre los días */
   position: relative; 
-  margin: 2px;/* Para posicionar la bolita en el día actual */
 }
 
-.semana > div.active {
-  background-color: #c8c8c8; /* Fondo del día activo */
+.day-container.active {
+  background-color: #aee5ff; /* Fondo del día activo */
+  border: 1px solid #82d5ff; 
+  box-shadow: 0 0 20px rgba(181, 230, 255, 0.8), 0 0 40px rgba(241, 250, 255, 0.6);
 }
-
 
 .plan-futuro {
   font-weight: bold;
@@ -36,20 +55,3 @@
   color: #666;
 }
 
-.istoday {
-  display: flex;
-  justify-content: space-around;
-  margin-top: 10px;
-}
-
-.istoday > div {
-  flex: none;
-  text-align: center;
-  padding: 10px;
-}
-
-.hoy {
-  margin-top: -48px;
-  width: 90%;
-  font-weight:400;
-}

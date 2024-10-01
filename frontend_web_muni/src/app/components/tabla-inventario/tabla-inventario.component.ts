@@ -1,9 +1,9 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewEncapsulation, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { TableModule } from 'primeng/table'; // Importación del módulo de tabla
-import { ButtonModule } from 'primeng/button'; // Importación del módulo de botón
-import { TagModule } from 'primeng/tag'; // Importación del módulo de etiquetas
-import { ToastModule } from 'primeng/toast'; // Importación del módulo de notificaciones
+import { TableModule } from 'primeng/table';
+import { ButtonModule } from 'primeng/button';
+import { TagModule } from 'primeng/tag';
+import { ToastModule } from 'primeng/toast';
 import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
@@ -13,17 +13,15 @@ import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { Categoria } from '../../models/categoria.model';
 import { Tanda } from '../../models/tanda.model';
-
-// Definición de interfaces para tipos de datos
-
-
+import { ProgressSpinnerModule } from 'primeng/progressspinner';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-tabla-inventario',
   encapsulation: ViewEncapsulation.None,
   templateUrl: './tabla-inventario.component.html',
   standalone: true,
-  providers: [SocketInventarioService, MessageService], // Agregar MessageService
+  providers: [SocketInventarioService, MessageService],
   imports: [
     CommonModule,
     TableModule,
@@ -35,119 +33,72 @@ import { Tanda } from '../../models/tanda.model';
     MultiSelectModule,
     SliderModule,
     FormsModule,
+    ProgressSpinnerModule,
   ]
 })
-
-export class TablaInventarioComponent implements OnInit {
+export class TablaInventarioComponent implements OnInit, OnDestroy {
   categorias: Categoria[] = [];
   categorias2: Categoria[] = [];
-  expandedRows = {};
+  expandedRows: { [key: string]: boolean } = {};
   filterCategory: string = '';
   filterCantidadTotal: number | null = null;
   filterProductosPorVencer: number | null = null;
+  isLoading: boolean = true;
+  
+  private subscriptions: Subscription = new Subscription(); // Para manejar la limpieza de eventos
 
   constructor(private socketService: SocketInventarioService) {}
 
   ngOnInit() {
-    this.socketService.onConnect().subscribe(() => {
-      console.log('Conexión: Conectado al servidor WebSocket');
-    });
+    const startTime = new Date().getTime();
   
-    this.socketService.onDisconnect().subscribe(() => {
-      console.log('Desconexión: Desconectado del servidor WebSocket');
-    });
-  
-    // Obtener todas las categorías
     this.socketService.getAllCategorias();
   
-    // Escuchar evento para nueva tanda creada
-    this.socketService.listenTandaCreate().subscribe((data: unknown) => {
-      const nuevaTanda = data as Tanda;
-      console.log(`Nueva tanda creada`, nuevaTanda);
-  
-      // Buscar la categoría correspondiente por ID y agregar la nueva tanda
-      this.categorias = this.categorias.map(cat => {
-        if (cat.id === nuevaTanda.categoria) {
-          return {
-            ...cat,
-            tandas: [...(cat.tandas || []), nuevaTanda] // Añadir nueva tanda a la lista existente
-          };
-        }
-        return cat;
-      });
-  
-      // Actualizar la lista filtrada
-      this.categorias2 = [...this.categorias];
-    });
-  
-    // Escuchar evento de cambio de stock de la categoría
-    this.socketService.listenStockCategoriaChanged().subscribe((data: unknown) => {
-      const categoriaActualizada = data as Categoria;
-      console.log(`Categoría actualizada:`, categoriaActualizada);
-  
-      // Actualizar el stock de la categoría correspondiente
-      this.categorias = this.categorias.map(cat => {
-        if (cat.id === categoriaActualizada.id) {
-          return {
-            ...cat,
-            stock: categoriaActualizada.stock // Actualizar el stock con el nuevo valor
-          };
-        }
-        return cat;
-      });
-  
-      // Actualizar la lista filtrada
-      this.categorias2 = [...this.categorias];
-    });
-  
-    // Cargar categorías y sus tandas
     this.socketService.onLoadAllCategorias().subscribe((categorias: Categoria[]) => {
-      console.log('Categorías recibidas:', categorias);
       this.categorias = categorias;
-      this.categorias2 = categorias; // Inicializar también el filtro
+      this.categorias2 = categorias;
   
-      // Para cada categoría, cargar las tandas correspondientes
-      this.categorias.forEach(categoria => {
-        console.log(categoria.id);
+      const elapsedTime = new Date().getTime() - startTime;
+      const minimumTime = 3000; // Tiempo mínimo de 3 segundos
+      const remainingTime = minimumTime - elapsedTime;
+  
+      if (remainingTime > 0) {
+        setTimeout(() => {
+          this.isLoading = false;
+        }, remainingTime);
+      } else {
+        this.isLoading = false;
+      }
+  
+      categorias.forEach(categoria => {
         this.socketService.getTandasByCategoriaId(categoria.id);
-  
-        // Escuchar las tandas por categoría
         this.socketService.onLoadTandasByCategoriaId(categoria.id).subscribe((tandas: Tanda[]) => {
-          console.log(`Tandas recibidas para la categoría ${categoria.id}:`, tandas);
-          
-  
-          // Actualizar las tandas de la categoría actual
           this.categorias = this.categorias.map(cat => {
             if (cat.id === categoria.id) {
-              return {
-                ...cat,
-                tandas: tandas // Asignar las tandas a la categoría correcta
-              };
+              return { ...cat, tandas: tandas };
             }
             return cat;
           });
   
-          // Refrescar la lista filtrada
           this.categorias2 = [...this.categorias];
         });
-        
       });
-      
     });
   }
   
+
   ngOnDestroy() {
-    console.log("se fue de la pagina")
+    this.subscriptions.unsubscribe(); // Limpieza de eventos suscritos
+    console.log("se fue de la pagina");
   }
-  
-  
+
   expandAll() {
     this.expandedRows = this.categorias.reduce((acc, categoria) => {
       acc[categoria.id] = true;
       return acc;
     }, {} as { [key: string]: boolean });
   }
-  
+
   collapseAll() {
     this.expandedRows = {};
   }
@@ -164,7 +115,7 @@ export class TablaInventarioComponent implements OnInit {
     const fechas = categoria.tandas.map(tanda => new Date(tanda.fechaVencimiento));
     const fechaProxima = fechas.reduce((min, fecha) => fecha < min ? fecha : min);
 
-    return fechaProxima.toISOString().split('T')[0]; // Formato YYYY-MM-DD
+    return fechaProxima.toISOString().split('T')[0];
   }
 
   calcularCantidadPorVencer(categoria: Categoria): number {
@@ -186,5 +137,5 @@ export class TablaInventarioComponent implements OnInit {
              (this.filterCantidadTotal !== null ? cantidadTotal === this.filterCantidadTotal : true) &&
              (this.filterProductosPorVencer !== null ? productosPorVencer === this.filterProductosPorVencer : true);
     });
-}
+  }
 }
