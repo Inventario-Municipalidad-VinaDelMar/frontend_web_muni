@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { Observable } from 'rxjs';
+import { Tanda } from '../models/tanda.model';
 
 @Injectable({
   providedIn: 'root', // Esto hace que el servicio esté disponible globalmente en toda la aplicación.
@@ -36,8 +37,8 @@ export class SocketInventarioService {
     this.socket.emit('getAllCategorias');
   }
 
-  listenTandaCreate() {
-    return this.socket.fromEvent('newTandaCreated');
+  listenTandaCreate(): Observable<Tanda> {
+    return this.socket.fromEvent<Tanda>('newTandaCreated');
   }
   listenStockCategoriaChanged() {
     return this.socket.fromEvent('stockCategoriaChange');

@@ -3,6 +3,14 @@
   display: flex;
   height: 100vh;
   position: relative;
+  &.collapsed {
+    .content {
+      flex: 1; // Ocupa todo el espacio disponible
+      margin-left: 0; // No hay margen cuando el sidebar está colapsado
+    }
+
+    
+  }
 }
 
 .content {
@@ -11,19 +19,19 @@
   padding: 20px;
   transition: margin-left 0.3s ease;
   overflow: auto;
+  
 }
 
-// Media Query para pantallas pequeñas 
 @media (max-width: 768px) {
   .layout {
-    flex-direction: column;
+    flex-direction: column; // Cambiar a columna en pantallas pequeñas
   }
 
   .content {
-    margin-left: 0;
+    margin-left: 0; // Sin margen en pantallas pequeñas
   }
 
-  .sidebar {
-    width: 100%;
+  app-sidebar {
+    width: 100%; // Sidebar ocupa todo el ancho en pantallas pequeñas
   }
 }

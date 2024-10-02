@@ -4,7 +4,7 @@
     <div *ngFor="let day of daysOfWeek" 
          class="day-container" 
          [class.active]="day.isToday" 
-         (click)="setActive($event)">
+         (click)="setActive(day)">
       <div class="day">
         <h2>{{ day.day }}</h2>
         <h6 class="fecha">{{ day.date }}</h6>
@@ -15,15 +15,30 @@
   </div>
 </div>
 
-<div class="row">
-<div class="col-6">
+<div class="row mt-4">
+  <div class="col-6">
     <div class="contenido">
-        Lista de recientes
+      <h2>Lista de Tandas Recientes</h2>
+      <div *ngFor="let categoria of categorias">
+        <!-- Verificar si hay tandas en la categoría antes de mostrar el nombre -->
+        <ng-container >
+          <ul>
+            <li *ngFor="let tanda of categoria.tandas">
+              <p>Producto: {{ tanda.producto }}</p> 
+              <p>Fecha de Llegada: {{ tanda.fechaLlegada | date: 'dd-MM-yyyy'}}</p> 
+              <p>Cantidad: {{ tanda.cantidadActual }}</p>
+            </li>
+          </ul>
+        </ng-container>
+      </div>
+      <div *ngIf="!isLoading && categorias.length === 0">No hay tandas disponibles.</div>
     </div>
-</div>
-<div class="col-6">
+  </div>
+  <div class="col-6">
     <div class="contenido">
-        Alertas de vencimiento
+      <!-- Aquí puedes añadir más contenido si es necesario -->
+      <h2>Otra sección</h2>
+      <p>Contenido adicional aquí...</p>
     </div>
-</div>
+  </div>
 </div>

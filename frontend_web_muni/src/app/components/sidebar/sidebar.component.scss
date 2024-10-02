@@ -1,22 +1,52 @@
 .side-bar {
-  background-color: #00B4D8;
-  height: 100%;
+  display: flex;
+  flex-direction: column; /* Organiza los elementos en columna */
+  background-color: #0095e6;
+  height: 100vh; /* Altura total */
   padding: 20px;
   margin-right: 10px;
-  overflow: hidden;
-  position: relative;
+  overflow-y: auto; /* Permite desplazamiento vertical */
+  position: sticky; /* Mantiene la barra en su lugar */
+  top: 0; /* Desde la parte superior */
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
+  color: white;
+  text-shadow: 
+      -0.5px -0.5px 0 #0090dd,  
+      0.5px -0.5px 0 #0090dd,
+      -0.5px  0.5px 0 #0090dd,
+      0.5px  0.5px 0 #0090dd;
 }
 
 .side-bar.collapsed {
   width: 60px;
   padding: 20px 5px;
+  overflow-y: auto;
+  overflow-x: clip; 
+}
+
+.side-bar::-webkit-scrollbar {
+  width: 12px; /* Ancho de la barra de desplazamiento */
+}
+
+.side-bar::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.1); /* Color de fondo de la pista */
+  border-radius: 10px; /* Bordes redondeados para la pista */
+}
+
+.side-bar::-webkit-scrollbar-thumb {
+  background: #0077b6; /* Color del pulgar de la barra de desplazamiento */
+  border-radius: 10px; /* Bordes redondeados para el pulgar */
+  transition: background 0.3s; /* Transición suave */
+}
+
+.side-bar::-webkit-scrollbar-thumb:hover {
+  background: #005f8c; /* Color del pulgar al pasar el mouse */
 }
 
 .side-bar img {
   filter: drop-shadow(0 1px 1px #000000);
-  width: 200px;
-  height: 200px;
+  width: 150px;
+  height: 150px;
   object-fit: cover;
   margin-bottom: 10px;
 }
@@ -54,7 +84,7 @@
 
 //activación de div con color cuando pasa el mouse (sólo cuando está normal)
 .side-bar:not(.collapsed) .categorias:hover{
-  background-color: #48CAE4;
+  background-color: #00aeff;
   border-radius: 10px;
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
   position: relative;
@@ -70,7 +100,7 @@
 //seleccion sidebar - selección activa
 .side-bar .categorias.active,
 .side-bar .logout.active {
-  background-color: #48CAE4;
+  background-color: #00aeff;
   border-radius: 10px;
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
   position: relative;
@@ -92,7 +122,6 @@
 
 .side-bar:not(.collapsed) .logout:hover{
   background-color: #0077B6;
-  ;
   color:white;
   border-radius: 10px;
   transform: scale(0.9);

@@ -1,4 +1,4 @@
-<div class="contenido">
+<div class="">
     <!-- Removemos el spinner de carga -->
     <p-table 
       [value]="categorias2" 
@@ -47,6 +47,7 @@
                     <th class="th">Producto</th>
                     <th class="th">Cantidad Actual</th>
                     <th class="th">Fecha de Vencimiento</th>
+                    <th class="th">Fecha de ingreso</th>
                   </tr>
                 </ng-template>
                 <ng-template pTemplate="body" let-tanda>
@@ -54,6 +55,7 @@
                     <td class="td">{{ tanda.producto }}</td>
                     <td class="td">{{ tanda.cantidadActual }}</td>
                     <td class="td">{{ tanda.fechaVencimiento | date: 'yyyy-MM-dd' }}</td>
+                    <td class="td">{{ tanda.fechaLlegada | date: 'yyyy-MM-dd' }}</td>
                   </tr>
                 </ng-template>
               </p-table>

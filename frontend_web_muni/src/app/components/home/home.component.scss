@@ -2,13 +2,13 @@
   padding: 20px; /* Añadir padding si es necesario */
   border-radius: 15px; /* Redondear bordes */
   background-color: #ffffff; /* Fondo blanco para el contenido */
-  border: 2px solid #4fc1ff; 
+  
 }
 
 .semana {
   display: flex;
   justify-content: space-between; /* Espacia uniformemente los elementos */
-  align-items: center; /* Alinea verticalmente los elementos */
+  flex-wrap: wrap;
   padding: 20px;
   border-radius: 15px;
   margin: 20px 0;
@@ -22,24 +22,28 @@
   top: -5px; /* Ajusta la posición del borde superior */
   left: -5px; /* Ajusta la posición del borde izquierdo */
   right: -5px; /* Ajusta la posición del borde derecho */
-  bottom: -5px; /* Ajusta la posición del borde inferior */
   border-radius: 15px; /* Redondear bordes */
 }
 
 .day-container {
-  flex: 1; /* Permite que todos los elementos crezcan y ocupen el mismo espacio */
-  text-align: center;
-  background-color: #c5edff; /* Fondo de cada día */
-  padding: 20px 15px;
-  border-radius: 15px;
-  margin: 2px; /* Espaciado entre los días */
-  position: relative; 
-}
+  flex: 1;
+  background-color: #c5edff;
+  padding-top:14px;
+  padding-bottom:0px;
 
+  border-radius: 15px;
+  margin: 10px;
+  position: relative;
+}
+.day-container:hover {
+  transform: scale(1.05); /* Aumenta el tamaño al 105% */
+  border: 1px solid #9bdeff; 
+  box-shadow: 0 0 5px rgba(179, 230, 255, 0.9); /* Sombra más intensa */
+}
 .day-container.active {
-  background-color: #aee5ff; /* Fondo del día activo */
-  border: 1px solid #82d5ff; 
-  box-shadow: 0 0 20px rgba(181, 230, 255, 0.8), 0 0 40px rgba(241, 250, 255, 0.6);
+  background-color: #a2e2ff; /* Mantiene el mismo estilo que los demás */
+  border: 2px solid #4fc4ff;
+  box-shadow: 0 0 20px rgba(228, 246, 255, 0.8), 0 0 40px rgba(241, 250, 255, 0.6);
 }
 
 .plan-futuro {
@@ -47,6 +51,7 @@
   cursor: pointer;
   color: #666;
   margin-left: 10px;
+  align-self: center;
 }
 
 .fecha {
@@ -55,3 +60,26 @@
   color: #666;
 }
 
+
+.hoy {
+  font-size: 0.9rem;
+  position: static;
+  width: 100%;
+}
+@media (max-width: 768px) {
+  .day-container {
+    flex: 1 1 40%; /* Cada día ocupa el 40% del contenedor */
+    max-width: 40%;
+    min-width: auto;
+    margin: 5px 2px; /* Menor margen entre los días */
+  }
+}
+
+/* Cambios en pantallas pequeñas */
+@media (max-width: 480px) {
+  .day-container {
+    flex: 1 1 90%; /* Ocupan casi el 100% del contenedor */
+    max-width: 90%; /* Evita que se extiendan demasiado */
+    margin: 5px 0; /* Espaciado reducido entre filas */
+  }
+}
