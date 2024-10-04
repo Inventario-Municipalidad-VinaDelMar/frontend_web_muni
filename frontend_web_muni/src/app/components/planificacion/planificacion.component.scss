@@ -1,0 +1,108 @@
+/* Contenedor de la información de la semana */
+.semana-info-container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 70px;
+    background-color: #f0f0f0;
+    border-radius: 5px;
+    margin-bottom: 10px;
+  }
+  
+  .semana-text {
+    font-size: 18px;
+    font-weight: bold;
+  }
+  
+  .boton {
+    background-color: #5d9cec;
+    color: white;
+    padding: 5px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  
+  .boton-semana:hover {
+    background-color: #4a8fd4;
+  }
+  
+  /* Contenedor de productos */
+  .productos-container {
+    margin: 10px 0;
+    text-align: start; /* Añadido margen para separar de la sección superior */
+  }
+  
+  /* Buscador de productos */
+  .buscador-container {
+    margin: 5px 10px; /* Espaciado en la parte superior e inferior */
+  }
+  
+  .buscador-input {
+    width: 150px; /* Ancho más pequeño para el buscador */
+    padding: 5px; /* Padding reducido */
+    border: 1px solid #dcdcdc;
+    border-radius: 5px;
+  }
+  
+  /* Divider para separar secciones */
+  .divider {
+    margin: 20px 70px;
+    border: none;
+    border-top: 1px solid #dcdcdc;
+  }
+  
+  /* Contenedor de productos con desplazamiento horizontal */
+  .productos-container-scroll {
+    display: flex;
+    overflow-x: auto; /* Permite el desplazamiento horizontal */
+    gap: 10px; /* Espacio entre productos */
+    padding: 10px 20px; /* Espaciado desde las orillas */
+    border-radius: 8px;
+    scrollbar-width: thin; /* Ancho de la barra de desplazamiento en navegadores compatibles */
+    scrollbar-color: #0084ff transparent; /* Color del scroll */
+    
+  }
+  
+
+  /* Estilo para cada producto (más pequeño) */
+  .producto {
+    background-color: #7edaff;
+    
+    padding: 5px 10px; /* Tamaño reducido */
+    text-align: center;
+    border: 1px solid #3e95ff; /* Borde ligero */
+    border-radius: 5px; /* Bordes redondeados */
+    cursor: pointer; /* Cambio de cursor */
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+    white-space: nowrap; /* Evita que el texto se desborde */
+  }
+  
+  .producto:hover {
+    background-color: #f7f7f7; /* Cambio de color en hover */
+    transform: scale(1.05); /* Aumentar tamaño ligeramente */
+  }
+  
+  /* Contenedor de los días de la semana */
+  .dias-semana-container {
+    display: flex;
+    justify-content: space-between; /* Espacio igual entre cada día */
+    align-items: center; /* Alinear verticalmente en el centro */
+    gap: 50px; /* Espacio entre los días */
+    padding: 0 70px; 
+  }
+  
+  /* Estilo para cada día */
+  .dia {
+    height: 50vh;
+    background-color: #c5edff;
+    box-shadow: 0 0 20px rgba(74, 165, 210, 0.8);
+    border: 2px solid #9edfff; 
+    padding: 10px 15px;
+    text-align: center;
+    border-radius: 5px;
+    flex: 1; /* Permite que cada día ocupe el mismo ancho */
+  }
+  .dia.drag-over {
+    background-color: #b2e4ff; /* Color al pasar un producto por encima */
+  }

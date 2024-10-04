@@ -1,10 +1,58 @@
-
 <div class="row">
-    <div class="contenido col">
-        DIAS DE LA SEMANA
+  <div class="contenido col">
+
+    <!-- Sección de información de la semana -->
+    <div class="semana-info-container">
+      <div class="semana-text">Semana 17-50 de septiembre</div>
+      <button class="boton" (click)="cambiarSemana()">Cambiar Semana</button>
     </div>
-    
+
+    <!-- Espacio entre la información de la semana y los productos -->
+    <hr class="divider" />
+
+    <!-- Sección de productos (listado horizontal deslizable) -->
+    <div class="productos-container">
+
+      <!-- Buscador de productos -->
+      <div class="buscador-container">
+        <input type="text" [(ngModel)]="searchTerm" (input)="filtrarProductos()" placeholder="Buscar..." class="buscador-input" />
+      </div>
+
+      <!-- Contenedor de productos con desplazamiento horizontal -->
+      <div class="productos-container-scroll" id="productos" (dragover)="allowDrop($event)" (drop)="dropToMainList($event)">
+        
+        <!-- Mostrar productos filtrados -->
+        <div class="producto" *ngFor="let producto of productosFiltrados" [attr.id]="producto.id" draggable="true" (dragstart)="drag($event)">
+          {{ producto.nombre }}
+        </div>
+        
+        <!-- Mostrar mensaje si no hay coincidencias -->
+        <div class="no-coincidencias" *ngIf="productosFiltrados.length === 0">
+          No hay coincidencias.
+        </div>
+      </div>
+    </div>
+
+    <!-- Espacio entre productos y días -->
+    <hr class="divider" />
+
+    <!-- Sección de días de la semana -->
+    <div class="dias-semana-container">
+      <div class="dia" id="lunes" (dragover)="allowDrop($event)" (drop)="drop($event, 'lunes')">Lunes</div>
+      <div class="dia" id="martes" (dragover)="allowDrop($event)" (drop)="drop($event, 'martes')">Martes</div>
+      <div class="dia" id="miercoles" (dragover)="allowDrop($event)" (drop)="drop($event, 'miercoles')">Miércoles</div>
+      <div class="dia" id="jueves" (dragover)="allowDrop($event)" (drop)="drop($event, 'jueves')">Jueves</div>
+      <div class="dia" id="viernes" (dragover)="allowDrop($event)" (drop)="drop($event, 'viernes')">Viernes</div>
+    </div>
+    <div class="boton">
+      botón de aceptar
+    </div>
+  </div>
+
+  
 </div>
+
+  
 <div class="row">
       <div class="col-3">
           <div class="contenido">

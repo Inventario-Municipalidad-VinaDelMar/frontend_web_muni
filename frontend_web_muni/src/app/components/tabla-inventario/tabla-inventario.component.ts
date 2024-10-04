@@ -14,7 +14,7 @@ import { FormsModule } from '@angular/forms';
 import { Categoria } from '../../models/categoria.model';
 import { Tanda } from '../../models/tanda.model';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
-import { Subscription } from 'rxjs';
+import { Subscription, timer } from 'rxjs';
 
 @Component({
   selector: 'app-tabla-inventario',
@@ -43,53 +43,62 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
   filterCategory: string = '';
   filterCantidadTotal: number | null = null;
   filterProductosPorVencer: number | null = null;
-  isLoading: boolean = true;
-  
-  private subscriptions: Subscription = new Subscription(); // Para manejar la limpieza de eventos
+  isLoading: boolean = true; // Estado para mostrar la carga
+  hasError: boolean = false;  // Estado para indicar si hay un error
 
-  constructor(private socketService: SocketInventarioService) {}
+  private subscriptions: Subscription = new Subscription();
+
+  constructor(private socketService: SocketInventarioService, private messageService: MessageService) {}
 
   ngOnInit() {
     const startTime = new Date().getTime();
-  
-    this.socketService.getAllCategorias();
-  
-    this.socketService.onLoadAllCategorias().subscribe((categorias: Categoria[]) => {
-      this.categorias = categorias;
-      this.categorias2 = categorias;
-  
-      const elapsedTime = new Date().getTime() - startTime;
-      const minimumTime = 3000; // Tiempo mínimo de 3 segundos
-      const remainingTime = minimumTime - elapsedTime;
-  
-      if (remainingTime > 0) {
-        setTimeout(() => {
-          this.isLoading = false;
-        }, remainingTime);
-      } else {
+
+    // Lógica para mostrar error si no hay respuesta después de 10 segundos
+    setTimeout(() => {
+      if (this.isLoading) {
+        this.hasError = true;
         this.isLoading = false;
       }
-  
-      categorias.forEach(categoria => {
-        this.socketService.getTandasByCategoriaId(categoria.id);
-        this.socketService.onLoadTandasByCategoriaId(categoria.id).subscribe((tandas: Tanda[]) => {
-          this.categorias = this.categorias.map(cat => {
-            if (cat.id === categoria.id) {
-              return { ...cat, tandas: tandas };
-            }
-            return cat;
+    }, 10000); // Tiempo límite de 10 segundos
+
+    // Tiempo mínimo de 2 segundos de carga antes de mostrar los productos
+    setTimeout(() => {
+      this.socketService.getAllCategorias();
+      this.socketService.onLoadAllCategorias().subscribe((categorias: Categoria[]) => {
+        const elapsedTime = new Date().getTime() - startTime;
+
+        // Si los datos llegan dentro del límite de tiempo
+        if (elapsedTime <= 10000) {
+          this.categorias = categorias;
+          this.categorias2 = categorias;
+          this.isLoading = false;
+          this.hasError = false;
+
+          categorias.forEach(categoria => {
+            this.socketService.getTandasByCategoriaId(categoria.id);
+            this.socketService.onLoadTandasByCategoriaId(categoria.id).subscribe((tandas: Tanda[]) => {
+              this.categorias = this.categorias.map(cat => {
+                if (cat.id === categoria.id) {
+                  return { ...cat, tandas: tandas };
+                }
+                return cat;
+              });
+
+              this.categorias2 = [...this.categorias];
+            });
           });
-  
-          this.categorias2 = [...this.categorias];
-        });
+        }
+      }, () => {
+        // Manejo de error de la llamada al servicio
+        this.hasError = true;
+        this.isLoading = false;
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'El servicio no está disponible. Intente más tarde.' });
       });
-    });
+    }, 2000); // Tiempo mínimo de carga inicial (2 segundos)
   }
-  
 
   ngOnDestroy() {
-    this.subscriptions.unsubscribe(); // Limpieza de eventos suscritos
-    console.log("se fue de la pagina");
+    this.subscriptions.unsubscribe();
   }
 
   expandAll() {
