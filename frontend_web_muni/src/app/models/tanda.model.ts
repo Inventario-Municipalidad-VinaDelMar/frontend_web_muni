@@ -1,6 +1,6 @@
 export interface Tanda {
     id: string;
-    categoria:string;
+    productoId:string;
     cantidadIngresada: number;
     cantidadActual: number;
     fechaLlegada: string;
@@ -9,4 +9,3 @@ export interface Tanda {
     bodega: string;
     ubicacion: string;
   }
-  

@@ -14,7 +14,7 @@
   <!-- Tabla de datos cuando se ha completado la carga sin errores -->
   <div *ngIf="!isLoading && !hasError">
     <p-table 
-      [value]="categorias2" 
+      [value]="productos2" 
       [tableStyle]="{ 'min-width': '70rem' }" 
       dataKey="id" 
       [resizableColumns]="true" 
@@ -26,7 +26,7 @@
       <!-- Encabezado de la tabla -->
       <ng-template pTemplate="header">
         <tr>
-          <th pResizableColumn class="th">Nombre de la Categoría</th>
+          <th pResizableColumn class="th">Nombre del Producto</th>
           <th pResizableColumn class="th">Cantidad Total</th>
           <th pResizableColumn class="th">Productos por Vencer</th>
           <th pResizableColumn class="th">Acciones</th>
@@ -34,27 +34,27 @@
       </ng-template>
 
       <!-- Cuerpo de la tabla con efecto de carga en las celdas -->
-      <ng-template pTemplate="body" let-categoria>
+      <ng-template pTemplate="body" let-producto>
         <tr class="tr">
           <td class="td" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
-            {{ isLoading ? '' : categoria.nombre }}
+            {{ isLoading ? '' : producto.nombre }}
           </td>
           <td class="td highlight-number" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
-            {{ isLoading ? '' : calcularCantidadTotal(categoria) }}
+            {{ isLoading ? '' : producto.stock }}
           </td>
           <td class="td highlight-number" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
-            {{ isLoading ? '' : calcularCantidadPorVencer(categoria) }}
+            {{ isLoading ? '' : calcularCantidadPorVencer(producto) }}
           </td>
           <td class="td" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
-            <button *ngIf="!isLoading" pButton label="Expandir" class="botones-expandir" icon="pi pi-plus" (click)="expandedRows[categoria.id] = !expandedRows[categoria.id]"></button>
+            <button *ngIf="!isLoading" pButton label="Expandir" class="botones-expandir" icon="pi pi-plus" (click)="expandedRows[producto.id] = !expandedRows[producto.id]"></button>
           </td>
         </tr>
 
         <!-- Fila expandida que muestra detalles de las tandas (sin efecto de carga) -->
-        <tr *ngIf="expandedRows[categoria.id]" class="expanded-row">
+        <tr *ngIf="expandedRows[producto.id]" class="expanded-row">
           <td colspan="5" class="expanded-body">
             <div class="expanded-content">
-              <p-table [value]="categoria.tandas" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-gridlines">
+              <p-table [value]="producto.tandas" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-gridlines">
                 <ng-template pTemplate="header">
                   <tr>
                     <th class="th">Producto</th>
@@ -81,7 +81,7 @@
       <ng-template pTemplate="footer">
         <tr>
           <td colspan="5">
-            Total Categorías: {{ categorias2.length }}
+            Total Productos: {{ productos2.length }}
           </td>
         </tr>
       </ng-template>

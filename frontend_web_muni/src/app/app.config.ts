@@ -9,7 +9,14 @@ import { routes } from './app.routes';
 export const SOCKET_IO_CONFIG = new InjectionToken<SocketIoConfig>('SocketIoConfig');
 
 // Define la configuración del WebSocket
-const config: SocketIoConfig = { url: 'http://34.176.26.41/inventario', options: {} };
+const config: SocketIoConfig = {
+   url: 'http://34.176.26.41/inventario',
+    options: {
+      extraHeaders:{
+        authentication:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhlODYwYTYxLTViZmMtNGEyYi1hMWEyLTU5OTc5YzFkOTAzZiIsImlhdCI6MTcyODUyNzUxMywiZXhwIjoxNzI4NTM0NzEzfQ.r2qabBnxeIQhfPNEyWfdSc-s-J0Cl1i_QnZgcTsh00s'
+      }
+
+    } };
 
 export const appConfig: ApplicationConfig = {
   providers: [

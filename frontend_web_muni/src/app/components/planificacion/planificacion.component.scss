@@ -28,13 +28,15 @@
   }
   
   /* Contenedor de productos */
-  .productos-container {
+  .tandas-container {
     margin: 10px 0;
     text-align: start; /* Añadido margen para separar de la sección superior */
   }
   
   /* Buscador de productos */
   .buscador-container {
+    display: flex;
+    justify-content: flex-start; /* Alinea el buscador a la izquierda */
     margin: 5px 10px; /* Espaciado en la parte superior e inferior */
   }
   
@@ -53,7 +55,7 @@
   }
   
   /* Contenedor de productos con desplazamiento horizontal */
-  .productos-container-scroll {
+  .tandas-container-scroll {
     display: flex;
     overflow-x: auto; /* Permite el desplazamiento horizontal */
     gap: 10px; /* Espacio entre productos */
@@ -66,16 +68,15 @@
   
 
   /* Estilo para cada producto (más pequeño) */
-  .producto {
+  .tanda {
     background-color: #7edaff;
-    
+    max-height: 100%;
     padding: 5px 10px; /* Tamaño reducido */
     text-align: center;
     border: 1px solid #3e95ff; /* Borde ligero */
     border-radius: 5px; /* Bordes redondeados */
     cursor: pointer; /* Cambio de cursor */
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-    white-space: nowrap; /* Evita que el texto se desborde */
   }
   
   .producto:hover {
@@ -90,19 +91,35 @@
     align-items: center; /* Alinear verticalmente en el centro */
     gap: 50px; /* Espacio entre los días */
     padding: 0 70px; 
+    margin-bottom: 20px;
   }
   
   /* Estilo para cada día */
-  .dia {
-    height: 50vh;
-    background-color: #c5edff;
-    box-shadow: 0 0 20px rgba(74, 165, 210, 0.8);
-    border: 2px solid #9edfff; 
-    padding: 10px 15px;
-    text-align: center;
-    border-radius: 5px;
-    flex: 1; /* Permite que cada día ocupe el mismo ancho */
-  }
+.dia {
+  height: 60vh;
+  display: flex;
+  gap:15px;
+  flex-direction: column;
+  background-color: #c5edff;
+  box-shadow: 0 0 20px rgba(74, 165, 210, 0.8);
+  border: 2px solid #9edfff; 
+  padding: 10px 15px;
+  text-align: center;
+  border-radius: 5px;
+  flex: 1; /* Permite que cada día ocupe el mismo ancho */
+  transition: background-color 0.2s ease; /* Suaviza el cambio de color */
+  overflow-y: auto;
+}
   .dia.drag-over {
     background-color: #b2e4ff; /* Color al pasar un producto por encima */
   }
+
+.tanda-en-dia {
+  font-size: smaller;
+  border: 1px solid #00b7ff; /* Borde para distinguir las tandas */
+  background-color: #6cd5ff; /* Fondo claro */
+  white-space: normal;
+  word-wrap: break-word;
+  border-radius: 5px; /* Bordes redondeados */
+  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra ligera */
+}

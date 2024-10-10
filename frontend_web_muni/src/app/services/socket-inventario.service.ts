@@ -33,8 +33,8 @@ export class SocketInventarioService {
     console.log('mató la tanda: '+categoriaId+'-tanda')
   }
 
-  getAllCategorias() {
-    this.socket.emit('getAllCategorias');
+  getAllProductos() {
+    this.socket.emit('getAllProductos');
   }
 
   listenTandaCreate(): Observable<Tanda> {
@@ -45,20 +45,20 @@ export class SocketInventarioService {
   }
 
   // Escuchar el evento que devuelve las categorías
-  onLoadAllCategorias(): Observable<any> {
-    return this.socket.fromEvent('loadAllCategorias');
+  loadAllProductos(): Observable<any> {
+    return this.socket.fromEvent('loadAllProductos');
   }
 
   // Emitir evento para obtener tandas por ID de categoría
-  getTandasByCategoriaId(idCategoria: string) {
-    this.socket.emit('getTandasByIdCategoria', { idCategoria });
+  getTandasByProductoId(idProducto: string) {
+    console.log('Emitiendo getTandasByProductoId para producto:', idProducto);
+    this.socket.emit('getTandasByIdProducto', { idProducto });
   }
   
 
   // Escuchar el evento que devuelve las tandas por ID de categoría
-  onLoadTandasByCategoriaId(idCategoria: string): Observable<any> {
-    idCategoria=idCategoria+"-tanda"
-    return this.socket.fromEvent(idCategoria);
+  onLoadTandasByProductoId(idProducto: string): Observable<any> {
+    return this.socket.fromEvent(`${idProducto}-tanda`);
   }
 
 }

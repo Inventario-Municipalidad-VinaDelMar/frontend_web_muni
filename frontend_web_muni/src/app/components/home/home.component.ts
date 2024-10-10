@@ -52,13 +52,13 @@ export class HomeComponent implements OnInit, OnDestroy {
   // Método para cargar categorías y sus tandas
   loadCategorias(): void {
     const startTime = new Date().getTime();
-    this.socketService.getAllCategorias();
+    this.socketService.getAllProductos();
   
-    const categoriasSubscription = this.socketService.onLoadAllCategorias().subscribe((categorias: Categoria[]) => {
+    const categoriasSubscription = this.socketService.loadAllProductos().subscribe((categorias: Categoria[]) => {
       this.categorias = categorias;
   
       const elapsedTime = new Date().getTime() - startTime;
-      const minimumTime = 3000; // Tiempo mínimo de 3 segundos
+      const minimumTime = 1000; // Tiempo mínimo de 3 segundos
       const remainingTime = minimumTime - elapsedTime;
   
       if (remainingTime > 0) {
@@ -71,8 +71,8 @@ export class HomeComponent implements OnInit, OnDestroy {
   
       // Cargar las tandas para cada categoría
       categorias.forEach(categoria => {
-        this.socketService.getTandasByCategoriaId(categoria.id);
-        const tandasSubscription = this.socketService.onLoadTandasByCategoriaId(categoria.id).subscribe((tandas: Tanda[]) => {
+        this.socketService.getTandasByProductoId(categoria.id);
+        const tandasSubscription = this.socketService.onLoadTandasByProductoId(categoria.id).subscribe((tandas: Tanda[]) => {
           // Filtrar tandas de los últimos 21 días
           const filteredTandas = tandas.filter(tanda => {
             const fechaLlegada = new Date(tanda.fechaLlegada);

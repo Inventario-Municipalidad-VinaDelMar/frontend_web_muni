@@ -11,10 +11,10 @@ import { SliderModule } from 'primeng/slider';
 import { SocketInventarioService } from '../../services/socket-inventario.service';
 import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
-import { Categoria } from '../../models/categoria.model';
 import { Tanda } from '../../models/tanda.model';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Subscription, timer } from 'rxjs';
+import { Producto } from '../../models/producto.model';
 
 @Component({
   selector: 'app-tabla-inventario',
@@ -37,10 +37,10 @@ import { Subscription, timer } from 'rxjs';
   ]
 })
 export class TablaInventarioComponent implements OnInit, OnDestroy {
-  categorias: Categoria[] = [];
-  categorias2: Categoria[] = [];
+  productos: Producto[] = [];  // Cambiado de categorias a productos
+  productos2: Producto[] = [];
   expandedRows: { [key: string]: boolean } = {};
-  filterCategory: string = '';
+  filterNombre: string = '';
   filterCantidadTotal: number | null = null;
   filterProductosPorVencer: number | null = null;
   isLoading: boolean = true; // Estado para mostrar la carga
@@ -53,6 +53,15 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const startTime = new Date().getTime();
 
+  this.socketService.onConnect().subscribe(() => {
+    console.log('Socket conectado');
+  });
+
+  this.socketService.onDisconnect().subscribe(() => {
+    console.log('Socket desconectado');
+  });
+
+
     // Lógica para mostrar error si no hay respuesta después de 10 segundos
     setTimeout(() => {
       if (this.isLoading) {
@@ -63,33 +72,42 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
 
     // Tiempo mínimo de 2 segundos de carga antes de mostrar los productos
     setTimeout(() => {
-      this.socketService.getAllCategorias();
-      this.socketService.onLoadAllCategorias().subscribe((categorias: Categoria[]) => {
+      this.socketService.getAllProductos();
+      this.socketService.loadAllProductos().subscribe((productos: Producto[]) => {
         const elapsedTime = new Date().getTime() - startTime;
 
         // Si los datos llegan dentro del límite de tiempo
         if (elapsedTime <= 10000) {
-          this.categorias = categorias;
-          this.categorias2 = categorias;
+          console.log('Productos recibidos:', productos);
+          this.productos = productos;
+          this.productos2 = productos;
           this.isLoading = false;
           this.hasError = false;
 
-          categorias.forEach(categoria => {
-            this.socketService.getTandasByCategoriaId(categoria.id);
-            this.socketService.onLoadTandasByCategoriaId(categoria.id).subscribe((tandas: Tanda[]) => {
-              this.categorias = this.categorias.map(cat => {
-                if (cat.id === categoria.id) {
-                  return { ...cat, tandas: tandas };
+          productos.forEach(producto => {
+            // Emitir la solicitud para obtener tandas por productoId
+            this.socketService.getTandasByProductoId(producto.id);
+         
+            // Escuchar la respuesta con las tandas para ese producto
+            this.socketService.onLoadTandasByProductoId(producto.id).subscribe((tandas: Tanda[]) => {
+              console.log('Tandas recibidas para producto:', producto.id, tandas);
+         
+              // Actualizar el producto con las tandas recibidas
+              this.productos = this.productos.map(prod => {
+                if (prod.id === producto.id) {
+                  return { ...prod, tandas: tandas };
                 }
-                return cat;
+                return prod;
               });
-
-              this.categorias2 = [...this.categorias];
+         
+              // Actualizar la segunda lista (productos2) para reflejar los cambios
+              this.productos2 = [...this.productos];
             });
           });
         }
-      }, () => {
+      }, (error) => {
         // Manejo de error de la llamada al servicio
+        console.log('Error al cargar productos:', error);
         this.hasError = true;
         this.isLoading = false;
         this.messageService.add({ severity: 'error', summary: 'Error', detail: 'El servicio no está disponible. Intente más tarde.' });
@@ -102,8 +120,8 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
   }
 
   expandAll() {
-    this.expandedRows = this.categorias.reduce((acc, categoria) => {
-      acc[categoria.id] = true;
+    this.expandedRows = this.productos.reduce((acc, producto) => {
+      acc[producto.id] = true;
       return acc;
     }, {} as { [key: string]: boolean });
   }
@@ -112,25 +130,25 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
     this.expandedRows = {};
   }
 
-  calcularCantidadTotal(categoria: Categoria): number {
-    return (categoria.tandas || []).reduce((total: number, tanda: Tanda) => total + tanda.cantidadActual, 0);
+  calcularCantidadTotal(producto: Producto): number {
+    return (producto.tandas || []).reduce((total: number, tanda: Tanda) => total + tanda.cantidadActual, 0);
   }
 
-  calcularFechaProxima(categoria: Categoria): string {
-    if (!categoria.tandas || categoria.tandas.length === 0) {
+  calcularFechaProxima(producto: Producto): string {
+    if (!producto.tandas || producto.tandas.length === 0) {
       return 'N/A';
     }
 
-    const fechas = categoria.tandas.map(tanda => new Date(tanda.fechaVencimiento));
+    const fechas = producto.tandas.map(tanda => new Date(tanda.fechaVencimiento));
     const fechaProxima = fechas.reduce((min, fecha) => fecha < min ? fecha : min);
 
     return fechaProxima.toISOString().split('T')[0];
   }
 
-  calcularCantidadPorVencer(categoria: Categoria): number {
+  calcularCantidadPorVencer(producto: Producto): number {
     const dosSemanas = 14;
     const hoy = new Date();
-    return (categoria.tandas || []).filter(tanda => {
+    return (producto.tandas || []).filter(tanda => {
       const fechaVencimiento = new Date(tanda.fechaVencimiento);
       const diffDias = (fechaVencimiento.getTime() - hoy.getTime()) / (1000 * 3600 * 24);
       return diffDias <= dosSemanas;
@@ -138,11 +156,11 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
   }
 
   onFilter() {
-    this.categorias2 = this.categorias.filter(categoria => {
-      const cantidadTotal = this.calcularCantidadTotal(categoria);
-      const productosPorVencer = this.calcularCantidadPorVencer(categoria);
+    this.productos2 = this.productos.filter(producto => {
+      const cantidadTotal = this.calcularCantidadTotal(producto);
+      const productosPorVencer = this.calcularCantidadPorVencer(producto);
 
-      return (this.filterCategory ? categoria.nombre.toLowerCase().includes(this.filterCategory.toLowerCase()) : true) &&
+      return (this.filterNombre ? producto.nombre.toLowerCase().includes(this.filterNombre.toLowerCase()) : true) &&
              (this.filterCantidadTotal !== null ? cantidadTotal === this.filterCantidadTotal : true) &&
              (this.filterProductosPorVencer !== null ? productosPorVencer === this.filterProductosPorVencer : true);
     });
