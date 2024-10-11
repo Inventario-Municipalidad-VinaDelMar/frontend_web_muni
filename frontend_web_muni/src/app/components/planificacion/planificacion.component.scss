@@ -114,12 +114,29 @@
     background-color: #b2e4ff; /* Color al pasar un producto por encima */
   }
 
-.tanda-en-dia {
-  font-size: smaller;
-  border: 1px solid #00b7ff; /* Borde para distinguir las tandas */
-  background-color: #6cd5ff; /* Fondo claro */
-  white-space: normal;
-  word-wrap: break-word;
-  border-radius: 5px; /* Bordes redondeados */
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2); /* Sombra ligera */
-}
+
+  
+  .tanda-container {
+    background-color: #b2e4ff;
+    border: 2px solid #3e95ff; 
+    font-size: smaller;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-direction: column;  
+  }
+  
+  .quitar-btn {
+    background: none;        /* Sin fondo */
+    border: none;           /* Sin borde */
+    color: red;             /* Color de la "X" */
+    cursor: pointer;        /* Cambiar el cursor al pasar el mouse */
+    padding: 0;             /* Sin padding */
+    margin-left: 5px;      /* Espacio a la izquierda de la "X" */
+    align-self: flex-start;
+  }
+  
+  .quitar-btn:hover {
+    opacity: 0.7;           /* Efecto de hover */
+  }
+  

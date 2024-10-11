@@ -55,20 +55,36 @@ export class PlanificacionComponent implements OnInit {
     const data = event.dataTransfer?.getData('text');
     const tandaElement = document.getElementById(data ?? '');
   
-    // Asegúrate de que el drop ocurra sólo en el contenedor del día
-    const diaElement = document.getElementById(dia);
+    if (tandaElement) {
+      const tanda = this.tandas.find(t => t.id === data);
+      
+      if (tanda) {
+        // Agregar la tanda al día correspondiente
+        this.tandasPorDia[dia].push(tanda);
+        
+        // Removerla de la lista de tandas filtradas
+        this.tandasFiltradas = this.tandasFiltradas.filter(t => t.id !== tanda.id);
   
-    if (tandaElement && diaElement) {
-      // Evita que las tandas se superpongan asegurándote de que el drop sea en el contenedor
-      diaElement.appendChild(tandaElement);
-  
-      // Aquí puedes agregar lógica para cambiar el estilo de la tanda cuando está en un día
-      tandaElement.classList.add('tanda-en-dia');
-      tandaElement.classList.remove('tanda-en-lista'); // O cualquier otra clase para la lista
+        // Cambiar las clases
+        tandaElement.classList.add('tanda-en-dia');
+        tandaElement.classList.add(`tanda-en-${dia}`);  // Clase específica para el día
+        tandaElement.classList.remove('tanda-en-lista');
+      }
     }
-  
-    (event.target as HTMLElement).classList.remove('drag-over');
   }
+  
+  quitarDeDia(tanda: Tanda, dia: string) {
+    // Remover la tanda del día correspondiente
+    this.tandasPorDia[dia] = this.tandasPorDia[dia].filter(t => t.id !== tanda.id);
+  
+    // Agregar la tanda de nuevo a la lista filtrada
+    this.tandasFiltradas.push(tanda);
+    
+    // Opcional: Puedes agregar lógica adicional si necesitas manejar la UI después de quitar
+  }
+  
+  
+  
   
   allowDrop(event: DragEvent) {
     // Evitar que el drop ocurra en otros lugares no deseados
@@ -87,29 +103,31 @@ export class PlanificacionComponent implements OnInit {
     const tandaElement = document.getElementById(data ?? '');
   
     if (tandaElement) {
-      // Remover la tanda del día actual
-      const parentId = tandaElement.parentElement?.id;
-      if (parentId && Object.keys(this.tandasPorDia).includes(parentId)) {
-        // Filtra la tanda del día
-        this.tandasPorDia[parentId] = this.tandasPorDia[parentId].filter(tanda => tanda.id !== data);
-      }
+      const tanda = this.tandas.find(t => t.id === data);
+      
+      if (tanda) {
+        // Remover la tanda del día correspondiente
+        for (let dia in this.tandasPorDia) {
+          this.tandasPorDia[dia] = this.tandasPorDia[dia].filter(t => t.id !== tanda.id);
+        }
   
-      // Verifica si la tanda ya está en tandasFiltradas antes de agregarla
-      const tanda = this.tandas.find(tanda => tanda.id === data);
-      if (tanda && !this.tandasFiltradas.some(t => t.id === tanda.id)) {
-        this.tandasFiltradas.push(tanda); // Agregar nuevamente a las tandas filtradas
-      }
+        // Añadir la tanda de vuelta a la lista principal
+        this.tandasFiltradas.push(tanda);
   
-      // Quitar la clase 'tanda-en-dia' cuando la tanda se devuelve a la lista principal
-      tandaElement.classList.remove('tanda-en-dia');
+        // Cambiar las clases
+        tandaElement.classList.remove('tanda-en-dia');
+        tandaElement.classList.add('tanda-en-lista');
   
-      // Asegúrate de que el contenedor de productos tenga el ID correcto
-      const productosContainer = document.getElementById('productos');
-      if (productosContainer) {
-        productosContainer.appendChild(tandaElement);
+        // Añadir el elemento de nuevo a la lista principal
+        const productosContainer = document.getElementById('productos');
+        if (productosContainer) {
+          productosContainer.appendChild(tandaElement);
+        }
       }
     }
   }
+  
+  
   
 
 
@@ -118,10 +136,17 @@ export class PlanificacionComponent implements OnInit {
 
   // Filtrar tandas en función del término de búsqueda
   filtrarTandas() {
-    this.tandasFiltradas = this.tandas.filter((tanda) =>
-      tanda.producto.toLowerCase().includes(this.searchTerm.toLowerCase())
-    );
+    // Obtener las tandas que ya han sido asignadas a los días de la semana
+    const tandasEnDias = Object.values(this.tandasPorDia).flat().map(t => t.id);
+  
+    // Filtrar solo las tandas que no están en los días de la semana
+    this.tandasFiltradas = this.tandas
+      .filter(tanda => !tandasEnDias.includes(tanda.id))  // Excluir tandas en días
+      .filter(tanda => tanda.producto.toLowerCase().includes(this.searchTerm.toLowerCase()));  // Aplicar filtro de búsqueda
   }
+  
+
+
 
   cambiarSemana() {
     alert('Semana cambiada');

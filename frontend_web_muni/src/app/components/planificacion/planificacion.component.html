@@ -10,35 +10,71 @@
     <!-- Espacio entre la información de la semana y los productos -->
     <hr class="divider" />
 
-    <!-- Sección de días de la semana -->
     <div class="dias-semana-container">
-      <div class="dia" id="lunes" (dragover)="allowDrop($event)" (drop)="drop($event, 'lunes')">Lunes</div>
-      <div class="dia" id="martes" (dragover)="allowDrop($event)" (drop)="drop($event, 'martes')">Martes</div>
-      <div class="dia" id="miercoles" (dragover)="allowDrop($event)" (drop)="drop($event, 'miercoles')">Miércoles</div>
-      <div class="dia" id="jueves" (dragover)="allowDrop($event)" (drop)="drop($event, 'jueves')">Jueves</div>
-      <div class="dia" id="viernes" (dragover)="allowDrop($event)" (drop)="drop($event, 'viernes')">Viernes</div>
+      <!-- Lunes a Viernes -->
+      <div class="dia" id="lunes" (dragover)="allowDrop($event)" (drop)="drop($event, 'lunes')">
+        lunes
+        <div *ngFor="let tanda of tandasPorDia['lunes']" class="tanda-container">
+          
+          <button class="quitar-btn" (click)="quitarDeDia(tanda, 'lunes')">×</button>
+          <span class="tanda-en-dia">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} disponibles
+          
+        </div>
+      </div>
+      <div class="dia" id="martes" (dragover)="allowDrop($event)" (drop)="drop($event, 'martes')">
+        martes
+        <div *ngFor="let tanda of tandasPorDia['martes']" class="tanda-container">
+          <button class="quitar-btn" (click)="quitarDeDia(tanda, 'martes')">×</button>
+          <span class="tanda-en-dia">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} disponibles
+          
+        </div>
+      </div>
+      <div class="dia" id="miercoles" (dragover)="allowDrop($event)" (drop)="drop($event, 'miercoles')">
+        miercoles
+        <div *ngFor="let tanda of tandasPorDia['miercoles']" class="tanda-container">
+          <button class="quitar-btn" (click)="quitarDeDia(tanda, 'miercoles')">×</button>
+          <span class="tanda-en-dia">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} disponibles
+          
+        </div>
+      </div>
+      <div class="dia" id="jueves" (dragover)="allowDrop($event)" (drop)="drop($event, 'jueves')">
+        jueves
+        <div *ngFor="let tanda of tandasPorDia['jueves']" class="tanda-container">
+          <button class="quitar-btn" (click)="quitarDeDia(tanda, 'jueves')">×</button>
+          <span class="tanda-en-dia">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} disponibles
+          
+        </div>
+      </div>
+      <div class="dia" id="viernes" (dragover)="allowDrop($event)" (drop)="drop($event, 'viernes')">
+        viernes
+        <div *ngFor="let tanda of tandasPorDia['viernes']" class="tanda-container">
+          <button class="quitar-btn" (click)="quitarDeDia(tanda, 'viernes')">×</button>
+          <span class="tanda-en-dia">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} disponibles
+          
+        </div>
+      </div>
     </div>
     
-    <!-- Sección de productos (listado horizontal deslizable) -->
+    
+    
+    
+    <!-- Contenedor de productos (listado filtrable) -->
     <div class="productos-container">
-
-      <!-- Buscador de productos -->
       <div class="buscador-container">
         <input type="text" [(ngModel)]="searchTerm" (input)="filtrarTandas()" placeholder="Buscar..." class="buscador-input" />
       </div>
-
-      <!-- Contenedor de productos con desplazamiento horizontal -->
       <div class="tandas-container-scroll" id="productos" (dragover)="allowDrop($event)" (drop)="dropToMainList($event)">
-    <!-- Mostrar productos filtrados -->
-    <div class="tanda" *ngFor="let tanda of tandasFiltradas" [attr.id]="tanda.id" draggable="true" (dragstart)="drag($event)">
-        {{ tanda.producto }} - {{ tanda.cantidadActual }} disponibles
-    </div>
-    <!-- Mostrar mensaje si no hay coincidencias -->
-    <div class="no-coincidencias" *ngIf="tandasFiltradas.length === 0">
-        No hay coincidencias.
+        <div class="tanda" *ngFor="let tanda of tandasFiltradas" [attr.id]="tanda.id" draggable="true" (dragstart)="drag($event)">
+          {{ tanda.producto }} - {{ tanda.cantidadActual }} disponibles
+        </div>
+        <div class="no-coincidencias" *ngIf="tandasFiltradas.length === 0">
+          No hay coincidencias.
+        </div>
+      </div>
+      
+      
     </div>
     
-</div>
 <div class="boton">
   botón de aceptar
 </div>

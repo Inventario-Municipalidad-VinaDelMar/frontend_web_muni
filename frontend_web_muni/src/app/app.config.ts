@@ -13,7 +13,7 @@ const config: SocketIoConfig = {
    url: 'http://34.176.26.41/inventario',
     options: {
       extraHeaders:{
-        authentication:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhlODYwYTYxLTViZmMtNGEyYi1hMWEyLTU5OTc5YzFkOTAzZiIsImlhdCI6MTcyODUyNzUxMywiZXhwIjoxNzI4NTM0NzEzfQ.r2qabBnxeIQhfPNEyWfdSc-s-J0Cl1i_QnZgcTsh00s'
+        authentication:'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjhlODYwYTYxLTViZmMtNGEyYi1hMWEyLTU5OTc5YzFkOTAzZiIsImlhdCI6MTcyODYxMjIwOCwiZXhwIjoxNzI4NjE5NDA4fQ.p04fVlVm41R1qQSqxtqoalg9hISLdy2asW5vZ89oFW4'
       }
 
     } };
