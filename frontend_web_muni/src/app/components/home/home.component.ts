@@ -3,30 +3,36 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button'; 
 import { Subscription } from 'rxjs';
-import { Categoria } from '../../models/categoria.model';
+import { Producto } from '../../models/producto.model';  // Cambio de Categoria a Producto
 import { SocketInventarioService } from '../../services/socket-inventario.service';
 import { Tanda } from '../../models/tanda.model';
-
+import { CardModule } from 'primeng/card';
+import { DividerModule } from 'primeng/divider'; // Para p-divider
+import { BadgeModule } from 'primeng/badge'; // Para p-badge
+import { TableModule} from 'primeng/table';
+import { DialogModule } from 'primeng/dialog';
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [CommonModule, ButtonModule],
+  imports: [CommonModule, TableModule, ButtonModule, CardModule, DividerModule, BadgeModule, DialogModule],
+
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
 })
 export class HomeComponent implements OnInit, OnDestroy {
   daysOfWeek: { day: string, date: string, isToday: boolean, active: boolean }[] = [];
-  categorias: Categoria[] = [];
-  isLoading = true; // Cambia esto para gestionar la carga
-  private subscriptions: Subscription[] = []; // Para almacenar las suscripciones
+  productos: Producto[] = [];  // Cambio de categorias a productos
+  isLoading = true;
+  tandasRecientes: Tanda[] = []; 
+  private subscriptions: Subscription[] = [];
 
-  timeoutId: any; // Variable para almacenar el temporizador
+  timeoutId: any;
 
   constructor(private router: Router, private socketService: SocketInventarioService) {}
 
   ngOnInit(): void {
     this.calculateWeekDates();
-    this.loadCategorias();
+    this.loadProductos();  // Cambio de loadCategorias a loadProductos
   }
 
   calculateWeekDates(): void {
@@ -49,18 +55,18 @@ export class HomeComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Método para cargar categorías y sus tandas
-  loadCategorias(): void {
+  // Método para cargar productos y sus tandas
+  loadProductos(): void {
     const startTime = new Date().getTime();
     this.socketService.getAllProductos();
-  
-    const categoriasSubscription = this.socketService.loadAllProductos().subscribe((categorias: Categoria[]) => {
-      this.categorias = categorias;
-  
+
+    const productosSubscription = this.socketService.loadAllProductos().subscribe((productos: Producto[]) => {
+      this.productos = productos;
+
       const elapsedTime = new Date().getTime() - startTime;
-      const minimumTime = 1000; // Tiempo mínimo de 3 segundos
+      const minimumTime = 1000; 
       const remainingTime = minimumTime - elapsedTime;
-  
+
       if (remainingTime > 0) {
         setTimeout(() => {
           this.isLoading = false;
@@ -68,45 +74,41 @@ export class HomeComponent implements OnInit, OnDestroy {
       } else {
         this.isLoading = false;
       }
-  
-      // Cargar las tandas para cada categoría
-      categorias.forEach(categoria => {
-        this.socketService.getTandasByProductoId(categoria.id);
-        const tandasSubscription = this.socketService.onLoadTandasByProductoId(categoria.id).subscribe((tandas: Tanda[]) => {
-          // Filtrar tandas de los últimos 21 días
+
+      // Cargar las tandas para cada producto
+      productos.forEach(producto => {
+        this.socketService.getTandasByProductoId(producto.id);
+        const tandasSubscription = this.socketService.onLoadTandasByProductoId(producto.id).subscribe((tandas: Tanda[]) => {
+          // Filtrar y agregar tandas al arreglo de tandasRecientes
           const filteredTandas = tandas.filter(tanda => {
             const fechaLlegada = new Date(tanda.fechaLlegada);
             const today = new Date();
             const daysDiff = Math.floor((today.getTime() - fechaLlegada.getTime()) / (1000 * 3600 * 24));
-            return daysDiff <= 21; // Mantener tandas de los últimos 21 días
+            return daysDiff <= 21; 
           });
-  
-          // Ordenar las tandas filtradas por fechaLlegada y hora (más recientes primero)
-          const sortedTandas = filteredTandas.sort((a, b) => {
-            const fechaA = new Date(a.fechaLlegada).getTime();
-            const fechaB = new Date(b.fechaLlegada).getTime();
-            return fechaB - fechaA; // Ordenar por fecha y hora
-          });
-  
-          // Actualizar la categoría con las tandas ordenadas
-          this.categorias = this.categorias.map(cat => {
-            if (cat.id === categoria.id) {
-              return { ...cat, tandas: sortedTandas };
+
+          this.tandasRecientes.push(...filteredTandas); // Agregar las tandas filtradas al arreglo
+
+          // Actualizar el producto con las tandas
+          this.productos = this.productos.map(prod => {
+            if (prod.id === producto.id) {
+              return { ...prod, tandas: filteredTandas };
             }
-            return cat;
+            return prod;
+          });
+
+          // Ordenar todas las tandasRecientes por fechaLlegada (más recientes primero)
+          this.tandasRecientes = this.tandasRecientes.sort((a, b) => {
+            return new Date(b.fechaLlegada).getTime() - new Date(a.fechaLlegada).getTime();
           });
         });
-  
-        // Almacenar la suscripción
+
         this.subscriptions.push(tandasSubscription);
       });
-  
-      // Almacenar la suscripción
-      this.subscriptions.push(categoriasSubscription);
+
+      this.subscriptions.push(productosSubscription);
     });
   }
-  
-  
 
   // Método para establecer el día seleccionado como activo
   setActive(day: { day: string, date: string, isToday: boolean, active: boolean }): void {
@@ -134,4 +136,11 @@ export class HomeComponent implements OnInit, OnDestroy {
     // Limpiar todas las suscripciones para evitar fugas de memoria
     this.subscriptions.forEach(subscription => subscription.unsubscribe());
   }
+  isNewTanda(fechaLlegada: string): boolean {
+    const fecha = new Date(fechaLlegada);
+    const hoy = new Date();
+    const diferenciaDias = Math.floor((hoy.getTime() - fecha.getTime()) / (1000 * 3600 * 24));
+    return diferenciaDias <= 7; // Consideramos nuevas las tandas de los últimos 7 días
+  }
+  
 }

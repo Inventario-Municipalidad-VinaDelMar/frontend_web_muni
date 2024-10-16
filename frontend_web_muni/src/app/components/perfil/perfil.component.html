@@ -1,27 +1,38 @@
 <div class="contenido">
-    PERFIL DE: (USUARIO)
-    
+    <h2>PERFIL DE: {{ usuario?.nombre }} {{ usuario?.apellidoPaterno }}</h2>
+  
     <div class="d-grid semana mt-4">
-      
+      <!-- Aquí puedes agregar más contenido relacionado, si es necesario -->
     </div>
   </div>
   
-  
   <div class="row">
-      <div class="col-8">
-          <div class="contenido">
-  
-            datos de usuarios
-          
-          </div>
+    <div class="col-8">
+      <div class="contenido">
+        <p-card header="Datos de Usuario" styleClass="mb-3">
+          <ng-template pTemplate="header">
+            <h3>Información del Usuario</h3>
+          </ng-template>
+          <ng-template pTemplate="content">
+            <p><strong>Nombre:</strong> {{ usuario?.nombre }} {{ usuario?.apellidoPaterno }} {{ usuario?.apellidoMaterno }}</p>
+            <p><strong>Email:</strong> {{ usuario?.email }}</p>
+            <p><strong>RUT:</strong> {{ usuario?.rut }}</p>
+            <p *ngIf="usuario?.imageUrl"><img [src]="usuario?.imageUrl" alt="Imagen del Usuario" style="max-width: 100%; border-radius: 8px;" /></p>
+            <p><strong>Roles:</strong> {{ usuario?.roles?.join(', ') }}</p> <!-- Asegúrate de que 'roles' no sea undefined -->
+          </ng-template>
+        </p-card>
       </div>
-      <div class="col-4">
-          <div class="contenido" id="lateral">
+    </div>
   
-              algo más
-          
-          </div>
+    <div class="col-4">
+      <div class="contenido" id="lateral">
+        <p-card header="Opciones Adicionales">
+          <ng-template pTemplate="content">
+            <p>Algo más</p>
+            <!-- Aquí puedes agregar más opciones o enlaces, según lo necesites -->
+          </ng-template>
+        </p-card>
       </div>
+    </div>
   </div>
-  
   

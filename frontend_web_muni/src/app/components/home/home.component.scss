@@ -1,20 +1,20 @@
 .contenido {
-  padding: 20px; /* Añadir padding si es necesario */
-  border-radius: 15px; /* Redondear bordes */
-  background-color: #ffffff; /* Fondo blanco para el contenido */
-  
+  padding: 15px; /* Menos padding */
+  border-radius: 10px; /* Bordes más redondeados */
+  background-color: #ffffff; /* Fondo blanco */
 }
-
+.contenido h3{
+  font-size: 0.9rem; 
+}
 .semana {
   display: flex;
-  justify-content: space-between; /* Espacia uniformemente los elementos */
+  justify-content: space-between; /* Espacio uniforme entre elementos */
   flex-wrap: wrap;
-  padding: 20px;
-  border-radius: 15px;
-  margin: 20px 0;
-  background-clip: padding-box; /* Evitar que el fondo del borde se extienda */
-  border: 2px solid #def4ff; 
-  box-shadow: 0 0 20px rgba(228, 246, 255, 0.8), 0 0 40px rgba(241, 250, 255, 0.6);
+  padding: 5px; /* Reduce padding */
+  border-radius: 10px; /* Bordes más redondeados */
+  margin: 5px 0; /* Reduce margen */
+  border: 1px solid #def4ff; 
+  box-shadow: 0 0 10px rgba(228, 246, 255, 0.5); /* Sombra más sutil */
 }
 
 .semana::before {
@@ -26,14 +26,16 @@
 }
 
 .day-container {
-  flex: 1;
+  flex: 1 1 18%; /* Mantiene el ancho como antes */
   background-color: #c5edff;
-  padding-top:14px;
-  padding-bottom:0px;
-
-  border-radius: 15px;
-  margin: 10px;
-  position: relative;
+  padding: 5px 0; /* Reduce el padding vertical para disminuir la altura */
+  border-radius: 10px;
+  margin: 5px; /* Reduce el margen */
+  height: 50px; /* Establece una altura deseada, ajústalo según sea necesario */
+  display: flex; /* Permite alinear el contenido */
+  align-items: center; /* Centra verticalmente el contenido */
+  justify-content: center; /* Centra horizontalmente el contenido */
+  font-size: 0.9rem; /* Ajusta el tamaño de la fuente según lo necesites */
 }
 .day-container:hover {
   transform: scale(1.05); /* Aumenta el tamaño al 105% */
@@ -45,6 +47,31 @@
   border: 2px solid #4fc4ff;
   box-shadow: 0 0 20px rgba(228, 246, 255, 0.8), 0 0 40px rgba(241, 250, 255, 0.6);
 }
+.day {
+  display: flex;
+  flex-direction: column; /* Alinea el texto verticalmente */
+  text-align: center; /* Centra el texto horizontalmente */
+  padding: 5px; /* Espacio interno */
+  font-size: 0.8rem; /* Tamaño general */
+}
+
+.day h2 {
+  font-size: 0.8rem; /* Tamaño del día */
+  margin: 0; /* Sin margen */
+}
+
+.day h6 {
+  font-size: 0.7rem; /* Tamaño para fechas */
+  margin: 0; /* Sin margen */
+}
+
+.hoy {
+  font-size: 0.5rem; /* Tamaño más pequeño para "Hoy" */
+  margin-top: 4px; /* Espaciado superior */
+  margin-bottom: 0; /* Sin margen inferior */
+}
+
+
 
 .plan-futuro {
   font-weight: bold;
@@ -55,31 +82,30 @@
 }
 
 .fecha {
-  margin-top: 5px;
-  font-size: 0.9rem;
-  color: #666;
+  font-size: 0.7rem; /* Reduce el tamaño de la fecha */
 }
 
 
-.hoy {
-  font-size: 0.9rem;
-  position: static;
-  width: 100%;
-}
+
 @media (max-width: 768px) {
   .day-container {
-    flex: 1 1 40%; /* Cada día ocupa el 40% del contenedor */
-    max-width: 40%;
-    min-width: auto;
-    margin: 5px 2px; /* Menor margen entre los días */
+    flex: 1 1 45%; /* Cambia a 45% para pantallas más pequeñas */
+    margin: 5px 1%; /* Ajusta margen */
   }
 }
 
 /* Cambios en pantallas pequeñas */
 @media (max-width: 480px) {
   .day-container {
-    flex: 1 1 90%; /* Ocupan casi el 100% del contenedor */
-    max-width: 90%; /* Evita que se extiendan demasiado */
-    margin: 5px 0; /* Espaciado reducido entre filas */
+    flex: 1 1 90%; /* Cambia a 90% para pantallas más pequeñas */
   }
 }
+
+/* Limita el ancho del contenedor de las tandas y habilita el desplazamiento horizontal */
+.tandas-list-container {
+  max-width: 100%; /* Puedes ajustar el valor según lo que necesites */
+  overflow-x: auto;
+  white-space: nowrap; /* Evita que los elementos se rompan en varias líneas */
+  padding-bottom: 10px; /* Añade un poco de espacio debajo para el scrollbar */
+}
+

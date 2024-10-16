@@ -1,5 +1,6 @@
 <div class="layout" [ngClass]="{'collapsed': isSidebarCollapsed}">
-  <app-sidebar></app-sidebar>
+  <!-- Mostrar el sidebar solo si no estamos en la ruta de login -->
+  <app-sidebar *ngIf="!isLoginRoute()"></app-sidebar>
   <div class="content">
     <router-outlet></router-outlet>
   </div>

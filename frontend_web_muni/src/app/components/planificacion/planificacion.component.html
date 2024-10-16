@@ -1,104 +1,117 @@
 <div class="row">
   <div class="contenido col">
-
     <!-- Sección de información de la semana -->
     <div class="semana-info-container">
-      <div class="semana-text">Semana 14-20 de septiembre</div>
-      <button class="boton" (click)="cambiarSemana()">Cambiar Semana</button>
+      <button class="boton" (click)="prevWeek()">Semana anterior</button>
+      <span class="semana-text">Semana del {{ fechasSemana['lunes'] }} al {{ fechasSemana['viernes'] }}</span>
+      <button class="boton" (click)="nextWeek()">Semana siguiente</button>
     </div>
 
     <!-- Espacio entre la información de la semana y los productos -->
     <hr class="divider" />
 
+    <!-- Contenedores para los días de la semana -->
     <div class="dias-semana-container">
-      <!-- Lunes a Viernes -->
       <div class="dia" id="lunes" (dragover)="allowDrop($event)" (drop)="drop($event, 'lunes')">
-        lunes
+        lunes {{ fechasSemana['lunes'] }}
         <div *ngFor="let tanda of tandasPorDia['lunes']" class="tanda-container">
-          
           <button class="quitar-btn" (click)="quitarDeDia(tanda, 'lunes')">×</button>
-          <span class="tanda-en-dia">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} disponibles
-          
+          <span class="tanda-en-dia"(click)="showTandaDetails(tanda)">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} seleccionados
         </div>
       </div>
       <div class="dia" id="martes" (dragover)="allowDrop($event)" (drop)="drop($event, 'martes')">
-        martes
+        martes {{ fechasSemana['martes'] }}
         <div *ngFor="let tanda of tandasPorDia['martes']" class="tanda-container">
           <button class="quitar-btn" (click)="quitarDeDia(tanda, 'martes')">×</button>
-          <span class="tanda-en-dia">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} disponibles
-          
+          <span class="tanda-en-dia"(click)="showTandaDetails(tanda)">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} seleccionados
         </div>
       </div>
       <div class="dia" id="miercoles" (dragover)="allowDrop($event)" (drop)="drop($event, 'miercoles')">
-        miercoles
+        miércoles {{ fechasSemana['miercoles'] }}
         <div *ngFor="let tanda of tandasPorDia['miercoles']" class="tanda-container">
           <button class="quitar-btn" (click)="quitarDeDia(tanda, 'miercoles')">×</button>
-          <span class="tanda-en-dia">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} disponibles
-          
+          <span class="tanda-en-dia"(click)="showTandaDetails(tanda)">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} seleccionados
         </div>
       </div>
       <div class="dia" id="jueves" (dragover)="allowDrop($event)" (drop)="drop($event, 'jueves')">
-        jueves
+        jueves {{ fechasSemana['jueves'] }}
         <div *ngFor="let tanda of tandasPorDia['jueves']" class="tanda-container">
           <button class="quitar-btn" (click)="quitarDeDia(tanda, 'jueves')">×</button>
-          <span class="tanda-en-dia">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} disponibles
-          
+          <span class="tanda-en-dia"(click)="showTandaDetails(tanda)">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} seleccionados
         </div>
       </div>
       <div class="dia" id="viernes" (dragover)="allowDrop($event)" (drop)="drop($event, 'viernes')">
-        viernes
+        viernes {{ fechasSemana['viernes'] }}
         <div *ngFor="let tanda of tandasPorDia['viernes']" class="tanda-container">
           <button class="quitar-btn" (click)="quitarDeDia(tanda, 'viernes')">×</button>
-          <span class="tanda-en-dia">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} disponibles
-          
+          <span class="tanda-en-dia"(click)="showTandaDetails(tanda)">{{ tanda.producto }}</span> - {{ tanda.cantidadActual }} seleccionados
         </div>
       </div>
+      
     </div>
-    
-    
-    
-    
+    <button class="boton" (click)="guardarTandas()">Guardar</button>
+
     <!-- Contenedor de productos (listado filtrable) -->
     <div class="productos-container">
       <div class="buscador-container">
         <input type="text" [(ngModel)]="searchTerm" (input)="filtrarTandas()" placeholder="Buscar..." class="buscador-input" />
       </div>
       <div class="tandas-container-scroll" id="productos" (dragover)="allowDrop($event)" (drop)="dropToMainList($event)">
-        <div class="tanda" *ngFor="let tanda of tandasFiltradas" [attr.id]="tanda.id" draggable="true" (dragstart)="drag($event)">
-          {{ tanda.producto }} - {{ tanda.cantidadActual }} disponibles
+        <div class="tanda" *ngFor="let tanda of tandasFiltradas"  [attr.id]="tanda.id" draggable="true" (dragstart)="drag($event)" (click)="showTandaDisponible(tanda)">
+          {{ tanda.producto }} - {{ tanda.cantidadIngresada }} disponibles
         </div>
         <div class="no-coincidencias" *ngIf="tandasFiltradas.length === 0">
           No hay coincidencias.
         </div>
       </div>
-      
-      
     </div>
-    
-<div class="boton">
-  botón de aceptar
-</div>
 
-  
-<div class="row">
-      <div class="col-3">
-          <div class="contenido">
-  
-            Manera de planificar futuramente (seguramente con algun calendario)
-          
-          </div>
-      </div>
-      <div class="col-4">
-          <div class="contenido" id="lateral">
-  
-            Despliegue de alguna información de planificación, como ubicaciones.
-          
-          </div>
-      </div>
-      <div class="col-5">
-        <div class="contenido" id="lateral">
-            productos que se planifican enviar
+    <!-- El diálogo para ver los detalles de la tanda y asignar cantidad -->
+    <p-dialog [(visible)]="displayDialog" [modal]="true" [closable]="true" [dismissableMask]="true" (onHide)="closeDialog()">
+      <ng-template pTemplate="header">
+        <span>Detalles de la Tanda</span>
+      </ng-template>
+      <ng-template pTemplate="content">
+        <div *ngIf="selectedTanda">
+          <p>Producto: {{ selectedTanda.producto }}</p>
+          <p>Cantidad total: {{ selectedTanda.cantidadActual }} seleccionados</p>
+          <p>Fecha de Llegada: {{ selectedTanda.fechaLlegada }}</p>
+          <p>Fecha de Vencimiento: {{ selectedTanda.fechaVencimiento }}</p>
+
+          <!-- Input para ingresar la cantidad a asignar -->
+          <label for="cantidadAsignada">Cantidad a asignar para el día:</label>
+          <input type="number" [(ngModel)]="cantidadAsignada" id="cantidadAsignada" [max]="selectedTanda.cantidadActual" />
         </div>
-    </div>
+      </ng-template>
+      <ng-template pTemplate="footer">
+        <button pButton type="button" label="Guardar" icon="pi pi-check" (click)="guardarCantidadAsignada()">Aceptar</button>
+        <button pButton type="button" label="Cancelar" (click)="closeDialog()">Cancelar</button>
+      </ng-template>
+    </p-dialog>
+  </div>
 </div>
-  
+<p-dialog [(visible)]="tandaDetailsDialogVisible" [modal]="true" [closable]="true" [dismissableMask]="true" (onHide)="closeTandaDetailsDialog()">
+  <ng-template pTemplate="header">
+    <span>Detalles de la Tanda</span>
+  </ng-template>
+  <ng-template pTemplate="content">
+    <div *ngIf="selectedTanda">
+      <p>Producto: {{ selectedTanda.producto }}</p>
+      <p>Cantidad total: {{ selectedTanda.cantidadActual }} disponibles</p>
+      <p>Fecha de Llegada: {{ selectedTanda.fechaLlegada }}</p>
+      <p>Fecha de Vencimiento: {{ selectedTanda.fechaVencimiento }}</p>
+      <p>Bodega: {{ selectedTanda.bodega }}</p>
+      <p>Ubicación: {{ selectedTanda.ubicacion }}</p>
+    </div>
+  </ng-template>
+  <ng-template pTemplate="footer">
+    <button pButton type="button" label="Cerrar" icon="pi pi-times" (click)="closeTandaDetailsDialog()"></button>
+  </ng-template>
+</p-dialog>
+<div class="calendario-container">
+  <p-calendar class="max-w-full" 
+    [inline]="true" 
+    [(ngModel)]="selectedDate" 
+    dateFormat="dd/mm/yy">
+  </p-calendar>
+</div>

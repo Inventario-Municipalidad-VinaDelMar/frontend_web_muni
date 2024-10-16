@@ -40,13 +40,18 @@
             {{ isLoading ? '' : producto.nombre }}
           </td>
           <td class="td highlight-number" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
-            {{ isLoading ? '' : producto.stock }}
+            {{ isLoading ? '' : calcularCantidadTotal(producto) }} <!-- Mostrar total aquí -->
           </td>
           <td class="td highlight-number" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
             {{ isLoading ? '' : calcularCantidadPorVencer(producto) }}
           </td>
           <td class="td" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
-            <button *ngIf="!isLoading" pButton label="Expandir" class="botones-expandir" icon="pi pi-plus" (click)="expandedRows[producto.id] = !expandedRows[producto.id]"></button>
+            <button *ngIf="!isLoading" pButton 
+                    [label]="expandedRows[producto.id] ? 'Minimizar' : 'Expandir'" 
+                    class="botones-expandir" 
+                    icon="pi" 
+                    [ngClass]="{'pi-minus': expandedRows[producto.id], 'pi-plus': !expandedRows[producto.id]}" 
+                    (click)="expandedRows[producto.id] = !expandedRows[producto.id]"></button>
           </td>
         </tr>
 

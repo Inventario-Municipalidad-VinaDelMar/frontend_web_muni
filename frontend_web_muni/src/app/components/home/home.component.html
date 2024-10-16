@@ -1,5 +1,5 @@
 <div class="contenido">
-  <h1>PLANIFICACIÓN SEMANAL</h1>
+  <h3>PLANIFICACIÓN SEMANAL</h3>
   <div class="semana mt-4">
     <div *ngFor="let day of daysOfWeek" 
          class="day-container" 
@@ -19,21 +19,26 @@
   <div class="col-6">
     <div class="contenido">
       <h2>Lista de Tandas Recientes</h2>
-      <div *ngFor="let categoria of categorias">
-        <!-- Verificar si hay tandas en la categoría antes de mostrar el nombre -->
-        <ng-container >
-          <ul>
-            <li *ngFor="let tanda of categoria.tandas">
-              <p>Producto: {{ tanda.producto }}</p> 
-              <p>Fecha de Llegada: {{ tanda.fechaLlegada | date: 'dd-MM-yyyy'}}</p> 
-              <p>Cantidad: {{ tanda.cantidadActual }}</p>
-            </li>
-          </ul>
-        </ng-container>
-      </div>
-      <div *ngIf="!isLoading && categorias.length === 0">No hay tandas disponibles.</div>
+      <p-table [value]="tandasRecientes" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10]">
+        <ng-template pTemplate="header">
+          <tr>
+            <th>Producto</th>
+            <th>Fecha de Llegada</th>
+            <th>Cantidad</th>
+          </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-tanda>
+          <tr>
+            <td>{{ tanda.producto }}</td>
+            <td>{{ tanda.fechaLlegada | date: 'dd-MM-yyyy' }}</td>
+            <td>{{ tanda.cantidadActual }}</td>
+          </tr>
+        </ng-template>
+      </p-table>
+      <div *ngIf="!isLoading && tandasRecientes.length === 0">No hay tandas disponibles.</div>
     </div>
   </div>
+  
   <div class="col-6">
     <div class="contenido">
       <!-- Aquí puedes añadir más contenido si es necesario -->

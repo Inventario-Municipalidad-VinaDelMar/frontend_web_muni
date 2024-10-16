@@ -54,30 +54,31 @@
     border-top: 1px solid #dcdcdc;
   }
   
-  /* Contenedor de productos con desplazamiento horizontal */
   .tandas-container-scroll {
     display: flex;
-    overflow-x: auto; /* Permite el desplazamiento horizontal */
-    gap: 10px; /* Espacio entre productos */
-    padding: 10px 20px; /* Espaciado desde las orillas */
+    overflow-x: auto;
+    gap: 10px;
+    padding: 10px 0; /* Espaciado desde las orillas */
     border-radius: 8px;
-    scrollbar-width: thin; /* Ancho de la barra de desplazamiento en navegadores compatibles */
-    scrollbar-color: #0084ff transparent; /* Color del scroll */
-    
-  }
-  
+    scrollbar-width: thin;
+    scrollbar-color: #0084ff transparent;
+    min-width: 400px; /* Establecer un ancho mínimo */
+}
 
-  /* Estilo para cada producto (más pequeño) */
-  .tanda {
+.tanda {
     background-color: #7edaff;
     max-height: 100%;
     padding: 5px 10px; /* Tamaño reducido */
     text-align: center;
-    border: 1px solid #3e95ff; /* Borde ligero */
-    border-radius: 5px; /* Bordes redondeados */
-    cursor: pointer; /* Cambio de cursor */
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1); /* Sombra ligera */
-  }
+    border: 1px solid #3e95ff;
+    border-radius: 5px;
+    cursor: pointer;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    flex-grow: 1; /* Permitir que crezca */
+    margin: 0 5px; /* Espacio entre productos */
+}
+
+
   
   .producto:hover {
     background-color: #f7f7f7; /* Cambio de color en hover */
@@ -139,4 +140,5 @@
   .quitar-btn:hover {
     opacity: 0.7;           /* Efecto de hover */
   }
+  
   

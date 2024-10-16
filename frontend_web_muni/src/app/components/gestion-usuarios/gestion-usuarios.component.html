@@ -1,26 +1,73 @@
 <div class="contenido">
-    GESTIÓN DE USUARIOS (para la plataforma)
-    
-    <div class="d-grid semana mt-4">
-      
+  <h2>Gestión de Usuarios (para la plataforma)</h2>
+
+  <div class="d-grid semana mt-4">
+    <p-button label="Agregar Usuario" icon="pi pi-plus" (click)="abrirDialogoAgregar()"></p-button>
+  </div>
+
+  <div class="row mt-4">
+    <div class="col-4">
+      <div class="contenido">
+        <h3>Listado de Usuarios</h3>
+        <p-table [value]="usuarios" selectionMode="single" [(selection)]="usuarioSeleccionado" (onRowSelect)="mostrarDetalles()">
+          <ng-template pTemplate="header">
+            <tr>
+              <th>ID</th>
+              <th>RUT</th>
+              <th>Nombre</th>
+              <th>Email</th>
+              <th>Roles</th>
+            </tr>
+          </ng-template>
+          <ng-template pTemplate="body" let-usuario>
+            <tr>
+              <td>{{ usuario.id }}</td>
+              <td>{{ usuario.rut }}</td>
+              <td>{{ usuario.nombre }} {{ usuario.apellidoPaterno }} {{ usuario.apellidoMaterno }}</td>
+              <td>{{ usuario.email }}</td>
+              <td>{{ usuario.roles.join(', ') }}</td>
+            </tr>
+          </ng-template>
+        </p-table>
+      </div>
+    </div>
+
+    <div class="col-8">
+      <div class="contenido" id="lateral" *ngIf="usuarioSeleccionado">
+        <h3>Detalles del Usuario Seleccionado</h3>
+        <p><strong>ID:</strong> {{ usuarioSeleccionado.id }}</p>
+        <p><strong>RUT:</strong> {{ usuarioSeleccionado.rut }}</p>
+        <p><strong>Nombre:</strong> {{ usuarioSeleccionado.nombre }} {{ usuarioSeleccionado.apellidoPaterno }} {{ usuarioSeleccionado.apellidoMaterno }}</p>
+        <p><strong>Email:</strong> {{ usuarioSeleccionado.email }}</p>
+        <p><strong>Roles:</strong> {{ usuarioSeleccionado.roles.join(', ') }}</p>
+        <p-button label="Editar" icon="pi pi-pencil" (click)="abrirDialogoEditar(usuarioSeleccionado)"></p-button>
+      </div>
     </div>
   </div>
-  
-  
-  <div class="row">
-      <div class="col-4">
-          <div class="contenido">
-  
-            Listado de usuarios
-          
-          </div>
-      </div>
-      <div class="col-8">
-          <div class="contenido" id="lateral">
-  
-            datos del usuario seleccionado
-          
-          </div>
-      </div>
-  </div>
-  
+
+  <!-- Diálogo para agregar usuario -->
+  <p-dialog header="Agregar Usuario" [(visible)]="mostrarDialogoAgregar" [modal]="true" [style]="{ width: '450px' }">
+    <div>
+      <label for="nombre">Nombre:</label>
+      <input id="nombre" [(ngModel)]="nuevoUsuario.nombre" type="text" pInputText />
+
+      <label for="apellidoPaterno">Apellido Paterno:</label>
+      <input id="apellidoPaterno" [(ngModel)]="nuevoUsuario.apellidoPaterno" type="text" pInputText />
+
+      <label for="apellidoMaterno">Apellido Materno:</label>
+      <input id="apellidoMaterno" [(ngModel)]="nuevoUsuario.apellidoMaterno" type="text" pInputText />
+
+      <label for="email">Email:</label>
+      <input id="email" [(ngModel)]="nuevoUsuario.email" type="email" pInputText />
+
+      <label for="roles">Roles:</label>
+      <input id="roles" [(ngModel)]="nuevoUsuario.roles" type="text" pInputText placeholder="Ejemplo: administrador, usuario" />
+      
+      <p-footer>
+        <p-button label="Guardar" icon="pi pi-check" (click)="guardarUsuario()"></p-button>
+        <p-button label="Cancelar" icon="pi pi-times" (click)="cerrarDialogoAgregar()"></p-button>
+      </p-footer>
+    </div>
+  </p-dialog>
+</div>
+

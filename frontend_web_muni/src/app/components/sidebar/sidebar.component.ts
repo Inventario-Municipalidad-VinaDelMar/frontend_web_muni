@@ -91,5 +91,8 @@ export class SidebarComponent {
 
   logout(): void {
     console.log('Cerrar sesión');
+    localStorage.removeItem('authToken'); // Eliminar el token de autenticación
+    this.router.navigate(['/login']); // Redirigir a la página de login
   }
+  
 }

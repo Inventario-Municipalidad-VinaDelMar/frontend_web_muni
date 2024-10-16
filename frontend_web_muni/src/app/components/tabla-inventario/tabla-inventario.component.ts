@@ -53,14 +53,13 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
   ngOnInit() {
     const startTime = new Date().getTime();
 
-  this.socketService.onConnect().subscribe(() => {
-    console.log('Socket conectado');
-  });
+    this.socketService.onConnect().subscribe(() => {
+      console.log('Socket conectado');
+    });
 
-  this.socketService.onDisconnect().subscribe(() => {
-    console.log('Socket desconectado');
-  });
-
+    this.socketService.onDisconnect().subscribe(() => {
+      console.log('Socket desconectado');
+    });
 
     // Lógica para mostrar error si no hay respuesta después de 10 segundos
     setTimeout(() => {
@@ -73,50 +72,56 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
     // Tiempo mínimo de 2 segundos de carga antes de mostrar los productos
     setTimeout(() => {
       this.socketService.getAllProductos();
-      this.socketService.loadAllProductos().subscribe((productos: Producto[]) => {
-        const elapsedTime = new Date().getTime() - startTime;
+      this.subscriptions.add(
+        this.socketService.loadAllProductos().subscribe((productos: Producto[]) => {
+          const elapsedTime = new Date().getTime() - startTime;
 
-        // Si los datos llegan dentro del límite de tiempo
-        if (elapsedTime <= 10000) {
-          console.log('Productos recibidos:', productos);
-          this.productos = productos;
-          this.productos2 = productos;
-          this.isLoading = false;
-          this.hasError = false;
+          // Si los datos llegan dentro del límite de tiempo
+          if (elapsedTime <= 10000) {
+            console.log('Productos recibidos:', productos);
+            this.productos = productos;
+            this.productos2 = productos;
+            this.isLoading = false;
+            this.hasError = false;
+            console.log("aqui comienza el ciclo");
 
-          productos.forEach(producto => {
-            // Emitir la solicitud para obtener tandas por productoId
-            this.socketService.getTandasByProductoId(producto.id);
-         
-            // Escuchar la respuesta con las tandas para ese producto
-            this.socketService.onLoadTandasByProductoId(producto.id).subscribe((tandas: Tanda[]) => {
-              console.log('Tandas recibidas para producto:', producto.id, tandas);
-         
-              // Actualizar el producto con las tandas recibidas
-              this.productos = this.productos.map(prod => {
-                if (prod.id === producto.id) {
-                  return { ...prod, tandas: tandas };
-                }
-                return prod;
+            productos.forEach(producto => {
+              // Emitir la solicitud para obtener tandas por productoId
+              this.socketService.getTandasByProductoId(producto.id);
+
+              // Escuchar la respuesta con las tandas para ese producto y agregar la suscripción
+              const tandaSubscription = this.socketService.onLoadTandasByProductoId(producto.id).subscribe((tandas: Tanda[]) => {
+                console.log('Tandas recibidas para producto:', producto.id, tandas);
+
+                // Actualizar el producto con las tandas recibidas
+                this.productos = this.productos.map(prod => {
+                  if (prod.id === producto.id) {
+                    return { ...prod, tandas: tandas };
+                  }
+                  return prod;
+                });
+
+                // Actualizar la segunda lista (productos2) para reflejar los cambios
+                this.productos2 = [...this.productos];
               });
-         
-              // Actualizar la segunda lista (productos2) para reflejar los cambios
-              this.productos2 = [...this.productos];
+
+              // Almacenar cada suscripción
+              this.subscriptions.add(tandaSubscription);
             });
-          });
-        }
-      }, (error) => {
-        // Manejo de error de la llamada al servicio
-        console.log('Error al cargar productos:', error);
-        this.hasError = true;
-        this.isLoading = false;
-        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'El servicio no está disponible. Intente más tarde.' });
-      });
+          }
+        }, (error) => {
+          // Manejo de error de la llamada al servicio
+          console.log('Error al cargar productos:', error);
+          this.hasError = true;
+          this.isLoading = false;
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'El servicio no está disponible. Intente más tarde.' });
+        })
+      );
     }, 2000); // Tiempo mínimo de carga inicial (2 segundos)
   }
 
   ngOnDestroy() {
-    this.subscriptions.unsubscribe();
+    this.subscriptions.unsubscribe(); // Limpia todas las suscripciones cuando el componente se destruye
   }
 
   expandAll() {

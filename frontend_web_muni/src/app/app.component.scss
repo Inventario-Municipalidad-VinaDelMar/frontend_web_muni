@@ -1,5 +1,5 @@
 .layout {
-  background-color: rgb(234, 234, 234);
+  background-color: #2573c0;
   display: flex;
   height: 100vh;
   position: relative;
@@ -15,7 +15,7 @@
 
 .content {
   flex: 1;
-  background-color: rgb(234, 234, 234);
+  background: linear-gradient(to right, rgba(77, 180, 172, 1) 0%, rgba(25, 118, 210, 1) 100%);
   padding: 20px;
   transition: margin-left 0.3s ease;
   overflow: auto;
