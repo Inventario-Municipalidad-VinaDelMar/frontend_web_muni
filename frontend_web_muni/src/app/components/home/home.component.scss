@@ -84,6 +84,12 @@
 .fecha {
   font-size: 0.7rem; /* Reduce el tamaño de la fecha */
 }
+.divider {
+  height: 1px; /* Altura del separador */
+  background-color: #e0e0e0; /* Color del separador */
+  margin: 16px 0; /* Espacio alrededor del separador */
+  width: 100%; /* Ancho completo */
+}
 
 
 
@@ -109,3 +115,33 @@
   padding-bottom: 10px; /* Añade un poco de espacio debajo para el scrollbar */
 }
 
+.dataview-center {
+  justify-content: center; /* Centra horizontalmente */
+  align-items: center; /* Centra verticalmente */
+  flex-direction: column; /* Asegura que los elementos se apilen verticalmente */
+  text-align: center; /* Centra el texto dentro de los elementos */
+}
+.image-container {
+  flex-shrink: 0; /* Asegúrate de que la imagen no se reduzca */
+  width: 60px; /* Ancho más pequeño para la imagen */
+  height: 60px; /* Alto más pequeño para la imagen */
+}
+
+.details-container {
+  flex-grow: 1; /* Permite que el contenedor de detalles ocupe el espacio restante */
+  display: flex;
+  flex-direction: column; /* Organiza la información verticalmente */
+  justify-content: center; /* Centra verticalmente la información */
+  margin-left: 8px; /* Menos espacio entre la imagen y el texto */
+}
+
+.product-info {
+  display: flex;
+  flex-direction: column; /* Asegura que la información del producto esté apilada */
+}
+
+.surface-100 {
+  background-color: #f5f5f5; /* Fondo claro para resaltar la información */
+  border-radius: 30px; /* Bordes redondeados */
+  padding: 4px; /* Menos espacio interno */
+}

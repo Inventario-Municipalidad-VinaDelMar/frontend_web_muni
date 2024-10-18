@@ -37,7 +37,10 @@ export class SocketInventarioService {
       console.log('Cambio de stock en categoría:', data);
     });
   }
-
+  connectSocket() {
+    this.socket.connect();
+    console.log('Socket de inventario conectado');
+  }
   // Método para escuchar el evento de conexión
   onConnect(): Observable<any> {
     return this.socket.fromEvent('connect');

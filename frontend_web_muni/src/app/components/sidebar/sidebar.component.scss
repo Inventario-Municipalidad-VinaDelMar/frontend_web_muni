@@ -1,7 +1,7 @@
 .side-bar {
   display: flex;
   flex-direction: column; /* Organiza los elementos en columna */
-  background-color: #1976D2;
+  background-color: #1b61a7;
   height: 100vh; /* Altura total */
   padding: 20px;
   margin-right: 10px;
@@ -84,7 +84,7 @@
 
 //activación de div con color cuando pasa el mouse (sólo cuando está normal)
 .side-bar:not(.collapsed) .categorias:hover{
-  background-color: #00aeff;
+  background: linear-gradient(to left, rgba(77, 180, 172, 1) 0%, rgba(25, 118, 210, 1) 60%); /* Degradado */
   border-radius: 10px;
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
   position: relative;
@@ -100,7 +100,7 @@
 //seleccion sidebar - selección activa
 .side-bar .categorias.active,
 .side-bar .logout.active {
-  background-color: #00aeff;
+  background: linear-gradient(to left, rgba(77, 180, 172, 1) 0%, rgba(25, 118, 210, 1) 60%); /* Degradado */
   border-radius: 10px;
   box-shadow: 0 8px 12px rgba(0, 0, 0, 0.2);
   position: relative;

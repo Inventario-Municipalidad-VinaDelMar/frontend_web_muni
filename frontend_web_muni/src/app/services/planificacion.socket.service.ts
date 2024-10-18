@@ -1,69 +1,120 @@
-import { Injectable } from '@angular/core';
+import { Injectable, OnDestroy } from '@angular/core';
 import { Socket, SocketIoConfig } from 'ngx-socket-io';
-import { Observable } from 'rxjs';
+import { Observable, Subscription, tap } from 'rxjs';
+import { TokenService } from './auth-token.service';
+
+interface SolicitudData {
+  solicitante: {
+    id: string;
+    rut: string;
+    email: string;
+    nombre: string;
+    apellidoPaterno: string;
+    apellidoMaterno: string;
+    imageUrl: string | null;
+    isActive: boolean;
+    roles: string[];
+  };
+  horaResolucion: string | null;
+  id: string;
+  fechaSolicitud: string;
+  horaSolicitud: string;
+  status: string;
+  administrador: string | null;
+  envioAsociado: string | null;
+}
 
 @Injectable({
   providedIn: 'root',
 })
-export class PlanificacionSocketService {
-  private socketPlanificacion: Socket;
+export class PlanificacionSocketService implements OnDestroy {
+  private socket: Socket;
+  private subscriptions: Subscription = new Subscription();
 
-  constructor() {
-    // Configuración del nuevo socket
-    const configPlanificacion: SocketIoConfig = {
-      url: 'http://34.176.26.41/planificacion', // URL del nuevo socket
-      options: {} // Este socket no requiere autenticación, así que las opciones están vacías
+  constructor(private tokenService: TokenService) {
+    const config: SocketIoConfig = {
+      url: 'http://34.176.26.41/planificacion',
+      options: {},
     };
 
-    // Instanciamos el socket con esta configuración
-    this.socketPlanificacion = new Socket(configPlanificacion);
-
-    // Inicializamos el socket y escuchamos los eventos necesarios
+    this.socket = new Socket(config);
     this.initSocket();
   }
 
-  // Inicializar el socket de planificación y escuchar eventos
   private initSocket() {
-    this.socketPlanificacion.on('connect', () => {
+    this.socket.on('connect', () => {
       console.log('Conectado al socket de Planificación');
     });
 
-    this.socketPlanificacion.on('disconnect', () => {
+    this.socket.on('disconnect', () => {
       console.log('Desconectado del socket de Planificación');
     });
 
-    // Escuchar algún evento específico para planificación
-    this.socketPlanificacion.on('loadAdminPlanificacionManage', (data: any) => {
-      // Manejar los datos recibidos
-    });
+    // Suscripciones a eventos comunes
+    this.subscriptions.add(
+      this.socket.fromEvent<any>('loadAdminPlanificacionManage').pipe(
+        tap(data => console.log('Datos de planificación recibidos:', data))
+      ).subscribe()
+    );
+
+    this.subscriptions.add(
+      this.socket.fromEvent<any>('loadPlanificacion').pipe(
+        tap(data => console.log('Datos de planificación cargados:', data))
+      ).subscribe()
+    );
+
+    this.subscriptions.add(
+      this.socket.fromEvent<SolicitudData>('loadSolicitud').pipe(
+        tap(data => console.log('Datos de solicitud cargados:', data))
+      ).subscribe()
+    );
+
+    // Eventos específicos de planificación individual
+    this.subscriptions.add(
+      this.socket.fromEvent<any>('loadPlanificacionIndividual').pipe(
+        tap(data => console.log('Datos de planificación individual recibidos:', data))
+      ).subscribe()
+    );
   }
 
-  // Emitir evento relacionado con planificación
-  getPlanificacion(lunes: string, viernes: string) {
-    // Prepara el mensaje con las fechas que el backend espera
+  getPlanificacion(lunes: string, viernes: string): void {
+    const token = this.tokenService.getToken();
     const mensaje = {
       inicio: lunes,
-      fin: viernes
+      fin: viernes,
+      token: token,
     };
-    console.log(mensaje)
-    // Envía el mensaje a través del socket para solicitar la planificación
-    this.socketPlanificacion.emit('adminPlanificacionManage', mensaje);
+    console.log(mensaje);
+
+    this.socket.emit('adminPlanificacionManage', mensaje);
   }
 
-  // Escuchar evento de respuesta de planificación
-  onLoadPlanificacion(): Observable<any> {
-    return this.socketPlanificacion.fromEvent('loadAdminPlanificacionManage');
+  getPlanificacionIndividual(fecha: string): void {
+    const token = this.tokenService.getToken();
+    const mensaje = {
+      fecha: fecha,
+      token: token,
+    };
+    this.socket.emit('getPlanificacion', mensaje);
   }
 
-  // Método para desconectar el socket
-  disconnectSocket() {
-    this.socketPlanificacion.disconnect();
+  ngOnDestroy() {
+    this.subscriptions.unsubscribe();
+    this.socket.disconnect();
     console.log('Socket de planificación desconectado');
   }
 
-  // Método para conectar el socket
-  connectSocket() {
-    this.socketPlanificacion.connect();
-    console.log('Socket de planificación conectado');
+  onLoadPlanificacion(): Observable<any> {
+    return this.socket.fromEvent('loadAdminPlanificacionManage');
+  }
+
+  onLoadPlanificacionData(): Observable<any> {
+    return this.socket.fromEvent('loadPlanificacion');
+  }
+
+  onLoadSolicitudData(): Observable<SolicitudData> {
+    return this.socket.fromEvent<SolicitudData>('loadSolicitud').pipe(
+      tap((data) => console.log('Solicitud recibida:', data))
+    );
   }
 }

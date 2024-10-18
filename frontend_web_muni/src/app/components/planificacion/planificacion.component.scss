@@ -28,23 +28,34 @@
   }
   
   /* Contenedor de productos */
-  .tandas-container {
+  .productos-container {
     margin: 10px 0;
     text-align: start; /* Añadido margen para separar de la sección superior */
   }
   
   /* Buscador de productos */
   .buscador-container {
-    display: flex;
-    justify-content: flex-start; /* Alinea el buscador a la izquierda */
-    margin: 5px 10px; /* Espaciado en la parte superior e inferior */
+    display: flex;                  /* Utilizar flexbox para alinear elementos */
+    flex-direction: column;         /* Apilar elementos verticalmente */
+    margin-bottom: 15px;            /* Espacio entre el buscador y los productos */
+  }
+  
+  .buscador-label {
+    font-weight: bold;              /* Negrita para la etiqueta */
+    margin-bottom: 5px;             /* Espacio debajo de la etiqueta */
   }
   
   .buscador-input {
-    width: 150px; /* Ancho más pequeño para el buscador */
-    padding: 5px; /* Padding reducido */
-    border: 1px solid #dcdcdc;
-    border-radius: 5px;
+    padding: 10px;                  /* Espaciado interno del input */
+    border: 1px solid #ccc;         /* Borde del input */
+    border-radius: 4px;             /* Bordes redondeados */
+    font-size: 14px;                /* Tamaño de fuente */
+    transition: border-color 0.3s;  /* Suavizar el cambio de color del borde */
+  }
+  
+  .buscador-input:focus {
+    border-color: #3e95ff;          /* Cambiar el color del borde al enfocar */
+    outline: none;                  /* Quitar el contorno por defecto */
   }
   
   /* Divider para separar secciones */
@@ -54,7 +65,7 @@
     border-top: 1px solid #dcdcdc;
   }
   
-  .tandas-container-scroll {
+  .productos-container-scroll {
     display: flex;
     overflow-x: auto;
     gap: 10px;
@@ -65,20 +76,6 @@
     min-width: 400px; /* Establecer un ancho mínimo */
 }
 
-.tanda {
-    background-color: #7edaff;
-    max-height: 100%;
-    padding: 5px 10px; /* Tamaño reducido */
-    text-align: center;
-    border: 1px solid #3e95ff;
-    border-radius: 5px;
-    cursor: pointer;
-    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-    flex-grow: 1; /* Permitir que crezca */
-    margin: 0 5px; /* Espacio entre productos */
-}
-
-
   
   .producto:hover {
     background-color: #f7f7f7; /* Cambio de color en hover */
@@ -88,44 +85,75 @@
   /* Contenedor de los días de la semana */
   .dias-semana-container {
     display: flex;
+    flex-wrap: wrap; /* Permitir que los días se ajusten a múltiples líneas */
     justify-content: space-between; /* Espacio igual entre cada día */
-    align-items: center; /* Alinear verticalmente en el centro */
-    gap: 50px; /* Espacio entre los días */
-    padding: 0 70px; 
+    align-items: flex-start; /* Alinear verticalmente al inicio */
+    gap: 20px; /* Espacio entre los días */
+    padding: 0 20px; /* Ajustar el padding para que no sobresalga */
     margin-bottom: 20px;
   }
   
-  /* Estilo para cada día */
-.dia {
-  height: 60vh;
-  display: flex;
-  gap:15px;
-  flex-direction: column;
-  background-color: #c5edff;
-  box-shadow: 0 0 20px rgba(74, 165, 210, 0.8);
-  border: 2px solid #9edfff; 
-  padding: 10px 15px;
-  text-align: center;
-  border-radius: 5px;
-  flex: 1; /* Permite que cada día ocupe el mismo ancho */
-  transition: background-color 0.2s ease; /* Suaviza el cambio de color */
-  overflow-y: auto;
-}
-  .dia.drag-over {
-    background-color: #b2e4ff; /* Color al pasar un producto por encima */
+  .dia {
+    flex: 1 1 calc(20% - 20px); /* Usar flexbox para definir el ancho */
+    height: 40vh; /* Altura mínima para los días */
+    max-width: 250px; /* Ancho máximo */
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    border: 2px solid #80deea;
+    padding: 10px 15px;
+    text-align: center;
+    border-radius: 8px;
+    overflow-y: auto; /* Permitir desplazamiento si el contenido excede el tamaño */
   }
+  
+
+.dia:hover {
+    background-color: #cfe6ff; /* Cambio de color al pasar el mouse */
+}
+
+.dia.drag-over {
+    background-color: #b2e4ff; /* Color al pasar un producto por encima */
+}
+
 
 
   
-  .tanda-container {
-    background-color: #b2e4ff;
-    border: 2px solid #3e95ff; 
-    font-size: smaller;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    flex-direction: column;  
-  }
+.producto-container {
+  background: #65b2ff; /* Degradado de fondo */
+  color: white;
+  border: 2px solid #3e95ff; /* Borde */
+  border-radius: 10px;
+  padding: 10px; /* Espaciado interno */
+  font-size: small; /* Tamaño de fuente reducido */
+  display: flex;
+  justify-content: center; /* Centrar contenido horizontalmente */
+  align-items: center; /* Centrar contenido verticalmente */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  width: 100%; /* Ancho completo para que se ajuste al contenedor padre */
+  height: auto; /* Permitir que la altura sea automática según el contenido */
+  max-height: 40px; /* Altura máxima para no desbordar el contenedor */
+  margin: 5px 0; /* Separación vertical entre productos */
+  overflow: hidden; /* Evitar que el texto se desborde */
+}
+
+/* Ajuste en la etiqueta del producto */
+.producto-container span {
+  overflow: hidden; /* Evita que el texto se desborde */
+  text-overflow: ellipsis; /* Muestra '...' si el texto es demasiado largo */
+  white-space: nowrap; /* Evita el salto de línea */
+  font-weight: bold; /* Negrita para el texto */
+  text-align: center; /* Centra el texto */
+  width: 100%; /* Ancho completo para el texto */
+}
+/* Efecto de hover para interacción */
+.producto-container:hover {
+    transform: translateY(-3px); /* Mueve ligeramente el contenedor hacia arriba */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Aumenta la sombra en hover */
+}
+
   
   .quitar-btn {
     background: none;        /* Sin fondo */
@@ -140,5 +168,55 @@
   .quitar-btn:hover {
     opacity: 0.7;           /* Efecto de hover */
   }
+
+
   
+  .p-card-title {
+    background: #1976d2;
+    color: white;
+
+    display: flex;              
+    justify-content: center;    
+    align-items: center;        
+    height: 50px;              
+    width: 200px;               
+    text-align: center;        
+    overflow: hidden;          
+    text-overflow: ellipsis;   
+    white-space: nowrap;    
+    
+    font-weight: bold; /* Cambia 'bold' por un número para más control, ej. 600, 700, etc. */
+  }
+  .semana-info-container {
+    background-color: #f0f8ff; /* Fondo claro para contrastar */
+    padding: 10px 20px; /* Espaciado alrededor del contenido */
+    border-radius: 8px; /* Bordes redondeados */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.semana-text {
+    font-size: 1.2em; /* Aumentar el tamaño de la fuente */
+    font-weight: bold; /* Negrita para destacar */
+    color: #333; /* Color del texto */
+}
+.titulo-pagina {
+  font-size: 2em; /* Tamaño de fuente grande */
+  font-weight: bold; /* Negrita */
+  color: #ffffff; /* Color del texto */
+  text-align: center; /* Centrado horizontal */
+  padding: 15px 0; /* Espaciado vertical */
+  background: #1976d2; /* Degradado de fondo */
+  border-radius: 5px; /* Bordes redondeados */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2); /* Sombra sutil */
+  margin-bottom: 20px; /* Espacio inferior para separación */
+}
+input {
   
+  background-color: #cae0ff; /* Cambia este color por el que desees */
+  border: 1px solid #ccc; /* Puedes ajustar el borde también si lo deseas */
+  padding: 10px; /* Espaciado interno */
+  border-radius: 5px; /* Bordes redondeados opcionalmente */
+  width: 100%; /* O el ancho que prefieras */
+  box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+  transition: background-color 0.3s; /* Para un efecto suave en el cambio de color */
+}

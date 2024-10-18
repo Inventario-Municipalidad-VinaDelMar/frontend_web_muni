@@ -7,14 +7,19 @@ import { DialogModule } from 'primeng/dialog';
 import { PlanificacionSocketService } from '../../services/planificacion.socket.service';
 import { Subscription } from 'rxjs';
 import { CalendarModule } from 'primeng/calendar';
-import { PrimeNGConfig } from 'primeng/api';
+import { ConfirmationService, MessageService, PrimeNGConfig } from 'primeng/api';
 import { EnviarService } from '../../services/enviar.service';
 import { Detalle, DiaPlanificacion, DiasPlanificacion } from '../../models/dia-envio.model';
 import { TokenService } from '../../services/auth-token.service';
+import { DataViewModule } from 'primeng/dataview';
+import { ToastModule } from 'primeng/toast';
+import { ConfirmDialogModule } from 'primeng/confirmdialog';
 
 interface Producto {
   id: string;
   nombre: string;
+  urlImagen:string;
+  cantidadPlanificada:number;
 }
 
 
@@ -22,28 +27,31 @@ interface Producto {
   selector: 'app-planificacion',
   standalone: true,
   templateUrl: './planificacion.component.html',
+  providers: [ConfirmationService, MessageService],
   styleUrls: ['./planificacion.component.scss'],
-  imports: [CommonModule, FormsModule, DialogModule,CalendarModule]
+  imports: [CommonModule, FormsModule, DialogModule,CalendarModule,DataViewModule,ToastModule,ConfirmDialogModule]
 })
 export class PlanificacionComponent implements OnInit, OnDestroy {
   productos: Producto[] = [];
-  tandas: Tanda[] = [];
-  tandasPorDia: { [key: string]: Set<Tanda> } = {
-    lunes: new Set(),
-    martes: new Set(),
-    miercoles: new Set(),
-    jueves: new Set(),
-    viernes: new Set(),
-  };
-  tandasFiltradas: Tanda[] = [];
+  productosFiltrado:Producto[] = [];
+  productosPorDia: { [key: string]: Set<Producto> } = {
+    lunes: new Set<Producto>(),
+    martes: new Set<Producto>(),
+    miercoles: new Set<Producto>(),
+    jueves: new Set<Producto>(),
+    viernes: new Set<Producto>()
+};
+
+
   searchTerm: string = '';
   displayDialog: boolean = false;
-  selectedTanda?: Tanda;
+  selectedProducto?: Producto;
   cantidadAsignada: number = 0;
   currentWeek: number = 0; 
   fechasSemana: { [key: string]: string } = {};
-  tandaDetailsDialogVisible: boolean = false;
+  productoDetailsDialogVisible: boolean = false;
   selectedDate: Date = new Date(); 
+  planificacion: any;
   
   
   
@@ -55,7 +63,9 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
     private planificacionSocketService: PlanificacionSocketService,
     private primengConfig: PrimeNGConfig,
     private enviarService: EnviarService,
-    private tokenService: TokenService
+    private tokenService: TokenService,
+    private confirmationService: ConfirmationService,
+    private messageService: MessageService
   ) {}
 
   ngOnInit() {
@@ -70,11 +80,9 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
       clear: 'Limpiar'
     });
 
-    
-
     this.planificacionSubscription.add(
       this.planificacionSocketService.onLoadPlanificacion().subscribe((data: any) => {
-        this.asignarTandasPorDia(data);
+        this.asignarProductosPorDia(data)
       }, (error: any) => {
         console.error('Error al cargar planificación:', error);
       })
@@ -83,6 +91,7 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
     this.updateWeekDates(); 
     this.logWeekDates();
     this.loadProductos(); // Carga los productos
+    this.productosFiltrado = [...this.productos];
   }
 
   ngOnDestroy() {
@@ -92,212 +101,180 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
 
   private resetData() {
     this.productos = [];
-    this.tandas = [];
-    this.tandasFiltradas = [];
-    this.tandasPorDia = {
-      lunes: new Set(),
-      martes: new Set(),
-      miercoles: new Set(),
-      jueves: new Set(),
-      viernes: new Set(),
-    };
   }
-
+  
   private loadProductos() {
     this.socketInventarioService.getAllProductos();
-
+    
     this.productSubscription.add(
-      this.socketInventarioService.loadAllProductos().subscribe((productos: Producto[]) => {
-        this.productos = productos;
-        this.loadTandasForProductos();
-      }, (error: any) => {
-        console.error('Error al cargar productos:', error);
-      })
+        this.socketInventarioService.loadAllProductos().subscribe((productos: Producto[]) => {
+            this.productos = productos;
+            this.productosFiltrado = [...this.productos]; // Inicializa productosFiltrado aquí
+        }, (error: any) => {
+            console.error('Error al cargar productos:', error);
+        })
     );
-  }
+}
 
-  private asignarTandasPorDia(planificacion: any[]) {
+
+  private asignarProductosPorDia(planificacion: any[]) {
+    //console.log("Planificación:", JSON.stringify(planificacion, null, 2));
+
+    // Limpiar los datos de productosPorDia antes de asignar nuevos productos
+    this.productosPorDia = {
+        lunes: new Set<Producto>(),
+        martes: new Set<Producto>(),
+        miercoles: new Set<Producto>(),
+        jueves: new Set<Producto>(),
+        viernes: new Set<Producto>()
+    };
+
     // Recorremos cada elemento de la planificación
     planificacion.forEach((plan: any) => {
-      const fechaTanda = new Date(plan.fecha+ 'T00:00:00');
-      const diaSemana = fechaTanda.getDay(); // Obtener el día de la semana (0 = domingo, 1 = lunes, ...)
-  
-      let dia: string;
-  
-      // Mapear el número de día a un nombre de día de la semana
-      switch (diaSemana) {
-        case 1: dia = 'lunes'; break;
-        case 2: dia = 'martes'; break;
-        case 3: dia = 'miercoles'; break;
-        case 4: dia = 'jueves'; break;
-        case 5: dia = 'viernes'; break;
-        default: return; // Ignorar fines de semana (0 = domingo)
-      }
-  
-      // Recorremos los detalles de la planificación
-      plan.detalles.forEach((detalle: any) => {
-         
-  
-        // Crear la tanda con la información necesaria
-        const tanda: Tanda = {
-          id: detalle.id,
-          productoId: detalle.productoId,
-          cantidadIngresada: detalle.cantidadPlanificada, // Puedes cambiar esto según tu lógica
-          cantidadActual: detalle.cantidadPlanificada,
-          fechaLlegada: plan.fecha, // La fecha de llegada
-          fechaVencimiento: this.calcularFechaVencimiento(plan.fecha), // Lógica para calcular la fecha de vencimiento
-          producto: detalle.producto, // Nombre del producto
-          bodega: '', // Valor predeterminado o lógica para la bodega
-          ubicacion: '', // Valor predeterminado o lógica para la ubicación
-        };
-  
-        // Añadir la tanda al Set del día correspondiente
-        this.tandasPorDia[dia].add(tanda);
-      });
+        const fechaProducto = new Date(plan.fecha + 'T00:00:00');
+        const diaSemana = fechaProducto.getDay(); // Obtener el día de la semana (0 = domingo, 1 = lunes, ...)
+
+        let dia: string;
+
+        // Mapear el número de día a un nombre de día de la semana
+        switch (diaSemana) {
+            case 1: dia = 'lunes'; break;
+            case 2: dia = 'martes'; break;
+            case 3: dia = 'miercoles'; break;
+            case 4: dia = 'jueves'; break;
+            case 5: dia = 'viernes'; break;
+            default: return; // Ignorar fines de semana (0 = domingo)
+        }
+
+        // Recorremos los detalles de la planificación
+        plan.detalles.forEach((detalle: any) => {
+            // Crear el producto con la información necesaria
+            const producto: Producto = {
+                id: detalle.productoId, // Cambiar a productoId
+                nombre: detalle.producto, // Asumiendo que el detalle tiene un campo 'producto'
+                urlImagen: detalle.urlImagen, // Incluyendo la URL de la imagen
+                cantidadPlanificada: detalle.cantidadPlanificada // Incluyendo la cantidad planificada
+            };
+
+            // Añadir el producto al Set del día correspondiente
+            this.productosPorDia[dia].add(producto);
+        });
     });
+
+    // Log para ver el resultado final de productosPorDia
+    console.log("Productos por día:", this.productosPorDia);
+}
+
+
+
+filterProductos() {
+  if (!this.searchTerm) {
+    this.productosFiltrado = [...this.productos]; // Si no hay término de búsqueda, mostrar todos
+  } else {
+    this.productosFiltrado = this.productos.filter(producto =>
+      producto.nombre.toLowerCase().includes(this.searchTerm.toLowerCase())
+    );
   }
+}
+
   
   
 
 
   private limpiarTandasPorDia() {
     // Reiniciar el objeto tandasPorDia a su estado inicial
-    this.tandasPorDia = {
-      lunes: new Set<Tanda>(),
-      martes: new Set<Tanda>(),
-      miercoles: new Set<Tanda>(),
-      jueves: new Set<Tanda>(),
-      viernes: new Set<Tanda>(),
+    this.productosPorDia = {
+      lunes: new Set<Producto>(),
+      martes: new Set<Producto>(),
+      miercoles: new Set<Producto>(),
+      jueves: new Set<Producto>(),
+      viernes: new Set<Producto>(),
     };
   }
   
-  
-  // Función para calcular la fecha de vencimiento (debes implementarla según tu lógica)
-  private calcularFechaVencimiento(fechaLlegada: string): string {
-    const llegada = new Date(fechaLlegada);
-    // Supongamos que la fecha de vencimiento es 30 días después de la llegada
-    llegada.setDate(llegada.getDate() + 30);
-    return llegada.toISOString().split('T')[0]; // Retorna la fecha en formato YYYY-MM-DD
-  }
-  
 
-  private loadTandasForProductos() {
-    this.productos.forEach(producto => {
-      this.socketInventarioService.getTandasByProductoId(producto.id);
-      this.productSubscription.add(
-        this.socketInventarioService.onLoadTandasByProductoId(producto.id).subscribe((tandas: Tanda[]) => {
-          this.tandas = [...this.tandas, ...tandas];
-          this.tandasFiltradas = [...this.tandas];  // Actualiza las tandas filtradas
-        }, (error: any) => {
-          console.error(`Error al cargar tandas para producto ${producto.id}:`, error);
-        })
-      );
-    });
-  }
-  
-  
-  guardarTandas() {
-    // Crear objeto para almacenar los días
+  guardarProductos() {
     const diasPlanificacion: DiasPlanificacion = { dias: [] };
-
-    // Iterar sobre los días de la semana
     const diasDeLaSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
+
+    // Llenar los días de planificación
     for (const dia of diasDeLaSemana) {
-        const fecha = this.fechasSemana[dia];
-        const tandas = this.tandasPorDia[dia];
-
-        if (fecha) {
-            const diaPlanificacion: DiaPlanificacion = {
-                fecha: fecha,
-                detalles: []
+      const fecha = this.fechasSemana[dia];
+      const tandas = this.productosPorDia[dia];
+      if (fecha) {
+        const diaPlanificacion: DiaPlanificacion = {
+          fecha: fecha,
+          detalles: [],
+        };
+        if (tandas.size > 0) {
+          tandas.forEach((producto: Producto) => {
+            const detalle: Detalle = {
+              productoId: producto.id,
+              cantidadPlanificada: 10, // Aquí la cantidad planificada
             };
-
-            if (tandas.size > 0) {
-                tandas.forEach((tanda: Tanda) => {
-                    const detalle: Detalle = {
-                        productoId: tanda.productoId,
-                        cantidadPlanificada: tanda.cantidadActual,
-                    };
-                    diaPlanificacion.detalles.push(detalle);
-                });
-            }
-
-            diasPlanificacion.dias.push(diaPlanificacion);
+            diaPlanificacion.detalles.push(detalle);
+          });
         }
+        diasPlanificacion.dias.push(diaPlanificacion);
+      }
     }
-
-    console.log('Estructura de días antes de enviar:', JSON.stringify(diasPlanificacion));
 
     const token = this.tokenService.getToken();
-    console.log('Token obtenido:', token);
-
-    // Desconectar el socket antes de enviar
-    this.planificacionSocketService.disconnectSocket();
 
     this.enviarService.setPlanificacion(token!, diasPlanificacion).subscribe(
-        response => {
-            alert('Planificación guardada con éxito.');
-        },
-        error => {
-            alert('Error al guardar la planificación.');
-            console.error('Error Status:', error.status);
-            console.error('Error Body:', error.error);
-        },
-        () => {
-            // Reconectar el socket después de completar la operación
-            this.planificacionSocketService.connectSocket();
-        }
+      (response) => {
+        this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Planificación guardada con éxito.' });
+      },
+      (error) => {
+        this.messageService.add({ severity: 'error', summary: 'Error', detail: 'Error al guardar la planificación.' });
+        console.error('Error al guardar planificación:', error);
+      }
     );
-}
-
-
+  }
   
-
-
-  
-  
-  
-  
-  
-
-  showTandaDetails(tanda: Tanda) {
-    this.selectedTanda = tanda;
-    this.displayDialog = true;
-    this.cantidadAsignada = tanda.cantidadActual;
+  confirm() {
+    this.confirmationService.confirm({
+      message: '¿Estás seguro de que deseas guardar la planificación?',
+      header: 'Confirmar',
+      icon: 'pi pi-exclamation-triangle',
+      accept: () => {
+        this.guardarProductos();
+        setTimeout(() => {
+          window.location.reload();
+        }, 1000); // 1000 milisegundos = 1 segundo
+        
+        
+      },
+      reject: () => {
+        this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se guardó la planificación' });
+      }
+    });
     
   }
-  showTandaDisponible(tanda: Tanda) {
-    this.selectedTanda = tanda; // Asignar la tanda seleccionada
-    this.tandaDetailsDialogVisible = true; // Mostrar el nuevo diálogo
+
+  
+
+
+  
+
+  showProductoDetails(producto: Producto) {
+    this.selectedProducto = producto;
+    this.displayDialog = true;
+    this.cantidadAsignada = 10;
+    
+  }
+  showProductoDisponible(producto: Producto) {
+    this.selectedProducto = producto; // Asignar la tanda seleccionada
+    this.productoDetailsDialogVisible = true; // Mostrar el nuevo diálogo
   }
 
-  guardarCantidadAsignada() {
-    if (this.selectedTanda && this.cantidadAsignada > 0 && this.cantidadAsignada <= this.selectedTanda.cantidadActual) {
-      const cantidadRestante = this.selectedTanda.cantidadActual - this.cantidadAsignada;
-
-      // Actualizar la tanda asignada al día
-      this.selectedTanda.cantidadActual = this.cantidadAsignada;
-
-      // Devolver la cantidad restante al listado principal
-      const tandaRestante = { ...this.selectedTanda, cantidadActual: cantidadRestante };
-
-      // Añadir el sobrante al listado si queda cantidad restante
-      if (cantidadRestante > 0) {
-        this.tandasFiltradas.push(tandaRestante);
-      }
-
-      this.displayDialog = false; // Cerrar el diálogo
-    } else {
-      alert('La cantidad asignada no es válida.');
-    }
-  }
 
   closeDialog() {
     this.displayDialog = false;
   }
-  closeTandaDetailsDialog() {
-    this.tandaDetailsDialogVisible = false; // Cerrar el diálogo
-    this.selectedTanda = undefined; // Limpiar la tanda seleccionada
+  closeProductoDetailsDialog() {
+    this.productoDetailsDialogVisible = false; // Cerrar el diálogo
+    this.selectedProducto = undefined; // Limpiar la tanda seleccionada
   }
 
   
@@ -312,78 +289,62 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
     event.dataTransfer?.setData('text', (event.target as HTMLElement).id);
   }
   
-  dropToMainList(event: DragEvent) {
-    event.preventDefault();
-    const data = event.dataTransfer?.getData('text');
-    const tandaElement = document.getElementById(data ?? '');
-  
-    if (tandaElement) {
-      const tanda = this.tandas.find(t => t.id === data);
-      
-      if (tanda) {
-        // Remover la tanda del día correspondiente
-        for (let dia in this.tandasPorDia) {
-          this.tandasPorDia[dia].delete(tanda);
-        }
-  
-        // Añadir la tanda de vuelta a la lista principal
-        this.tandasFiltradas.push(tanda);
-  
-        // Cambiar las clases
-        tandaElement.classList.remove('tanda-en-dia');
-        tandaElement.classList.add('tanda-en-lista');
-  
-        // Añadir el elemento de nuevo a la lista principal
-        const productosContainer = document.getElementById('productos');
-        if (productosContainer) {
-          productosContainer.appendChild(tandaElement);
-        }
+  // Cambiar el método dropToMainList para evitar eliminar de productosFiltrado
+dropToMainList(event: DragEvent) {
+  event.preventDefault();
+  const data = event.dataTransfer?.getData('text');
+  const productoElement = document.getElementById(data ?? '');
+
+  if (productoElement) {
+    const producto = this.productos.find(t => t.id === data);
+    
+    if (producto) {
+      // Cambiar las clases
+      productoElement.classList.remove('producto-en-dia');
+      productoElement.classList.add('producto-en-lista');
+
+      // Añadir el elemento de nuevo a la lista principal
+      const productosContainer = document.getElementById('productos');
+      if (productosContainer) {
+        productosContainer.appendChild(productoElement);
       }
     }
   }
-
-  drop(event: DragEvent, dia: string) {
-    event.preventDefault();
-    const data = event.dataTransfer?.getData('text');
-    const tandaElement = document.getElementById(data ?? '');
-
-    if (tandaElement) {
-        const tanda = this.tandas.find(t => t.id === data);
-        
-        if (tanda && !this.tandasPorDia[dia].has(tanda)) { // Verifica si ya está asignada
-            // Agregar la tanda al día correspondiente
-            this.tandasPorDia[dia].add(tanda);
-            
-            // Removerla de la lista de tandas filtradas
-            this.tandasFiltradas = this.tandasFiltradas.filter(t => t.id !== tanda.id);
-
-            // Cambiar las clases
-            tandaElement.classList.add('tanda-en-dia');
-            tandaElement.classList.add(`tanda-en-${dia}`);  // Clase específica para el día
-            tandaElement.classList.remove('tanda-en-lista');
-        }
-    }
 }
+
+// Cambiar el método drop para evitar duplicados en productosPorDia
+drop(event: DragEvent, dia: string) {
+  event.preventDefault();
+  const data = event.dataTransfer?.getData('text');
+  const productoElement = document.getElementById(data ?? '');
+
+  if (productoElement) {
+    const producto = this.productos.find(t => t.id === data);
+    
+    if (producto && !this.productosPorDia[dia].has(producto)) { // Verifica si ya está asignada
+      // Agregar la tanda al día correspondiente
+      this.productosPorDia[dia].add(producto);
+      
+      // Cambiar las clases
+      productoElement.classList.add('tanda-en-dia');
+      productoElement.classList.add(`tanda-en-${dia}`);  // Clase específica para el día
+      productoElement.classList.remove('tanda-en-lista');
+    }
+  }
+}
+
 
 // Para quitar de un día, usamos delete para el Set
-quitarDeDia(tanda: Tanda, dia: string) {
+quitarDeDia(producto: Producto, dia: string) {
     // Remover la tanda del día correspondiente
-    this.tandasPorDia[dia].delete(tanda);
+    this.productosPorDia[dia].delete(producto);
   
     // Agregar la tanda de nuevo a la lista filtrada
-    this.tandasFiltradas.push(tanda);
+    this.productosFiltrado.push(producto);
 }
 
-// Actualización del filtro para no incluir tandas ya asignadas
-filtrarTandas() {
-    const tandasEnDias = Object.values(this.tandasPorDia)
-        .flatMap(set => Array.from(set)) // Convertir cada Set en un Array
-        .map(t => t.id);
 
-    this.tandasFiltradas = this.tandas
-        .filter(tanda => !tandasEnDias.includes(tanda.id))  // Excluir tandas en días
-        .filter(tanda => tanda.producto.toLowerCase().includes(this.searchTerm.toLowerCase()));  // Aplicar filtro de búsqueda
-}
+
 
 
   formatDate(date: Date): string {

@@ -5,7 +5,7 @@ import { BehaviorSubject } from 'rxjs';
   providedIn: 'root'
 })
 export class TokenService {
-  private tokenKey: string = 'authToken'; 
+  private tokenKey: string = 'authToken'; // Clave para el token en localStorage
   private tokenSubject = new BehaviorSubject<string | null>(this.getToken());
 
   setToken(token: string): void {
