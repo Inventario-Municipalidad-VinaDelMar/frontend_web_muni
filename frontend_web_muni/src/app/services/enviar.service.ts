@@ -23,17 +23,14 @@ export class EnviarService {
   }
 
   // Nuevo método para autorizar la solicitud
-  authorizeSolicitud(token: string, idSolicitud: string): Observable<any> {
-    const headers = new HttpHeaders({
-      'Authorization': `Bearer ${token}`,
-      'Content-Type': 'application/json'
-    });
+  // Nuevo método para autorizar la solicitud
+authorizeSolicitud(token: string, body: { aceptada: boolean; idSolicitud: string }): Observable<any> {
+  const headers = new HttpHeaders({
+    'Authorization': `Bearer ${token}`,
+    'Content-Type': 'application/json'
+  });
 
-    const body = {
-      aceptada: true,
-      idSolicitud: idSolicitud
-    };
+  return this.http.post(this.apiUrlAuthorizeSolicitud, body, { headers });
+}
 
-    return this.http.post(this.apiUrlAuthorizeSolicitud, body, { headers });
-  }
 }

@@ -27,7 +27,7 @@
 
 .day-container {
   flex: 1 1 18%; /* Mantiene el ancho como antes */
-  background-color: #c5edff;
+  background: linear-gradient(to right, rgba(77, 180, 172, 1) 0%, rgba(25, 118, 210, 1) 60%); /* Degradado */
   padding: 5px 0; /* Reduce el padding vertical para disminuir la altura */
   border-radius: 10px;
   margin: 5px; /* Reduce el margen */
@@ -36,6 +36,7 @@
   align-items: center; /* Centra verticalmente el contenido */
   justify-content: center; /* Centra horizontalmente el contenido */
   font-size: 0.9rem; /* Ajusta el tamaño de la fuente según lo necesites */
+  color:white;
 }
 .day-container:hover {
   transform: scale(1.05); /* Aumenta el tamaño al 105% */
@@ -145,3 +146,8 @@
   border-radius: 30px; /* Bordes redondeados */
   padding: 4px; /* Menos espacio interno */
 }
+.titulo{
+  font-size: small;
+  font-family: bold;background: linear-gradient(to left, rgba(77, 180, 172, 1) 0%, rgba(25, 118, 210, 1) 60%); /* Degradado */
+}
+

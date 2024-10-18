@@ -50,7 +50,7 @@
                     [label]="expandedRows[producto.id] ? 'Minimizar' : 'Expandir'" 
                     class="botones-expandir" 
                     icon="pi" 
-                    [ngClass]="{'pi-minus': expandedRows[producto.id], 'pi-plus': !expandedRows[producto.id]}" 
+                    [ngClass]="{'bi bi-caret-up': expandedRows[producto.id], 'bi bi-caret-down': !expandedRows[producto.id]}" 
                     (click)="expandedRows[producto.id] = !expandedRows[producto.id]"></button>
           </td>
         </tr>

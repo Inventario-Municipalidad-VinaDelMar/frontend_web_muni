@@ -2,6 +2,8 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { Socket, SocketIoConfig } from 'ngx-socket-io';
 import { Observable, Subscription, tap } from 'rxjs';
 import { TokenService } from './auth-token.service';
+import { SolicitudDialogService } from './dialog-service.service';
+import { EnviarService } from './enviar.service';
 
 interface SolicitudData {
   solicitante: {
@@ -31,7 +33,11 @@ export class PlanificacionSocketService implements OnDestroy {
   private socket: Socket;
   private subscriptions: Subscription = new Subscription();
 
-  constructor(private tokenService: TokenService) {
+  constructor(
+    private tokenService: TokenService,
+    private solicitudDialogService: SolicitudDialogService,
+    private enviarservice:EnviarService,
+   ) {
     const config: SocketIoConfig = {
       url: 'http://34.176.26.41/planificacion',
       options: {},
@@ -57,6 +63,7 @@ export class PlanificacionSocketService implements OnDestroy {
       ).subscribe()
     );
 
+
     this.subscriptions.add(
       this.socket.fromEvent<any>('loadPlanificacion').pipe(
         tap(data => console.log('Datos de planificación cargados:', data))
@@ -71,10 +78,56 @@ export class PlanificacionSocketService implements OnDestroy {
 
     // Eventos específicos de planificación individual
     this.subscriptions.add(
-      this.socket.fromEvent<any>('loadPlanificacionIndividual').pipe(
-        tap(data => console.log('Datos de planificación individual recibidos:', data))
-      ).subscribe()
+      this.socket.fromEvent<SolicitudData>('loadSolicitud').pipe(
+        tap(data => {
+          console.log('Solicitud recibida:', data);
+          // Solo mostrar el diálogo si el estado es "Pendiente"
+          if (data.status === 'Pendiente') {
+            const ref = this.solicitudDialogService.showSolicitudDialog(data);
+            ref.subscribe(confirmed => {
+              console.log(confirmed ? 'Aceptado' : 'Rechazado');
+    
+              if (confirmed) {
+                const token = this.tokenService.getToken(); // Obtiene el token
+                
+                if (token) { // Verifica que el token no sea nulo
+                  console.log("id solicitud "+data.id)
+                  const body = {
+                    aceptada: true,
+                    idSolicitud: data.id // Asegúrate de que 'id' está disponible en 'data'
+                  };
+    
+                  // Llama al servicio para autorizar la solicitud
+                  console.log("body "+body)
+                  this.enviarservice.authorizeSolicitud(token, body).subscribe(
+                    (res) => {
+                      console.log('Solicitud autorizada:', res);
+                      // Aquí puedes cerrar el diálogo o realizar alguna otra acción
+                    },
+                    (error) => {
+                      console.error('Error al autorizar la solicitud:', error);
+                      console.error('Cuerpo del error:', error.error); // Imprime el cuerpo de la respuesta de error
+                      console.error('Estado:', error.status);
+                      console.error('Texto del estado:', error.statusText);
+                    }
+                  );
+                } else {
+                  console.error('Token no disponible. No se puede autorizar la solicitud.');
+                }
+              }
+            });
+          } else {
+            console.log('Solicitud omitida, status no es "Pendiente"');
+          }
+        })
+      ).subscribe({
+        next: () => console.log('Suscripción a loadSolicitud activa'), // Log adicional
+        error: (err) => console.error('Error en la suscripción a loadSolicitud:', err)
+      })
     );
+    
+    
+
   }
 
   getPlanificacion(lunes: string, viernes: string): void {

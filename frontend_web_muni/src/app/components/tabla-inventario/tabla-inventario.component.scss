@@ -1,2 +1,12 @@
-
-
+.botones-expandir {
+    background-color: #007bff; /* Cambia a tu color deseado */
+    color: white; /* Color del texto del botón */
+    border: none; /* Sin borde */
+    border-radius: 5px; /* Bordes redondeados */
+    padding: 0.5rem 1rem; /* Espaciado interno */
+    transition: background-color 0.3s; /* Transición suave para el color de fondo */
+  }
+  
+  .botones-expandir:hover {
+    background-color: #0056b3; /* Color más oscuro al pasar el ratón */
+  }

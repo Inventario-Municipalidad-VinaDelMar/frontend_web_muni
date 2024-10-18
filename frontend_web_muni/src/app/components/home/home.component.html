@@ -56,7 +56,7 @@
 <div class="row mt-4">
   <div class="col-6">
     <div class="contenido">
-      <h2>Lista de Tandas Recientes</h2>
+      <h2 class="titulo">Lista de Tandas Recientes</h2>
       <p-table [value]="tandasRecientes" [paginator]="true" [rows]="10" [rowsPerPageOptions]="[10]">
         <ng-template pTemplate="header">
           <tr>
@@ -79,7 +79,7 @@
   
   <div class="col-6">
     <div class="contenido planificacion">
-      <h2>Planificación del Día: {{ selectedDay }}</h2>
+      <h2 class="titulo">Planificación del Día: {{ selectedDay }}</h2>
       <div class="divider"></div>
       <div class="dataview-center">
         <p-dataView #dv [value]="planningData?.detalles" layout="list">

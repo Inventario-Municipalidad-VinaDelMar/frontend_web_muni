@@ -17,20 +17,46 @@
   color: white; /* Cambiar el color del texto a blanco */
 }
 
-.p-field {
-  margin-bottom: 1.5rem; /* Espaciado entre los campos */
+h2 {
+  color: #333; /* Color del texto del encabezado */
+  margin-bottom: 1.5rem; /* Espacio debajo del encabezado */
+  text-align: center; /* Centra el texto */
 }
 
-.ingresar {
-  background-color: red;
-  color: white; /* Texto en blanco para el botón */
+.p-field {
+  margin-bottom: 1.5rem; /* Espacio entre los campos */
+}
+
+input[type="email"],
+input[type="password"] {
+  width: 100%; /* Ocupa todo el ancho disponible */
+  padding: 0.8rem; /* Espaciado interno */
+  border: 1px solid #ccc; /* Borde gris claro */
+  border-radius: 5px; /* Bordes redondeados */
+  transition: border-color 0.3s; /* Transición suave para el borde */
+}
+
+input[type="email"]:focus,
+input[type="password"]:focus {
+  border-color: #007bff; /* Cambia el color del borde al enfocar */
+  outline: none; /* Elimina el contorno por defecto */
+}
+
+button {
+  width: 100%; /* Botón ocupa todo el ancho */
+  padding: 0.8rem; /* Espaciado interno */
   border: none; /* Sin borde */
   border-radius: 5px; /* Bordes redondeados */
-  padding: 0.5rem 1rem; /* Espaciado interno del botón */
-  cursor: pointer; /* Cambiar cursor al pasar sobre el botón */
-  transition: background-color 0.3s; /* Transición suave */
+  background-color: #007bff; /* Color de fondo del botón */
+  color: white; /* Color del texto del botón */
+  cursor: pointer; /* Cambia el cursor al pasar por encima */
+  transition: background-color 0.3s; /* Transición suave para el fondo */
 }
 
-.ingresar:hover {
-  background-color: darkred; /* Cambiar color al pasar el mouse */
+button:hover {
+  background-color: #0056b3; /* Color más oscuro al pasar el ratón */
+}
+
+.IS{
+  Color:white;
 }
