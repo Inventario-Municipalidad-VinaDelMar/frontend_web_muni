@@ -86,34 +86,34 @@ export class PlanificacionSocketService implements OnDestroy {
             const ref = this.solicitudDialogService.showSolicitudDialog(data);
             ref.subscribe(confirmed => {
               console.log(confirmed ? 'Aceptado' : 'Rechazado');
-    
-              if (confirmed) {
-                const token = this.tokenService.getToken(); // Obtiene el token
+              
+              const token = this.tokenService.getToken(); // Obtiene el token
+              
+              if (token) { // Verifica que el token no sea nulo
+                console.log("id solicitud " + data.id);
                 
-                if (token) { // Verifica que el token no sea nulo
-                  console.log("id solicitud "+data.id)
-                  const body = {
-                    aceptada: true,
-                    idSolicitud: data.id // Asegúrate de que 'id' está disponible en 'data'
-                  };
-    
-                  // Llama al servicio para autorizar la solicitud
-                  console.log("body "+body)
-                  this.enviarservice.authorizeSolicitud(token, body).subscribe(
-                    (res) => {
-                      console.log('Solicitud autorizada:', res);
-                      // Aquí puedes cerrar el diálogo o realizar alguna otra acción
-                    },
-                    (error) => {
-                      console.error('Error al autorizar la solicitud:', error);
-                      console.error('Cuerpo del error:', error.error); // Imprime el cuerpo de la respuesta de error
-                      console.error('Estado:', error.status);
-                      console.error('Texto del estado:', error.statusText);
-                    }
-                  );
-                } else {
-                  console.error('Token no disponible. No se puede autorizar la solicitud.');
-                }
+                // Define el cuerpo con 'aceptada' en función de la confirmación del usuario
+                const body = {
+                  aceptada: confirmed, // Si confirmado es true, envía true; si es false, envía false
+                  idSolicitud: data.id // Asegúrate de que 'id' está disponible en 'data'
+                };
+                
+                // Llama al servicio para autorizar la solicitud
+                console.log("body ", body);
+                this.enviarservice.authorizeSolicitud(token, body).subscribe(
+                  (res) => {
+                    console.log('Solicitud autorizada:', res);
+                    // Aquí puedes cerrar el diálogo o realizar alguna otra acción
+                  },
+                  (error) => {
+                    console.error('Error al autorizar la solicitud:', error);
+                    console.error('Cuerpo del error:', error.error); // Imprime el cuerpo de la respuesta de error
+                    console.error('Estado:', error.status);
+                    console.error('Texto del estado:', error.statusText);
+                  }
+                );
+              } else {
+                console.error('Token no disponible. No se puede autorizar la solicitud.');
               }
             });
           } else {
