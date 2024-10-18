@@ -148,19 +148,23 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
 
         // Recorremos los detalles de la planificación
         plan.detalles.forEach((detalle: any) => {
+          console.log( typeof(detalle.producto.nombre)==="string")
             // Crear el producto con la información necesaria
+            // typeof(detalle.producto.nombre)==="string"?detalle.producto.nombre:(detalle.producto.nombre as any).nombre
+            // const {} = detalle;
             const producto: Producto = {
                 id: detalle.productoId, // Cambiar a productoId
-                nombre: detalle.producto, // Asumiendo que el detalle tiene un campo 'producto'
+                nombre:  typeof(detalle.producto)==="string"?detalle.producto:(detalle.producto as any).nombre, // Asumiendo que el detalle tiene un campo 'producto'
+                // nombre: detalle.producto, // Asumiendo que el detalle tiene un campo 'producto'
                 urlImagen: detalle.urlImagen, // Incluyendo la URL de la imagen
                 cantidadPlanificada: detalle.cantidadPlanificada // Incluyendo la cantidad planificada
             };
-
+            console.log({ producto})
             // Añadir el producto al Set del día correspondiente
             this.productosPorDia[dia].add(producto);
         });
     });
-
+    console.log({productos:this.productosPorDia['lunes']});
     // Log para ver el resultado final de productosPorDia
     console.log("Productos por día:", this.productosPorDia);
 }
@@ -240,7 +244,7 @@ filterProductos() {
       accept: () => {
         this.guardarProductos();
         setTimeout(() => {
-          window.location.reload();
+          // window.location.reload();
         }, 1000); // 1000 milisegundos = 1 segundo
         
         
