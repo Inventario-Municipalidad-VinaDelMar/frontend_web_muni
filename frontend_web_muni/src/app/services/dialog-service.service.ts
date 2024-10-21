@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
-import { SolicitudData } from '../solicitud-data.model';
+import { SolicitudData } from '../models/solicitud-data.model';
 import { SolicitudDialogComponent } from '../components/solicitud-dialog/solicitud-dialog.component';
 
 @Injectable({

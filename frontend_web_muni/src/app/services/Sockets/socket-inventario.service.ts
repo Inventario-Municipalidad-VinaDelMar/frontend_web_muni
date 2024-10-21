@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { Observable } from 'rxjs';
-import { Tanda } from '../models/tanda.model';
+import { Tanda } from '../../models/tanda.model';
 
 @Injectable({
   providedIn: 'root',
@@ -37,10 +37,7 @@ export class SocketInventarioService {
       console.log('Cambio de stock en categoría:', data);
     });
   }
-  connectSocket() {
-    this.socket.connect();
-    console.log('Socket de inventario conectado');
-  }
+  
   // Método para escuchar el evento de conexión
   onConnect(): Observable<any> {
     return this.socket.fromEvent('connect');

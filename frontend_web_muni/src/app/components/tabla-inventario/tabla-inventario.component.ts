@@ -8,13 +8,13 @@ import { InputTextModule } from 'primeng/inputtext';
 import { DropdownModule } from 'primeng/dropdown';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { SliderModule } from 'primeng/slider';
-import { SocketInventarioService } from '../../services/socket-inventario.service';
 import { MessageService } from 'primeng/api';
 import { FormsModule } from '@angular/forms';
 import { Tanda } from '../../models/tanda.model';
 import { ProgressSpinnerModule } from 'primeng/progressspinner';
 import { Subscription, timer } from 'rxjs';
 import { Producto } from '../../models/producto.model';
+import { SocketInventarioService } from '../../services/Sockets/socket-inventario.service';
 
 @Component({
   selector: 'app-tabla-inventario',

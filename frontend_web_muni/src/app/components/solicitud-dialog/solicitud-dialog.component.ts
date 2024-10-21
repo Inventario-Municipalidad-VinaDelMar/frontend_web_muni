@@ -1,6 +1,6 @@
 import { Component, Inject } from '@angular/core';
 import { MAT_DIALOG_DATA, MatDialogRef } from '@angular/material/dialog';
-import { SolicitudData } from '../../solicitud-data.model';
+import { SolicitudData } from '../../models/solicitud-data.model';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { EnviarService } from '../../services/enviar.service';

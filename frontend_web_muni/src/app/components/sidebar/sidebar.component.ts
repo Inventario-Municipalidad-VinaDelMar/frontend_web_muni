@@ -1,6 +1,7 @@
 import { Component, Input } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { PlanificacionSocketService } from '../../services/Sockets/planificacion.socket.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -13,7 +14,7 @@ export class SidebarComponent {
   @Input() collapsed = false;
   activeCategory: string = 'home';
 
-  constructor(private router: Router) {}
+  constructor(private router: Router,) {}
 
   ngOnInit(): void {
     this.router.events.subscribe((event) => {

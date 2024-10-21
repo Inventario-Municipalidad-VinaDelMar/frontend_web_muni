@@ -3,12 +3,12 @@ import { MessageService } from 'primeng/api'; // Para mostrar mensajes
 import { TableModule } from 'primeng/table'; // Para usar p-table
 import { PanelModule } from 'primeng/panel'; // Para usar p-panel
 import { CardModule } from 'primeng/card'; // Para usar p-card
-import { AuthService } from '../../services/auth.service';
+import { AuthService } from '../../services/Sockets/auth.service';
 import { CommonModule } from '@angular/common';
 import { ButtonModule } from 'primeng/button';
 import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
-import { Usuario } from '../../usuario.model';
+import { Usuario } from '../../models/usuario.model';
 
 @Component({
   selector: 'app-gestion-usuarios',

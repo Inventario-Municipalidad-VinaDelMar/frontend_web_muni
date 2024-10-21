@@ -1,10 +1,8 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SocketInventarioService } from '../../services/socket-inventario.service';
 import { Tanda } from '../../models/tanda.model';
 import { DialogModule } from 'primeng/dialog'; 
-import { PlanificacionSocketService } from '../../services/planificacion.socket.service';
 import { Subscription } from 'rxjs';
 import { CalendarModule } from 'primeng/calendar';
 import { ConfirmationService, MessageService, PrimeNGConfig } from 'primeng/api';
@@ -14,6 +12,8 @@ import { TokenService } from '../../services/auth-token.service';
 import { DataViewModule } from 'primeng/dataview';
 import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { SocketInventarioService } from '../../services/Sockets/socket-inventario.service';
+import { PlanificacionSocketService } from '../../services/Sockets/planificacion.socket.service';
 
 interface Producto {
   id: string;
@@ -244,7 +244,6 @@ filterProductos() {
       accept: () => {
         this.guardarProductos();
         setTimeout(() => {
-          // window.location.reload();
         }, 1000); // 1000 milisegundos = 1 segundo
         
         

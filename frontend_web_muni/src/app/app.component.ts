@@ -17,7 +17,7 @@ export class AppComponent {
   isSidebarCollapsed = false; // Estado del sidebar
   currentToken: string | null = null; // Almacenar el token actual
 
-  constructor(private router: Router, private tokenService: TokenService) { // Inyectar el Router y TokenService
+  constructor(private router: Router, private tokenService: TokenService,) { // Inyectar el Router y TokenService
     // Suscribirse al tokenObservable para recibir actualizaciones del token
     this.tokenService.getTokenObservable().subscribe(token => {
       this.currentToken = token; // Actualizar el token actual

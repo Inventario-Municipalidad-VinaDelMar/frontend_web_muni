@@ -3,16 +3,16 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { ButtonModule } from 'primeng/button'; 
 import { Subscription } from 'rxjs';
-import { Producto } from '../../models/producto.model';  // Cambio de Categoria a Producto
-import { SocketInventarioService } from '../../services/socket-inventario.service';
+import { Producto } from '../../models/producto.model'; 
 import { Tanda } from '../../models/tanda.model';
 import { CardModule } from 'primeng/card';
 import { DividerModule } from 'primeng/divider'; // Para p-divider
 import { BadgeModule } from 'primeng/badge'; // Para p-badge
 import { TableModule} from 'primeng/table';
 import { DialogModule } from 'primeng/dialog';
-import { PlanificacionSocketService } from '../../services/planificacion.socket.service';
 import { DataViewModule } from 'primeng/dataview';
+import { SocketInventarioService } from '../../services/Sockets/socket-inventario.service';
+import { PlanificacionSocketService } from '../../services/Sockets/planificacion.socket.service';
 
 
 interface Planificacion {

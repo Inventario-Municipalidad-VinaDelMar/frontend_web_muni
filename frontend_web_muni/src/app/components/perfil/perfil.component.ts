@@ -1,7 +1,7 @@
 import { Component } from '@angular/core'; // Asegúrate de importar tu modelo de usuario
 import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
-import { Usuario } from '../../usuario.model';
+import { Usuario } from '../../models/usuario.model';
 
 @Component({
   selector: 'app-perfil',
