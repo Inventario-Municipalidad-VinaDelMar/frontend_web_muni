@@ -10,15 +10,7 @@ import { EnviarService } from './enviar.service';
 export class SolicitudDialogService {
   private dialogRef: MatDialogRef<SolicitudDialogComponent> | null = null;
 
-  constructor(private dialog: MatDialog, private enviarService: EnviarService) {
-    // Escuchar cambios en localStorage para cerrar el diálogo
-    window.addEventListener('storage', (event) => {
-      if (event.key === 'closeSolicitudDialog' && event.newValue === 'true') {
-        this.closeSolicitudDialog();
-        localStorage.removeItem('closeSolicitudDialog'); // Restablecer el valor
-      }
-    });
-  }
+  constructor(private dialog: MatDialog) {}
 
   showSolicitudDialog(data: SolicitudData) {
     if (this.dialogRef) {
@@ -44,8 +36,10 @@ export class SolicitudDialogService {
     }
   }
 
-  // Método para cerrar el diálogo desde otros dispositivos o pestañas
-  triggerCloseDialog() {
-    localStorage.setItem('closeSolicitudDialog', 'true');
+  // Método para verificar y cerrar si la solicitud ya fue procesada
+  handleUpdatedSolicitud(data: SolicitudData) {
+    if (this.dialogRef && data.status !== 'Pendiente') {
+      this.closeSolicitudDialog();
+    }
   }
 }

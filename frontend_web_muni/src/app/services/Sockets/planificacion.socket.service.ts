@@ -73,44 +73,40 @@ export class PlanificacionSocketService implements OnDestroy {
    * Función para manejar los datos de la solicitud recibida.
    * @param data Datos de la solicitud
    */
-  private handleSolicitudData(data: SolicitudData) {
-    console.log('Solicitud recibida:', data);
-    if (data.status === 'Pendiente') {
-      const ref = this.solicitudDialogService.showSolicitudDialog(data);
-      ref.subscribe((confirmed) => {
-        console.log(confirmed ? 'Aceptado' : 'Rechazado');
-  
-        const token = this.tokenService.getToken();
-  
-        if (token) {
-          console.log('id solicitud ' + data.id);
-  
-          const body = {
-            aceptada: confirmed,
-            idSolicitud: data.id,
-          };
-  
-          this.enviarservice.authorizeSolicitud(token, body).subscribe(
-            (res) => {
-              console.log('Solicitud autorizada:', res);
-              // Notificar a otros dispositivos para cerrar el diálogo
-              this.solicitudDialogService.triggerCloseDialog();
-            },
-            (error) => {
-              console.error('Error al autorizar la solicitud:', error);
-              console.error('Cuerpo del error:', error.error);
-              console.error('Estado:', error.status);
-              console.error('Texto del estado:', error.statusText);
-            }
-          );
-        } else {
-          console.error('Token no disponible. No se puede autorizar la solicitud.');
-        }
-      });
-    } else {
-      console.log('Solicitud omitida, status no es "Pendiente"');
-    }
+  // Suponiendo que manejas el evento de 'loadSolicitud' en tu servicio
+private handleSolicitudData(data: SolicitudData) {
+  console.log('Solicitud recibida:', data);
+
+  if (data.status === 'Pendiente') {
+    const ref = this.solicitudDialogService.showSolicitudDialog(data);
+    ref.subscribe((confirmed) => {
+      console.log(confirmed ? 'Aceptado' : 'Rechazado');
+
+      const token = this.tokenService.getToken();
+      if (token) {
+        const body = {
+          aceptada: confirmed,
+          idSolicitud: data.id,
+        };
+
+        this.enviarservice.authorizeSolicitud(token, body).subscribe(
+          (res) => {
+            console.log('Solicitud autorizada:', res);
+          },
+          (error) => {
+            console.error('Error al autorizar la solicitud:', error);
+          }
+        );
+      } else {
+        console.error('Token no disponible. No se puede autorizar la solicitud.');
+      }
+    });
+  } else {
+    // Si el estado no es "Pendiente", asegurarse de cerrar el diálogo si está abierto
+    this.solicitudDialogService.handleUpdatedSolicitud(data);
   }
+}
+
   
 
   getPlanificacion(lunes: string, viernes: string): void {
