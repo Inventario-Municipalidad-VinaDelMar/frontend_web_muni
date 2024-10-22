@@ -75,25 +75,26 @@ export class PlanificacionSocketService implements OnDestroy {
    */
   private handleSolicitudData(data: SolicitudData) {
     console.log('Solicitud recibida:', data);
-    // Solo mostrar el diálogo si el estado es "Pendiente"
     if (data.status === 'Pendiente') {
       const ref = this.solicitudDialogService.showSolicitudDialog(data);
       ref.subscribe((confirmed) => {
         console.log(confirmed ? 'Aceptado' : 'Rechazado');
-
+  
         const token = this.tokenService.getToken();
-
+  
         if (token) {
           console.log('id solicitud ' + data.id);
-
+  
           const body = {
             aceptada: confirmed,
             idSolicitud: data.id,
           };
-
+  
           this.enviarservice.authorizeSolicitud(token, body).subscribe(
             (res) => {
               console.log('Solicitud autorizada:', res);
+              // Notificar a otros dispositivos para cerrar el diálogo
+              this.solicitudDialogService.triggerCloseDialog();
             },
             (error) => {
               console.error('Error al autorizar la solicitud:', error);
@@ -103,15 +104,14 @@ export class PlanificacionSocketService implements OnDestroy {
             }
           );
         } else {
-          console.error(
-            'Token no disponible. No se puede autorizar la solicitud.'
-          );
+          console.error('Token no disponible. No se puede autorizar la solicitud.');
         }
       });
     } else {
       console.log('Solicitud omitida, status no es "Pendiente"');
     }
   }
+  
 
   getPlanificacion(lunes: string, viernes: string): void {
     const token = this.tokenService.getToken();
