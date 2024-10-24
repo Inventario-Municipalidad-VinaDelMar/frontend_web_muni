@@ -1,38 +1,46 @@
-<div class="contenido">
-    <h2>PERFIL DE: {{ usuario?.nombre }} {{ usuario?.apellidoPaterno }}</h2>
-  
-    <div class="d-grid semana mt-4">
-      <!-- Aquí puedes agregar más contenido relacionado, si es necesario -->
+<div class="perfil-contenido">  
+  <div class="perfil-header">
+    <h2>Perfil de Usuario</h2>
+    <p>{{ usuario.nombre }} {{ usuario.apellidoPaterno }}</p>
+  </div>
+
+  <div class="perfil-main">
+    <div class="perfil-datos">
+      <p-card styleClass="perfil-card mb-3">
+        <ng-template pTemplate="header">
+          <div class="perfil-imagen-container">
+            <img 
+              [src]="usuario.imageUrl || 'assets/default-user.png'" 
+              alt="Imagen del Usuario" 
+              class="perfil-imagen" 
+            />
+          </div>
+        </ng-template>
+        <ng-template pTemplate="content">
+          <div class="perfil-informacion">
+            <p><i class="pi pi-user"></i> <strong>Nombre: </strong> {{ " "+usuario.nombre }} {{ usuario.apellidoPaterno }} {{ usuario.apellidoMaterno }}</p>
+            <p><i class="pi pi-envelope"></i> <strong>Email: </strong> {{ " "+usuario.email }}</p>
+            <p><i class="pi pi-id-card"></i> <strong>RUT: </strong> {{ " "+usuario.rut }}</p>
+            <p><i class="pi pi-users"></i> <strong>Roles: </strong> {{ " "+usuario.roles.join(', ') }}</p>
+          </div>
+          <!-- Botón para editar el perfil -->
+          <div class="perfil-boton-editar">
+            <button pButton type="button" label="Editar Perfil" icon="pi pi-pencil" class="p-button-info" title="Editar el perfil del usuario"></button>
+          </div>
+        </ng-template>
+      </p-card>
+    </div>
+
+    <div class="perfil-opciones">
+      <p-card styleClass="perfil-card-opciones">
+        <ng-template pTemplate="header">
+          <h3>Opciones Adicionales</h3>
+        </ng-template>
+        <ng-template pTemplate="content">
+          <button pButton type="button" icon="pi pi-cog" class="p-button-secondary mb-2" title="Configuración"></button>
+          <button pButton type="button" icon="pi pi-sign-out" class="p-button-danger" title="Cerrar Sesión" (click)="logout()"></button>
+        </ng-template>
+      </p-card>
     </div>
   </div>
-  
-  <div class="row">
-    <div class="col-8">
-      <div class="contenido">
-        <p-card header="Datos de Usuario" styleClass="mb-3">
-          <ng-template pTemplate="header">
-            <h3>Información del Usuario</h3>
-          </ng-template>
-          <ng-template pTemplate="content">
-            <p><strong>Nombre:</strong> {{ usuario?.nombre }} {{ usuario?.apellidoPaterno }} {{ usuario?.apellidoMaterno }}</p>
-            <p><strong>Email:</strong> {{ usuario?.email }}</p>
-            <p><strong>RUT:</strong> {{ usuario?.rut }}</p>
-            <p *ngIf="usuario?.imageUrl"><img [src]="usuario?.imageUrl" alt="Imagen del Usuario" style="max-width: 100%; border-radius: 8px;" /></p>
-            <p><strong>Roles:</strong> {{ usuario?.roles?.join(', ') }}</p> <!-- Asegúrate de que 'roles' no sea undefined -->
-          </ng-template>
-        </p-card>
-      </div>
-    </div>
-  
-    <div class="col-4">
-      <div class="contenido" id="lateral">
-        <p-card header="Opciones Adicionales">
-          <ng-template pTemplate="content">
-            <p>Algo más</p>
-            <!-- Aquí puedes agregar más opciones o enlaces, según lo necesites -->
-          </ng-template>
-        </p-card>
-      </div>
-    </div>
-  </div>
-  
+</div>

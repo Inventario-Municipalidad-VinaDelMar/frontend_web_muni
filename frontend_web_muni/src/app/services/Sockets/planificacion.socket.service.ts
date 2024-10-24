@@ -69,7 +69,7 @@ export class PlanificacionSocketService implements OnDestroy {
     );
   }
 
-  /**
+  /**a
    * Función para manejar los datos de la solicitud recibida.
    * @param data Datos de la solicitud
    */

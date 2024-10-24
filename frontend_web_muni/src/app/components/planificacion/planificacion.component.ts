@@ -154,8 +154,8 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
             // const {} = detalle;
             const producto: Producto = {
                 id: detalle.productoId, // Cambiar a productoId
-                nombre:  typeof(detalle.producto)==="string"?detalle.producto:(detalle.producto as any).nombre, // Asumiendo que el detalle tiene un campo 'producto'
-                // nombre: detalle.producto, // Asumiendo que el detalle tiene un campo 'producto'
+                // nombre:  typeof(detalle.producto)==="string"?detalle.producto:(detalle.producto as any).nombre, // Asumiendo que el detalle tiene un campo 'producto' 
+                nombre: detalle.producto, // Asumiendo que el detalle tiene un campo 'producto'
                 urlImagen: detalle.urlImagen, // Incluyendo la URL de la imagen
                 cantidadPlanificada: detalle.cantidadPlanificada // Incluyendo la cantidad planificada
             };

@@ -1,33 +1,39 @@
+<div class="row">
+  <div class="contenido col">
+      <h2>DESPLIEGUE DE LISTA DE BODEGAS</h2>
+      <!-- Aquí puedes agregar la lista de bodegas -->
+      <ul>
+          <li *ngFor="let bodega of bodegas">{{ bodega.nombre }}</li>
+      </ul>
+  </div>
+</div>
 
 <div class="row">
-    <div class="contenido col">
-        DESPLIEGUE DE LISTA DE BODEGAS
-    </div>
-    
-</div>
-  
-  
-<div class="row">
-      <div class="col-3">
-          <div class="contenido">
-  
-            Listado de ubicaciones dentro de la bodega
-          
-          </div>
+  <div class="col-3">
+      <div class="contenido">
+          <h3>Listado de ubicaciones dentro de la bodega</h3>
+          <!-- Aquí puedes agregar el listado de ubicaciones -->
+          <ul>
+              <li *ngFor="let ubicacion of ubicaciones">{{ ubicacion.nombre }}</li>
+          </ul>
       </div>
-      <div class="col-7">
-          <div class="contenido" id="lateral">
-  
-            Datos de productos dentro de la bodega
-          
-          </div>
+  </div>
+  <div class="col-7">
+      <div class="contenido" id="lateral">
+          <h3>Datos de productos dentro de la bodega</h3>
+          <!-- Aquí puedes agregar el listado de productos -->
+          <ul>
+              <li *ngFor="let producto of productos">{{ producto.nombre }}</li>
+          </ul>
       </div>
-      <div class="col-2">
-        <div class="contenido" id="lateral">
-
-          Categorias que existen en la bodega
-        
-        </div>
-    </div>
+  </div>
+  <div class="col-2">
+      <div class="contenido" id="lateral">
+          <h3>Categorías que existen en la bodega</h3>
+          <!-- Aquí puedes agregar el listado de categorías -->
+          <ul>
+              <li *ngFor="let categoria of categorias">{{ categoria.nombre }}</li>
+          </ul>
+      </div>
+  </div>
 </div>
-  

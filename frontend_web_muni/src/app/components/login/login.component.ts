@@ -28,7 +28,11 @@ export class LoginComponent {
       response => {
         console.log('Respuesta del servidor:', response);
         if (response.token) {
+          // Guardar el token y los datos del usuario
           this.authService.setAuthToken(response.token); 
+          this.authService.setUser(response);
+          
+          // Redirigir al usuario al home
           this.router.navigate(['/home']);
         } else {
           this.setError('No se recibió un token. Verifica tus credenciales.');

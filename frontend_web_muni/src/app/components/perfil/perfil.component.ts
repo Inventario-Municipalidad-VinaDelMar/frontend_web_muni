@@ -1,17 +1,20 @@
-import { Component } from '@angular/core'; // Asegúrate de importar tu modelo de usuario
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
 import { Usuario } from '../../models/usuario.model';
+import { AuthService } from '../../services/Sockets/auth.service';
+import { ButtonModule } from 'primeng/button';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-perfil',
   standalone: true,
   templateUrl: './perfil.component.html',
   styleUrls: ['./perfil.component.scss'],
-  imports: [CardModule,CommonModule],
+  imports: [CardModule, CommonModule,ButtonModule],
 })
 export class PerfilComponent {
-  usuario: Usuario = { // Proporciona un valor por defecto
+  usuario: Usuario = {
     id: '',
     rut: '',
     email: '',
@@ -22,16 +25,22 @@ export class PerfilComponent {
     roles: []
   };
 
-  constructor() {
+  constructor(private authService: AuthService,private router: Router) {
     this.cargarUsuario();
   }
 
   cargarUsuario() {
-    const usuarioJson = localStorage.getItem('authUser');
-    if (usuarioJson) {
-      this.usuario = JSON.parse(usuarioJson);
+    const usuarioGuardado = this.authService.getUser();
+    if (usuarioGuardado) {
+      this.usuario = usuarioGuardado;
     } else {
-      console.error('No se encontró información del usuario en localStorage');
+      console.error('No se encontró información del usuario.');
     }
+  }
+
+  logout(): void {
+    console.log('Cerrar sesión');
+    localStorage.removeItem('authToken'); // Eliminar el token de autenticación
+    this.router.navigate(['/login']); // Redirigir a la página de login
   }
 }

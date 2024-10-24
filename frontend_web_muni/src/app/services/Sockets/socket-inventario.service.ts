@@ -58,6 +58,13 @@ export class SocketInventarioService {
     return this.socket.fromEvent('loadAllProductos');
   }
 
+  getAllBodegas(){
+   this.socket.emit('getAllBodegas');
+  }
+  loadAllBodegas(): Observable<any> {
+    return this.socket.fromEvent('loadAllBodegas');
+  }
+
   // Escuchar el evento de creación de tanda
   listenTandaCreate(): Observable<Tanda> {
     return this.socket.fromEvent<Tanda>('newTandaCreated');

@@ -1,0 +1,142 @@
+
+  .perfil-header {
+    text-align: center;
+    background-color: #ffffff;
+    color: #000000;
+    padding: 20px;
+    border-radius: 12px 12px 0 0;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .perfil-header h2 {
+    margin: 0;
+    font-size: 24px;
+  }
+  
+  .perfil-header p {
+    font-size: 18px;
+    margin-top: 8px;
+    opacity: 0.8;
+  }
+  
+  .perfil-main {
+    display: flex;
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .perfil-datos {
+    flex: 2;
+    flex-direction: column; /* Coloca la imagen y el contenido uno encima del otro */
+    align-items: center; /* Centra horizontalmente la imagen y el contenido */
+  }
+  
+  .perfil-imagen-container {
+    display: flex;              /* Activa flexbox */
+    justify-content: center;    /* Centra horizontalmente el contenido */
+    align-items: center;        /* Centra verticalmente el contenido */
+    margin-bottom: 20px;       /* Espacio debajo del contenedor */
+  }
+  
+  
+  .perfil-imagen {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    border: 4px solid #007ad9;
+    object-fit: cover;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .perfil-informacion {
+    text-align: center; /* Centra el texto */
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
+    display: flex;
+    flex-direction: column; /* Asegura que los elementos se apilen verticalmente */
+    align-items: center; /* Centra el contenido horizontalmente */
+  }
+  
+  .perfil-informacion p {
+    display: flex;
+    align-items: center; /* Alinea verticalmente los íconos con el texto */
+    justify-content: center; /* Centra horizontalmente el contenido */
+    gap: 8px; /* Espacio entre el ícono y el texto */
+    margin: 8px 0; /* Espacio entre cada párrafo */
+  }
+  
+  .perfil-informacion i {
+    color: #007ad9;
+    font-size: 18px;
+  }
+  
+  
+  .perfil-opciones {
+    flex: 1;
+  }
+  
+  .perfil-card, .perfil-card-opciones {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+  }
+  
+  .perfil-card h3, .perfil-card-opciones h3 {
+    text-align: center;
+    color: #007ad9;
+  }
+  
+  .p-button {
+    padding: 10px;
+    border-radius: 20px;
+    width: 100%;
+    background: #007ad9;
+    color:white;
+  }
+  .perfil-boton-editar {
+    display: flex;
+    justify-content: center; /* Centra el botón */
+    margin-top: 20px; /* Espacio para separarlo del contenido superior */
+  }
+  
+  .perfil-card-opciones {
+    padding: 20px;
+  }
+
+  .perfil-card-opciones:hover {
+    padding: 20px;
+  }
+  
+  
+  .p-button-info {
+    padding: 10px;
+    font-size: 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background-color: #007ad9;
+  }
+  
+  .p-button-info:hover {
+    background-color: #f4f4f4; /* Mantener el mismo color para desactivar el efecto hover */
+    color:black;
+  }
+  
+  .p-button-secondary, .p-button-danger {
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  .p-button-secondary:hover {
+    background-color: #f4f4f4; /* No cambiar el color al pasar el ratón */
+    color:black
+
+  }
+  .p-button-danger:hover{
+    background-color: #d57d7d;
+    color:black;
+    
+  }
+  
