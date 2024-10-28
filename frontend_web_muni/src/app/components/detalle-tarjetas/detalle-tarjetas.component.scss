@@ -1,0 +1,142 @@
+:host {
+  display: block;
+  padding: 16px;
+  font-family: Arial, sans-serif;
+}
+
+h2 {
+  font-size: 1.8rem;
+  color: #ffffff;
+  
+  text-align: center;
+  padding: 8px 0;
+  border-radius: 4px;
+}
+
+/* Configuración del grid para tres columnas */
+.envio-grid {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 24px;
+}
+
+/* Columnas con altura fija */
+.left-column, .center-column, .right-column {
+  max-height: 85vh;
+  text-align: center;
+  overflow-y: auto;
+  border-radius: 8px;
+  background-color: #ffffff;
+}
+
+/* Fieldset PrimeNG */
+.p-fieldset {
+  margin-bottom: 16px;
+  padding: 16px;
+  border-radius: 8px;
+}
+
+/* Carrusel personalizado */
+.custom-carousel .p-carousel-container {
+  max-width: 300px; /* Ancho fijo del carrusel */
+  margin: 0 auto;
+}
+
+.movimiento-card {
+  background-color: #ffffff;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  width: 100%; /* Ancho completo del contenedor */
+  margin: 0 auto; /* Centrado */
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1); /* Sombra suave */
+  text-align: center;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+
+  /* Efecto de hover para mejorar la estética */
+  &:hover {
+    background: #ddedff;
+    box-shadow: 0px 6px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.movimiento-card p {
+  margin: 8px 0;
+  font-size: 1rem;
+  color: #333;
+}
+
+.movimiento-card strong {
+  color: #007bff; /* Color destacado para los títulos */
+  font-weight: bold;
+}
+
+/* Tarjeta de Producto en Cargas */
+.producto-card {
+  border: 1px solid #ddd;
+  text-align: center;
+}
+
+/* Imagen de producto en cargas */
+.producto-card img {
+  display: block;
+  margin: 8px auto;
+  border-radius: 4px;
+  max-width: 80px;
+  height: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+/* Estilo general de texto */
+p {
+  margin: 4px 0;
+  font-size: 1rem;
+}
+
+strong {
+  color: #555;
+}
+
+/* Listas */
+ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+
+li {
+  margin-bottom: 8px;
+}
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Espacia el botón y el título */
+  padding: 16px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
+  background: linear-gradient(45deg, #0056b3, #007bff);
+  color: #ffffff;
+}
+
+h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  text-align: center;
+  flex-grow: 1; /* Permite que el título ocupe el espacio restante */
+}
+
+.btn-volver {
+  background: none;
+  color: #ffffff;
+  border: none;
+  font-size: 1rem;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  padding: 8px;
+  transition: background-color 0.3s ease;
+}
+
+.btn-volver:hover {
+  background-color: rgba(255, 255, 255, 0.1);
+}

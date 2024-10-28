@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { CardModule } from 'primeng/card';
-import { Usuario } from '../../models/usuario.model';
 import { AuthService } from '../../services/Sockets/auth.service';
 import { ButtonModule } from 'primeng/button';
 import { Router } from '@angular/router';
@@ -11,21 +10,12 @@ import { Router } from '@angular/router';
   standalone: true,
   templateUrl: './perfil.component.html',
   styleUrls: ['./perfil.component.scss'],
-  imports: [CardModule, CommonModule,ButtonModule],
+  imports: [CardModule, CommonModule, ButtonModule],
 })
 export class PerfilComponent {
-  usuario: Usuario = {
-    id: '',
-    rut: '',
-    email: '',
-    nombre: '',
-    apellidoPaterno: '',
-    apellidoMaterno: '',
-    imageUrl: null,
-    roles: []
-  };
+  usuario: any = {}; // Se puede declarar como un objeto sin definir detalles específicos
 
-  constructor(private authService: AuthService,private router: Router) {
+  constructor(private authService: AuthService, private router: Router) {
     this.cargarUsuario();
   }
 

@@ -1,90 +1,26 @@
 <div class="row">
   <div class="contenido col">
+    <div class="titulo-pagina">Planificación Semanal</div>
 
-    <div class="titulo-pagina">Ventana de planificación</div>
-
-    <!-- Sección de información de la semana -->
     <div class="semana-info-container p-d-flex p-jc-between p-ai-center">
-      <p-button icon="pi pi-chevron-left" (click)="prevWeek()" label="Semana anterior" class="p-button-secondary "></p-button>
-      <span class="semana-text">Semana del {{ fechasSemana['lunes'] }} al {{ fechasSemana['viernes'] }}</span>
-      <p-button icon="pi pi-chevron-right" (click)="nextWeek()" label="Semana siguiente" class="p-button-secondary"></p-button>
+      <button (click)="prevWeek()" class="custom-button" aria-label="Semana anterior">
+        <i class="pi pi-chevron-left"></i> Semana anterior
+      </button>
+
+      <div class="semana-info">
+        <span class="semana-text">Semana del {{ fechasSemana['lunes'] }} al {{ fechasSemana['viernes'] }}</span>
+        <label for="calendar">Buscar por día:</label>
+        <p-calendar id="calendar" [(ngModel)]="selectedDate" (onSelect)="updateWeek()" dateFormat="dd/mm/yy" [showIcon]="true"></p-calendar>
+      </div>
+
+      <button (click)="nextWeek()" class="custom-button" aria-label="Semana siguiente">
+        Semana siguiente <i class="pi pi-chevron-right"></i>
+      </button>
     </div>
 
-    <!-- Espacio entre la información de la semana y los productos -->
-    <hr class="divider" />
-
-    <!-- Contenedores para los días de la semana -->
-    <div class="dias-semana-container p-grid">
-      <div class="dia p-col" id="lunes" (dragover)="allowDrop($event)" (drop)="drop($event, 'lunes')">
-        <div class="card">
-          <strong>lunes {{ fechasSemana['lunes'] }}</strong>
-          <div *ngFor="let producto of productosPorDia['lunes']" class="producto-container">
-            <button class="quitar-btn" (click)="quitarDeDia(producto, 'lunes')">×</button>
-            <span class="producto-en-dia" (click)="showProductoDetails(producto)">{{ producto.nombre }}</span>
-          </div>
-        </div>
-      </div>
-      <div class="dia p-col" id="martes" (dragover)="allowDrop($event)" (drop)="drop($event, 'martes')">
-        <div class="card">
-          <strong>martes {{ fechasSemana['martes'] }}</strong>
-          <div *ngFor="let producto of productosPorDia['martes']" class="producto-container">
-            <button class="quitar-btn" (click)="quitarDeDia(producto, 'martes')">×</button>
-            <span class="producto-en-dia" (click)="showProductoDetails(producto)">{{ producto.nombre }}</span>
-          </div>
-        </div>
-      </div>
-      <div class="dia p-col" id="miercoles" (dragover)="allowDrop($event)" (drop)="drop($event, 'miercoles')">
-        <div class="card">
-          <strong>miércoles {{ fechasSemana['miercoles'] }}</strong>
-          <div *ngFor="let producto of productosPorDia['miercoles']" class="producto-container">
-            <button class="quitar-btn" (click)="quitarDeDia(producto, 'miercoles')">×</button>
-            <span class="producto-en-dia" (click)="showProductoDetails(producto)">{{ producto.nombre }}</span>
-          </div>
-        </div>
-      </div>
-      <div class="dia p-col" id="jueves" (dragover)="allowDrop($event)" (drop)="drop($event, 'jueves')">
-        <div class="card">
-          <strong>jueves {{ fechasSemana['jueves'] }}</strong>
-          <div *ngFor="let producto of productosPorDia['jueves']" class="producto-container">
-            <button class="quitar-btn" (click)="quitarDeDia(producto, 'jueves')">×</button>
-            <span class="producto-en-dia" (click)="showProductoDetails(producto)">{{ producto.nombre }}</span>
-          </div>
-        </div>
-      </div>
-      <div class="dia p-col" id="viernes" (dragover)="allowDrop($event)" (drop)="drop($event, 'viernes')">
-        <div class="card">
-          <strong>viernes {{ fechasSemana['viernes'] }}</strong>
-          <div *ngFor="let producto of productosPorDia['viernes']" class="producto-container">
-            <button class="quitar-btn" (click)="quitarDeDia(producto, 'viernes')">×</button>
-            <span class="producto-en-dia" (click)="showProductoDetails(producto)">{{ producto.nombre }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Botón de enviar -->
-    
-    <p-toast></p-toast>
-
-      <p-confirmDialog></p-confirmDialog>
-
-      <p-button (click)="confirm()" icon="pi pi-check" label="Guardar Planificación"></p-button>
-
-
-    <!-- Contenedor de productos (listado filtrable) -->
     <div class="productos-container">
-      <div class="buscador-container">
-        <label for="producto-buscar" class="buscador-label">Buscar por producto: </label>
-        <input
-          id="producto-buscar"
-          type="text"
-          [(ngModel)]="searchTerm"
-          (ngModelChange)="filterProductos()"
-          placeholder="Buscar..."
-          class="buscador-input"
-        />
-      </div>
-      <div class="buscador-label">Productos para planificar</div>
+      
+      <div class="buscador text-center">Productos para planificar</div>
       <div class="productos-container-scroll" id="productos" (dragover)="allowDrop($event)" (drop)="dropToMainList($event)">
         <div class="producto" *ngFor="let producto of productosFiltrado" [attr.id]="producto.id" draggable="true" (dragstart)="drag($event)" (click)="showProductoDisponible(producto)">
           <div class="card">
@@ -95,9 +31,59 @@
           No hay coincidencias.
         </div>
       </div>
+
+      <div class="buscador-container d-flex align-items-center">
+    <label for="producto-buscar" class="buscador-label mr-2">Buscar productos:</label>
+    <input
+      id="producto-buscar"
+      type="text"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="filterProductos()"
+      placeholder="Buscar..."
+      class="buscador-input"
+      aria-label="Buscar productos"
+    />
+</div>
+
+
     </div>
-    
+
+    <hr class="divider" />
+
+    <div class="dias-semana-container p-grid">
+      <ng-container *ngFor="let dia of ['lunes', 'martes', 'miercoles', 'jueves', 'viernes']">
+        <div class="dia p-col" [id]="dia" (dragover)="allowDrop($event)" (drop)="drop($event, dia)">
+          <div class="card">
+            <strong class="dia-text">{{ dia.toUpperCase() }}</strong>
+            <span class="fecha-text">{{ fechasSemana[dia] }}</span>
+            <div *ngIf="productosPorDia[dia]?.size === 0" class="no-productos-message">
+              <img src="assets/img/planificacion.jpeg" alt="No hay productos" class="no-productos-image" />
+              <p class="no-hay-text">No hay productos asignados para este día.</p>
+            </div>
+            <div *ngFor="let producto of productosPorDia[dia]" class="producto-container">
+              
+              <span class="producto-nombre" (click)="showProductoDetails(producto)">{{ producto.nombre }}</span>
+              <span class="producto-cantidad" (click)="showProductoDetails(producto)">{{"Cantidad: "+ producto.cantidadPlanificada }}</span>
+              <button class="quitar-btn" (click)="quitarDeDia(producto, dia)">×</button>
+            </div>
+            
+          </div>
+        </div>
+      </ng-container>
+    </div>
 
 
+    <p-toast></p-toast>
+    <p-confirmDialog></p-confirmDialog>
+
+    <div class="button-container">
+      <button (click)="confirm()" class="custom-button" aria-label="Guardar planificación">
+        <i class="pi pi-check"></i> Guardar Planificación
+      </button>
+    </div>
+  </div>
+  
+  <div class="envios">
+    <app-envios></app-envios>
   </div>
 </div>

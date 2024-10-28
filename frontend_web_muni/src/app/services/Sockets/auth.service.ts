@@ -9,6 +9,7 @@ import { TokenService } from '../auth-token.service';
 export class AuthService {
   private apiUrl = 'http://34.176.26.41/api/auth'; 
   private userKey = 'user';
+  private defaultImageUrl = '/assets/img/user.jpeg'; // Imagen por defecto
 
   constructor(private http: HttpClient, private tokenService: TokenService) {}
 
@@ -26,11 +27,20 @@ export class AuthService {
 
   getUser(): any {
     const user = localStorage.getItem(this.userKey);
-    return user ? JSON.parse(user) : null;
+    if (user) {
+      const parsedUser = JSON.parse(user);
+
+      // Verificar si no tiene imageUrl o es null/undefined
+      if (!parsedUser.imageUrl) {
+        parsedUser.imageUrl = this.defaultImageUrl; // Asignar imagen por defecto
+      }
+
+      return parsedUser;
+    }
+    return null;
   }
 
   isAuthenticated(): boolean {
     return this.tokenService.getToken() !== null;
   }
-
 }

@@ -4,6 +4,7 @@ import { AppComponent } from './app/app.component';
 import { provideHttpClient } from '@angular/common/http';
 import { provideAnimationsAsync } from '@angular/platform-browser/animations/async'; // Importar provideHttpClient
 import { PlanificacionSocketService } from './app/services/Sockets/planificacion.socket.service';
+import { EnviosSocketService } from './app/services/envios.service';
 
 // Actualiza tu appConfig para incluir HttpClient
 const config = {
@@ -12,7 +13,9 @@ const config = {
     ...appConfig.providers || [], // Asegúrate de mantener los proveedores existentes
     provideHttpClient(), 
     provideAnimationsAsync(),
-    PlanificacionSocketService
+    PlanificacionSocketService,
+    EnviosSocketService
+
 
   ],
 };

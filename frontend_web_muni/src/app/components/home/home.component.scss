@@ -4,18 +4,20 @@
   background-color: #ffffff; /* Fondo blanco */
 }
 .contenido h3{
-  font-size: 0.9rem; 
+  font-size: 1rem; 
 }
 .semana {
   display: flex;
-  justify-content: space-between; /* Espacio uniforme entre elementos */
-  flex-wrap: wrap;
-  padding: 5px; /* Reduce padding */
-  border-radius: 10px; /* Bordes más redondeados */
-  margin: 5px 0; /* Reduce margen */
-  border: 1px solid #def4ff; 
-  box-shadow: 0 0 10px rgba(228, 246, 255, 0.5); /* Sombra más sutil */
+  align-items: center;
 }
+
+.plan-futuro {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%; /* Ocupa toda la altura del contenedor */
+}
+
 
 .semana::before {
   position: absolute;
@@ -71,85 +73,158 @@
   margin-top: 4px; /* Espaciado superior */
   margin-bottom: 0; /* Sin margen inferior */
 }
+.titulo-planificacion {
+  margin-top: 4vh;
+  font-size: 1.5rem; /* Tamaño de fuente más grande */
+  color: #8e8f8f; /* Cambia el color para hacerlo más llamativo */
+  margin-bottom: 10px; /* Espacio debajo del título */
+  text-align: center; /* Centra el título horizontalmente */
+  border-bottom: 2px solid #def4ff; /* Línea inferior para enfatizar */
+  padding-bottom: 5px; /* Espacio entre el título y la línea */
+}
+
+/* Tarjeta de cada tanda */
+.tanda-card {
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Centra los elementos */
+  justify-content: center;
+  border-radius: 10px;
+  background: #f7f9fc; /* Fondo claro */
+  box-shadow:8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease-in-out;
+  text-align: center; /* Centra el texto */
+  max-width: 100%;
+  margin: 0 auto; /* Centrado */
+}
 
 
-
-.plan-futuro {
+/* Estilo del título de la tanda */
+.tanda-card h5 {
+  font-size: 1.5rem;
   font-weight: bold;
+  color: #ffffff;
+  background-color: #007bff; /* Fondo azul para el título */
+  border-radius: 5px;
+  width: 100%;
+  margin-bottom: 15px;
+}
+
+/* Estilo de cada dato en la tarjeta */
+.tanda-card p {
+  font-size: 1rem;
+  color: #333;
+  border-radius: 5px;
+  background-color: #e9f5ff; /* Fondo azul claro para los datos */
+  border: 1px solid #b3d7ff; /* Borde más oscuro */
+  width: 100%;
+  max-width: 90%;
+}
+
+/* Negrita para los títulos de cada dato */
+.tanda-card p strong {
+  color: #555;
+}
+
+/* Personalización del carrusel */
+.ui-carousel .ui-carousel-content {
+  padding-top: 15px;
+}
+
+/* Botones de navegación del carrusel */
+.ui-carousel .ui-carousel-prev,
+.ui-carousel .ui-carousel-next {
+  background-color: #007bff; /* Azul para los botones de navegación */
+  color: #ffffff;
+  border-radius: 50%;
+  width: 30px;
+  height: 30px;
+}
+
+.ui-carousel .ui-carousel-prev:hover,
+.ui-carousel .ui-carousel-next:hover {
+  background-color: #0056b3; /* Color más oscuro en hover */
+}
+
+/* Paginación personalizada del carrusel */
+.ui-carousel-indicators .ui-carousel-page {
+  background-color: #ddd;
+  width: 10px;
+  height: 10px;
+  margin: 0 4px;
+  border-radius: 50%;
+  transition: background-color 0.3s;
+}
+
+.ui-carousel-indicators .ui-carousel-page.ui-state-active {
+  background-color: #007bff; /* Azul para el indicador activo */
+}
+
+.contenido.planificacion {
+  padding: 15px;
+  border-radius: 10px;
+}
+
+.detalle-item {
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  margin-bottom: 5px;
+  padding: 10px;
+}
+
+.estado-completo {
+  color: green;
+  font-weight: bold;
+}
+
+.estado-pendiente {
+  color: red;
+  font-weight: bold;
+}
+.row {
+  display: flex;
+  align-items: stretch; /* Hace que las columnas tengan la misma altura */
+}
+
+.col-6 {
+  display: flex;
+  flex-direction: column;
+}
+
+.contenido {
+  flex: 1; /* Permite que el contenido se expanda para ocupar el espacio completo */
+}
+
+.full-width-carousel {
+  width: 100%;
+  height: 100%;
+}
+
+.p-card.contenido.planificacion {
+  height: 100%;
+}
+.btn-redirect {
+  display: inline-flex;
+  align-items: center;
+  background-color: #007bff; /* Color de fondo azul */
+  color: #ffffff; /* Color de texto blanco */
+  border: none;
+  padding: 8px 12px;
+  padding-top: 12px; /* Espacio adicional en la parte superior */
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 5px;
   cursor: pointer;
-  color: #666;
-  margin-left: 10px;
-  align-self: center;
+  transition: background-color 0.3s;
+  margin-top: 15px; /* También puedes usar margin-top para separar del contenido superior */
 }
 
-.fecha {
-  font-size: 0.7rem; /* Reduce el tamaño de la fecha */
-}
-.divider {
-  height: 1px; /* Altura del separador */
-  background-color: #e0e0e0; /* Color del separador */
-  margin: 16px 0; /* Espacio alrededor del separador */
-  width: 100%; /* Ancho completo */
+.btn-redirect i {
+  margin-right: 8px; /* Espacio entre el icono y el texto */
+  font-size: 1.2rem;
 }
 
-
-
-@media (max-width: 768px) {
-  .day-container {
-    flex: 1 1 45%; /* Cambia a 45% para pantallas más pequeñas */
-    margin: 5px 1%; /* Ajusta margen */
-  }
-}
-
-/* Cambios en pantallas pequeñas */
-@media (max-width: 480px) {
-  .day-container {
-    flex: 1 1 90%; /* Cambia a 90% para pantallas más pequeñas */
-  }
-}
-
-/* Limita el ancho del contenedor de las tandas y habilita el desplazamiento horizontal */
-.tandas-list-container {
-  max-width: 100%; /* Puedes ajustar el valor según lo que necesites */
-  overflow-x: auto;
-  white-space: nowrap; /* Evita que los elementos se rompan en varias líneas */
-  padding-bottom: 10px; /* Añade un poco de espacio debajo para el scrollbar */
-}
-
-.dataview-center {
-  justify-content: center; /* Centra horizontalmente */
-  align-items: center; /* Centra verticalmente */
-  flex-direction: column; /* Asegura que los elementos se apilen verticalmente */
-  text-align: center; /* Centra el texto dentro de los elementos */
-}
-.image-container {
-  flex-shrink: 0; /* Asegúrate de que la imagen no se reduzca */
-  width: 60px; /* Ancho más pequeño para la imagen */
-  height: 60px; /* Alto más pequeño para la imagen */
-}
-
-.details-container {
-  flex-grow: 1; /* Permite que el contenedor de detalles ocupe el espacio restante */
-  display: flex;
-  flex-direction: column; /* Organiza la información verticalmente */
-  justify-content: center; /* Centra verticalmente la información */
-  margin-left: 8px; /* Menos espacio entre la imagen y el texto */
-}
-
-.product-info {
-  display: flex;
-  flex-direction: column; /* Asegura que la información del producto esté apilada */
-}
-
-.surface-100 {
-  background-color: #f5f5f5; /* Fondo claro para resaltar la información */
-  border-radius: 30px; /* Bordes redondeados */
-  padding: 4px; /* Menos espacio interno */
-}
-.titulo{
-  font-size: large;
-  font-family: bold;
-  color:white;
-  background: linear-gradient(to left, rgba(77, 180, 172, 1) 0%, rgba(25, 118, 210, 1) 60%); /* Degradado */
+.btn-redirect:hover {
+  background-color: #0056b3; /* Color más oscuro en hover */
 }
 

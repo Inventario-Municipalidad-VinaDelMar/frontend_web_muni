@@ -1,20 +1,21 @@
-<div class="contenido">
-  <h2>Gestión de Usuarios (para la plataforma)</h2>
+<div class="gestion-usuarios-container">
+  <p-card>
+    <div class="header">
+      <h2>Gestión de Usuarios</h2>
+      <p-button label="Agregar Usuario" icon="pi pi-plus" (click)="abrirDialogoAgregar()" class="btn-agregar-usuario"></p-button>
+    </div>
 
-  <div class="d-grid semana mt-4">
-    <p-button label="Agregar Usuario" icon="pi pi-plus" (click)="abrirDialogoAgregar()"></p-button>
-  </div>
+    <p-divider></p-divider>
 
-  <div class="row mt-4">
-    <div class="col-4">
-      <div class="contenido">
-        <h3>Listado de Usuarios</h3>
-        <p-table [value]="usuarios" selectionMode="single" [(selection)]="usuarioSeleccionado" (onRowSelect)="mostrarDetalles()">
+    <!-- Tabla de usuarios -->
+    <div class="usuarios-tabla">
+      <p-panel header="Listado de Usuarios" class="tabla-panel">
+        <p-table [value]="usuarios" selectionMode="single" [(selection)]="usuarioSeleccionado" (onRowSelect)="mostrarDetalles()" responsiveLayout="scroll">
           <ng-template pTemplate="header">
             <tr>
               <th>ID</th>
               <th>RUT</th>
-              <th>Nombre</th>
+              <th>Nombre Completo</th>
               <th>Email</th>
               <th>Roles</th>
             </tr>
@@ -29,45 +30,60 @@
             </tr>
           </ng-template>
         </p-table>
-      </div>
+      </p-panel>
     </div>
 
-    <div class="col-8">
-      <div class="contenido" id="lateral" *ngIf="usuarioSeleccionado">
-        <h3>Detalles del Usuario Seleccionado</h3>
-        <p><strong>ID:</strong> {{ usuarioSeleccionado.id }}</p>
-        <p><strong>RUT:</strong> {{ usuarioSeleccionado.rut }}</p>
-        <p><strong>Nombre:</strong> {{ usuarioSeleccionado.nombre }} {{ usuarioSeleccionado.apellidoPaterno }} {{ usuarioSeleccionado.apellidoMaterno }}</p>
-        <p><strong>Email:</strong> {{ usuarioSeleccionado.email }}</p>
-        <p><strong>Roles:</strong> {{ usuarioSeleccionado.roles.join(', ') }}</p>
-        <p-button label="Editar" icon="pi pi-pencil" (click)="abrirDialogoEditar(usuarioSeleccionado)"></p-button>
-      </div>
+    <!-- Panel de detalles del usuario seleccionado -->
+    <div *ngIf="usuarioSeleccionado" class="detalles-usuario">
+      <p-card header="Detalles del Usuario Seleccionado">
+        <div class="detalles-contenido">
+          <p><strong>ID:</strong> {{ usuarioSeleccionado.id }}</p>
+          <p><strong>RUT:</strong> {{ usuarioSeleccionado.rut }}</p>
+          <p><strong>Nombre:</strong> {{ usuarioSeleccionado.nombre }} {{ usuarioSeleccionado.apellidoPaterno }} {{ usuarioSeleccionado.apellidoMaterno }}</p>
+          <p><strong>Email:</strong> {{ usuarioSeleccionado.email }}</p>
+          <p><strong>Roles:</strong> {{ usuarioSeleccionado.roles.join(', ') }}</p>
+        </div>
+        <p-footer>
+          <p-button label="Editar" icon="pi pi-pencil" (click)="abrirDialogoEditar(usuarioSeleccionado)" class="p-button-warning"></p-button>
+        </p-footer>
+      </p-card>
     </div>
-  </div>
+  </p-card>
 
   <!-- Diálogo para agregar usuario -->
-  <p-dialog header="Agregar Usuario" [(visible)]="mostrarDialogoAgregar" [modal]="true" [style]="{ width: '450px' }">
-    <div>
-      <label for="nombre">Nombre:</label>
-      <input id="nombre" [(ngModel)]="nuevoUsuario.nombre" type="text" pInputText />
+  <p-dialog header="Agregar Usuario" [(visible)]="mostrarDialogoAgregar" [modal]="true" [style]="{ width: '400px' }" (onHide)="cerrarDialogoAgregar()">
+    <div class="p-fluid">
+      <div class="field">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" [(ngModel)]="nuevoUsuario.nombre" type="text" pInputText />
+      </div>
 
-      <label for="apellidoPaterno">Apellido Paterno:</label>
-      <input id="apellidoPaterno" [(ngModel)]="nuevoUsuario.apellidoPaterno" type="text" pInputText />
+      <div class="field">
+        <label for="apellidoPaterno">Apellido Paterno</label>
+        <input id="apellidoPaterno" [(ngModel)]="nuevoUsuario.apellidoPaterno" type="text" pInputText />
+      </div>
 
-      <label for="apellidoMaterno">Apellido Materno:</label>
-      <input id="apellidoMaterno" [(ngModel)]="nuevoUsuario.apellidoMaterno" type="text" pInputText />
+      <div class="field">
+        <label for="apellidoMaterno">Apellido Materno</label>
+        <input id="apellidoMaterno" [(ngModel)]="nuevoUsuario.apellidoMaterno" type="text" pInputText />
+      </div>
 
-      <label for="email">Email:</label>
-      <input id="email" [(ngModel)]="nuevoUsuario.email" type="email" pInputText />
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" [(ngModel)]="nuevoUsuario.email" type="email" pInputText />
+      </div>
 
-      <label for="roles">Roles:</label>
-      <input id="roles" [(ngModel)]="nuevoUsuario.roles" type="text" pInputText placeholder="Ejemplo: administrador, usuario" />
-      
+      <div class="field">
+        <label for="roles">Roles</label>
+        <input id="roles" [(ngModel)]="nuevoUsuario.roles" type="text" pInputText placeholder="Ejemplo: administrador, usuario" />
+      </div>
+
       <p-footer>
-        <p-button label="Guardar" icon="pi pi-check" (click)="guardarUsuario()"></p-button>
-        <p-button label="Cancelar" icon="pi pi-times" (click)="cerrarDialogoAgregar()"></p-button>
+        <div class="dialog-footer">
+          <p-button label="Guardar" icon="pi pi-check" (click)="guardarUsuario()" class="p-button-success"></p-button>
+          <p-button label="Cancelar" icon="pi pi-times" (click)="cerrarDialogoAgregar()" class="p-button-secondary"></p-button>
+        </div>
       </p-footer>
     </div>
   </p-dialog>
 </div>
-

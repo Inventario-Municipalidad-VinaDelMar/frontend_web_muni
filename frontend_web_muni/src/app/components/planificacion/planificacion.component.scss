@@ -8,6 +8,14 @@
     border-radius: 5px;
     margin-bottom: 10px;
   }
+  .semana-info {
+    display: flex;
+    flex-direction: column; /* Para apilar el texto y el calendario */
+    align-items: center; /* Centrar horizontalmente */
+    margin: 0 10px; /* Margen horizontal opcional */
+    font-size: x-small;
+  }
+  
   
   .semana-text {
     font-size: 18px;
@@ -28,29 +36,36 @@
   
   /* Contenedor de productos */
   .productos-container {
-    margin: 10px 0;
     text-align: start; /* Añadido margen para separar de la sección superior */
   }
   
-  /* Buscador de productos */
-  .buscador-container {
-    display: flex;                  /* Utilizar flexbox para alinear elementos */
-    flex-direction: column;         /* Apilar elementos verticalmente */
-    margin-bottom: 15px;            /* Espacio entre el buscador y los productos */
+/* Ajuste en el contenedor del buscador */
+.buscador-container {
+  display: flex;                  /* Utilizar flexbox para alinear elementos */
+  flex-direction: row;         /* Apilar elementos verticalmente */
+  width: 300px;                  /* Ancho fijo o ajustable según lo desees */
+  margin-top: 10px;
+}
+
+/* Ajuste en la entrada del buscador */
+.buscador-input {
+  background-color: #f3fbff;
+  padding: 8px;                  /* Ajustar el espaciado interno para hacerlo más pequeño */
+  border: 1px solid #ccc;         /* Borde del input */
+  border-radius: 4px;                 /* Tamaño de fuente */
+  transition: border-color 0.3s;  /* Suavizar el cambio de color del borde */
+  height: 2vh; /* Ajusta el ancho según sea necesario */
+  font-size: small; /* Cambia el tamaño de la fuente si lo deseas */
+}
+
+  
+  .buscador-label {  
+    font-size: x-small;
+    justify-content: center;
+    margin-right: 6px;
   }
   
-  .buscador-label {
-    font-weight: bold;              /* Negrita para la etiqueta */
-    margin-bottom: 5px;             /* Espacio debajo de la etiqueta */
-  }
   
-  .buscador-input {
-    padding: 10px;                  /* Espaciado interno del input */
-    border: 1px solid #ccc;         /* Borde del input */
-    border-radius: 4px;             /* Bordes redondeados */
-    font-size: 14px;                /* Tamaño de fuente */
-    transition: border-color 0.3s;  /* Suavizar el cambio de color del borde */
-  }
   
   .buscador-input:focus {
     border-color: #3e95ff;          /* Cambiar el color del borde al enfocar */
@@ -66,20 +81,14 @@
   
   .productos-container-scroll {
     display: flex;
+    font-size: small;
     overflow-x: auto;
     gap: 10px;
-    padding: 10px 0; /* Espaciado desde las orillas */
-    border-radius: 8px;
     scrollbar-width: thin;
     scrollbar-color: #0084ff transparent;
     min-width: 400px; /* Establecer un ancho mínimo */
 }
 
-  
-  .producto:hover {
-    background-color: #f7f7f7; /* Cambio de color en hover */
-    transform: scale(1.05); /* Aumentar tamaño ligeramente */
-  }
   
   /* Contenedor de los días de la semana */
   .dias-semana-container {
@@ -87,30 +96,22 @@
     flex-wrap: wrap; /* Permitir que los días se ajusten a múltiples líneas */
     justify-content: space-between; /* Espacio igual entre cada día */
     align-items: flex-start; /* Alinear verticalmente al inicio */
-    gap: 20px; /* Espacio entre los días */
     padding: 0 20px; /* Ajustar el padding para que no sobresalga */
     margin-bottom: 20px;
   }
   
   .dia {
+    border: 1px solid rgb(231, 231, 231);
     flex: 1 1 calc(20% - 20px); /* Usar flexbox para definir el ancho */
     height: 40vh; /* Altura mínima para los días */
-    max-width: 250px; /* Ancho máximo */
+    max-width: 30vh; /* Ancho máximo */
     display: flex;
     flex-direction: column;
-    gap: 15px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    border: 2px solid #80deea;
-    padding: 10px 15px;
     text-align: center;
-    border-radius: 8px;
     overflow-y: auto; /* Permitir desplazamiento si el contenido excede el tamaño */
   }
-  
 
-.dia:hover {
-    background-color: #cfe6ff; /* Cambio de color al pasar el mouse */
-}
 
 .dia.drag-over {
     background-color: #b2e4ff; /* Color al pasar un producto por encima */
@@ -120,23 +121,44 @@
 
   
 .producto-container {
-  background: #65b2ff; /* Degradado de fondo */
-  color: white;
-  border: 2px solid #3e95ff; /* Borde */
-  border-radius: 10px;
-  padding: 10px; /* Espaciado interno */
-  font-size: small; /* Tamaño de fuente reducido */
+  background: #1976d2;
+  color: rgb(255, 255, 255);
+  margin-bottom: 1px;
+  padding: 10px;
+  font-size: small;
   display: flex;
-  justify-content: center; /* Centrar contenido horizontalmente */
-  align-items: center; /* Centrar contenido verticalmente */
+  align-items: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  width: 100%; /* Ancho completo para que se ajuste al contenedor padre */
-  height: auto; /* Permitir que la altura sea automática según el contenido */
-  max-height: 40px; /* Altura máxima para no desbordar el contenedor */
-  margin: 5px 0; /* Separación vertical entre productos */
-  overflow: hidden; /* Evitar que el texto se desborde */
+  width: 100%;
+  height: auto;
+  overflow: hidden;
 }
+
+/* Asignar anchos específicos a los elementos */
+.producto-nombre {
+  flex: 5; /* 70% del ancho total */
+  text-align: left; /* Alinear a la izquierda */
+  font-size: x-small;
+}
+
+.producto-cantidad {
+  flex: 4; /* 20% del ancho total */
+  text-align: right; /* Alinear a la derecha */
+  font-size: xx-small;
+}
+
+
+/* Botón quitar (puedes ajustar el tamaño también si es necesario) */
+.quitar-btn {
+  color: #003b72;
+  font-size: large;
+  flex: 1; /* 10% del ancho total */
+  background: transparent; /* Sin fondo */
+  border: none; /* Sin borde */
+  cursor: pointer; /* Cambiar el cursor a puntero */
+}
+
 
 /* Ajuste en la etiqueta del producto */
 .producto-container span {
@@ -148,23 +170,15 @@
 }
 /* Efecto de hover para interacción */
 .producto-container:hover {
+    background-color: #0058ab;
     transform: translateY(-3px); /* Mueve ligeramente el contenedor hacia arriba */
     box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Aumenta la sombra en hover */
 }
 
   
-  .quitar-btn {
-    background: none;        /* Sin fondo */
-    border: none;           /* Sin borde */
-    color: red;             /* Color de la "X" */
-    cursor: pointer;        /* Cambiar el cursor al pasar el mouse */
-    padding: 0;             /* Sin padding */
-    margin-left: 5px;      /* Espacio a la izquierda de la "X" */
-    align-self: flex-start;
-  }
-  
   .quitar-btn:hover {
     opacity: 0.7;           /* Efecto de hover */
+    
   }
 
 
@@ -176,14 +190,23 @@
     display: flex;              
     justify-content: center;    
     align-items: center;        
-    height: 50px;              
+    height: 25px;              
     width: 200px;               
     text-align: center;        
     overflow: hidden;          
     text-overflow: ellipsis;   
-    white-space: nowrap;    
+    white-space: nowrap; 
+    cursor: pointer; /* Cambiar el cursor al pasar sobre el botón */  
+     
     
   }
+
+  .p-card-title:hover {
+    transition: 0.4s;
+    background-color: #0058ab;
+    transform: translateY(-3px); /* Mueve ligeramente el contenedor hacia arriba */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Aumenta la sombra en hover */
+}
   .semana-info-container {
     background-color: #f0f8ff; /* Fondo claro para contrastar */
     padding: 10px 20px; /* Espaciado alrededor del contenido */
@@ -193,12 +216,9 @@
 
 .semana-text {
     font-size: 1.2em; /* Aumentar el tamaño de la fuente */
-    font-weight: bold; /* Negrita para destacar */
     color: #333; /* Color del texto */
 }
 .titulo-pagina {
-  font-size: 2em; /* Tamaño de fuente grande */
-  font-weight: bold; /* Negrita */
   color: #ffffff; /* Color del texto */
   text-align: center; /* Centrado horizontal */
   padding: 15px 0; /* Espaciado vertical */
@@ -209,11 +229,79 @@
 }
 input {
   
-  background-color: #cae0ff; /* Cambia este color por el que desees */
   border: 1px solid #ccc; /* Puedes ajustar el borde también si lo deseas */
   padding: 10px; /* Espaciado interno */
   border-radius: 5px; /* Bordes redondeados opcionalmente */
-  width: 100%; /* O el ancho que prefieras */
   box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
   transition: background-color 0.3s; /* Para un efecto suave en el cambio de color */
 }
+.envios { 
+  text-align: center;
+  margin-top: 10px;
+  border-radius: 10px;
+  padding: 10px;
+}
+.button-container {
+  display: flex; /* Usar flexbox para centrar */
+  justify-content: center; /* Centrar horizontalmente */
+  margin-top: 20px; /* Margen superior para separar de otros elementos */
+}
+
+.custom-button {
+  background: linear-gradient(to right, rgba(77, 180, 172, 1) 0%, rgba(25, 118, 210, 1) 60%); /* Degradado */
+  color:white;
+  border: 1px solid #ffffff; 
+  border-radius: 4px; /* Bordes redondeados */
+  padding: 8px 16px; /* Espaciado interno */
+  cursor: pointer; /* Cambiar el cursor al pasar sobre el botón */
+  font-size: 14px; /* Tamaño de fuente */
+  display: flex; /* Para alinear el ícono y el texto */
+  align-items: center; /* Alinear verticalmente */
+  justify-content: center; /* Alinear horizontalmente */
+  
+}
+
+.custom-button:hover {
+  background: #f4f4f4; /* No cambiar el color al pasar el ratón */
+  color:black;
+  transition: 0.2s;
+  border: 1px solid #d6d6d6; 
+
+}
+
+.custom-button i {
+  
+  margin-right: 4px; /* Espacio entre el ícono y el texto */
+}
+
+.calendario-container {
+  display: flex;
+  justify-content: center; /* Centrar horizontalmente */
+}
+
+.card{
+  border:none;
+}
+.no-productos-image {
+  max-width: 50%;
+  height: auto;
+  display: block;
+  opacity: 0.5; /* Ajusta este valor para cambiar la opacidad */
+  filter: blur(2px); /* Ajusta el valor para cambiar la cantidad de desenfoque */
+  margin: 0 auto; /* Esto centra la imagen */
+}
+.dia-text {
+  margin-top: 10px;
+  font-weight: bold; /* Puedes cambiar el grosor de la fuente si lo deseas */
+}
+
+.fecha-text {
+  font-size: 0.7em; /* Ajusta el tamaño de la fecha como desees */
+  color: gray; /* Cambia el color si lo deseas */
+  margin-bottom: 10px;
+}
+
+.no-hay-text{
+  padding: 10px;
+}
+

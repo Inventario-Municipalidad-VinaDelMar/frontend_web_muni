@@ -1,29 +1,492 @@
-.row {
-    display: flex;
-    margin-bottom: 20px; /* Espacio entre filas */
-}
-
+/* Estilo para el contenedor principal */
 .contenido {
-    padding: 15px;
-    background-color: #f8f8f8; /* Color de fondo claro */
-    border: 1px solid #ddd; /* Borde sutil */
+    background-color: #f8f9fa;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    height: 300px; /* Altura fija para el contenedor principal */
+    max-width: 100%; /* Asegura que el contenedor no se desborde */
+}
+
+.contenido.col{
+    padding:0;
+    margin:0;
+    border:0;
+}
+h2{
+    padding:10px;
+    font-size: large;
+    color:white;
+    background: linear-gradient(45deg, #0056b3, #007bff); /* Degradado para el fondo del título */
+}
+
+::ng-deep p-carousel {
+    width: 100%;
+    height: 100%; /* Ocupa toda la altura del contenedor */
+    padding: 5px; /* Reduce el padding interno */
+    box-sizing: border-box;
+}
+
+.contenido p-carousel {
+    max-width: 100%;
+    height: auto;
+    padding: 10px; /* Reduce el padding del contenedor del carrusel */
+    box-sizing: border-box;
+}
+::ng-deep .p-carousel .p-carousel-item .p-card {
+    max-width: 90%; /* Asegura que las tarjetas no ocupen todo el ancho */
+    height: auto;
+    padding: 8px; /* Reduce el padding interno de cada tarjeta */
+    margin: 5px auto; /* Centra las tarjetas dentro del carrusel */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+}
+::ng-deep .p-carousel-prev, 
+::ng-deep .p-carousel-next {
+    font-size: 0.8em; /* Tamaño reducido */
+    width: 25px;
+    height: 25px;
+    padding: 4px;
+}
+::ng-deep .p-carousel-indicators {
+    margin: 0 !important;
+    padding: 0 !important;
+}
+
+.no-products-message {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 20px;
+    color: #6c757d; /* Optional color for text */
+}
+
+.no-products-message img.no-products-icon {
+    width: 80px; /* Adjust size as needed */
+    height: auto;
+    margin-bottom: 10px; /* Space between image and text */
+}
+.error-message {
+    text-align: center;
+    margin-top: 20px;
+    color: #333;
+  }
+  
+  .no-bodegas-icon {
+    width: 150px;
+    height: auto;
+    margin-bottom: 10px;
+  }
+/* Estilo para el card-container, usando flex para dividir el contenido */
+.card-container {
+    display: flex;
+    align-items: stretch;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+/* Sección de información (80%) */
+.info-section {
+    flex: 0 0 70%; /* Ajusta el ancho de la sección de información */
+    padding: 10px; /* Reduce el padding */
+    background-color: #ffffff;
+    border-top-left-radius: 8px;
+    border-bottom-left-radius: 8px;
+    box-sizing: border-box;
+}
+.info-section h2 {
+    background: linear-gradient(45deg, #007bff, #0056b3); /* Degradado para el fondo del título */
+    color: #ffffff;
+    font-size: 1em;
+    font-weight: bold;
+    margin: 0;
+    padding: 8px 10px;
+    border-radius: 6px; /* Bordes redondeados para el título */
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15); /* Sombra para el título */
+}
+
+.info-section p {
+    font-size: 0.8em;
+    line-height: 1.4;
+    margin: 4px 0;
+}
+
+/* Sección de imagen (20%) */
+.image-section {
+    flex: 0 0 30%; /* Ajusta el ancho de la sección de imagen */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 5px;
+}
+.bodega-icon {
+    width: 80%;
+    height: auto;
+    max-width: 100px;
+    filter: drop-shadow(0px 4px 6px rgba(0, 0, 0, 0.2)); /* Sombra para la imagen */
+}
+
+/* Estilo para el p-card de PrimeNG */
+.p-card {
+    margin: 10px;
+    border: none;
+    box-shadow: 0px 6px 20px rgba(0, 0, 0, 0.25); /* Sombra más profunda para el card */
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border-radius: 12px;
+}
+
+.p-card:hover {
+    transform: scale(1.05);
+    box-shadow: 0px 12px 30px rgba(0, 0, 0, 0.3); /* Sombra más intensa en hover */
+}
+
+/* Adaptación para dispositivos móviles */
+@media (max-width: 768px) {
+    .card-container {
+        flex-direction: column;
+    }
+    .info-section,
+    .image-section {
+        flex: 1 0 100%;
+    }
+    .bodega-icon {
+        width: 100px;
+    }
+}
+
+/* Contenedor principal dividido en 60% y 40% */
+.main-container {
+    display: flex;
+    width: 100%;
+    gap: 20px;
+    padding: 20px;
+    height: 60vh;
+}
+
+/* Configuración para la columna de contenido principal (60%) */
+/* Estilos para content-section */
+/* Contenedor principal de content-section */
+.content-section {
+    flex: 0 0 80%;
+    background-color: #f9f9f9;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+    max-height: 80vh; /* Altura máxima para permitir el desplazamiento */
+    position: relative;
+}
+
+/* Estilos para navegadores WebKit (Chrome, Safari, Edge basado en Chromium) */
+.content-section::-webkit-scrollbar {
+    width: 8px; /* Ancho de la barra de desplazamiento */
+}
+
+.content-section::-webkit-scrollbar-track {
+    background: #f0f4f8; /* Color de fondo de la pista de desplazamiento */
+    border-radius: 4px; /* Bordes redondeados para la pista */
+}
+
+.content-section::-webkit-scrollbar-thumb {
+    background-color: #007bff; /* Color azul para el pulgar de desplazamiento */
+    border-radius: 4px; /* Bordes redondeados del pulgar */
+    border: 2px solid #f0f4f8; /* Bordes para crear espacio entre el pulgar y la pista */
+}
+
+/* Para Firefox */
+.content-section {
+    scrollbar-width: thin; /* Hace la barra de desplazamiento más estrecha */
+    scrollbar-color: #007bff #f0f4f8; /* Color del pulgar y de la pista de desplazamiento */
+}
+
+
+/* Encabezado fijo que se alinea al principio */
+.product-list h3 {
+    text-align: center;
+    position: sticky;
+    top: 0; /* Alineación superior para que quede en el principio */
+    background: linear-gradient(45deg, #0056b3, #007bff); /* Degradado para el fondo del título */
+    color:white;
+    padding: 10px;
+    margin: 0;
+    z-index: 10;
+    font-size: 1.2em;
+    border-bottom: 1px solid #ddd;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra para destacar el encabezado */
+}
+
+/* Ajustes adicionales para que el encabezado se vea alineado */
+.product-list {
+    padding-top: 0;
+    margin-top: 0;
+}
+
+
+
+.additional-section {
+    flex: 0 0 20%;
+    background: linear-gradient(135deg, #f0f4f8, #d9e2ec);
+    padding: 0;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    height: 100%; /* Asegura que el contenedor ocupe toda la altura */
+}
+
+.additional-section p-panel {
+    width: 100%;
+    height: 100%; /* Expande el panel a toda la altura del contenedor */
+    display: flex;
+    flex-direction: column;
+}
+
+.panel-content {
+    
+    text-align: center;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    color: #34495e;
+    overflow-y: auto; /* Permite el desplazamiento en caso de contenido adicional */
+    max-height: 200px; /* Limita la altura para evitar que se extienda */
+}
+
+.panel-subheader {
+    background: linear-gradient(45deg, #0056b3, #007bff); /* Degradado para el fondo del título */
+    border-radius: 3px;
+    font-size: 1.1em;
+    font-weight: bold;
+    color: white;
+    margin-bottom: 10px;
+}
+
+.ubicaciones-list {
+    max-height: 100px; /* Altura máxima para la lista de ubicaciones */
+    overflow-y: auto; /* Permite desplazamiento vertical en la lista de ubicaciones */
+    background-color: #f9fafc;
+    border-radius: 8px;
+    box-shadow: inset 0px 0px 6px rgba(0, 0, 0, 0.05);
+    padding: 8px;
+}
+
+.ubicaciones-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.ubicaciones-list li {
+    font-size: 0.95em;
+    color: #2c3e50;
+    padding: 6px 10px;
+    margin-bottom: 6px;
+    border-radius: 6px;
+    background-color: #ffffff;
+    transition: background-color 0.3s ease;
+}
+
+.ubicaciones-list li:hover {
+    background-color: #e0f7fa;
+}
+
+.ubicaciones-list::-webkit-scrollbar {
+    width: 8px; /* Hace la barra de desplazamiento más estrecha */
+}
+
+.ubicaciones-list::-webkit-scrollbar-track {
+    background: #f0f4f8; /* Color de fondo de la pista de desplazamiento */
+    border-radius: 4px; /* Bordes redondeados */
+}
+
+.ubicaciones-list::-webkit-scrollbar-thumb {
+    background-color: #007bff; /* Color azul para el pulgar de desplazamiento */
+    border-radius: 4px; /* Bordes redondeados del pulgar */
+    border: 2px solid #f0f4f8; /* Bordes para crear espacio entre el pulgar y la pista */
+}
+
+/* Para Firefox */
+.ubicaciones-list {
+    scrollbar-width: thin; /* Hace la barra de desplazamiento más estrecha */
+    scrollbar-color: #007bff #f0f4f8; /* Color del pulgar y de la pista de desplazamiento */
+}
+
+
+.productos-list {
+    max-height: 150px; /* Define una altura máxima para la lista de productos */
+    padding: 8px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    box-shadow: inset 0px 0px 6px rgba(0, 0, 0, 0.05); /* Sombra interna */
+    margin-top: 10px;
+}
+
+.productos-list ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.productos-list li {
+    font-size: 0.9em;
+    color: #2c3e50;
+    padding: 4px 0;
+}
+.listado-ubicacion {
+    max-height: 25vh; /* Limita la altura máxima */
+    overflow-y: auto; /* Activa el desplazamiento vertical */
+    padding: 0 8px;
+    background-color: #ffffff;
+    border-radius: 6px;
+    box-shadow: inset 0px 0px 6px rgba(0, 0, 0, 0.05);
+}
+
+.listado-ubicacion .panel-subheader {
+    position: sticky;
+    padding: 10px;
+    top: 0;
+    background: linear-gradient(45deg, #0056b3, #007bff); /* Degradado para el fondo del título */
+    color:white;
+    z-index: 10; /* Asegura que esté por encima de otros elementos dentro del contenedor */
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Agrega sombra para separar visualmente el encabezado */
+}
+
+/* Estilos para navegadores WebKit (Chrome, Safari, Edge basado en Chromium) */
+.listado-ubicacion::-webkit-scrollbar {
+    width: 8px; /* Hace la barra de desplazamiento más estrecha */
+}
+
+.listado-ubicacion::-webkit-scrollbar-track {
+    background: #f0f4f8; /* Color de fondo de la pista de desplazamiento */
+    border-radius: 4px; /* Bordes redondeados */
+}
+
+.listado-ubicacion::-webkit-scrollbar-thumb {
+    background-color: #007bff; /* Color azul para el pulgar de desplazamiento */
+    border-radius: 4px; /* Bordes redondeados del pulgar */
+    border: 2px solid #f0f4f8; /* Bordes para crear espacio entre el pulgar y la pista */
+}
+
+/* Para Firefox */
+.listado-ubicacion {
+    scrollbar-width: thin; /* Hace la barra de desplazamiento más estrecha */
+    scrollbar-color: #007bff #f0f4f8; /* Color del pulgar y de la pista de desplazamiento */
+}
+
+
+//tarjeta 
+
+/* Estilo para cada tarjeta de producto */
+.product-card {
+    margin:10px;
+    padding: 8px; /* Reduce el padding general */
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+    background-color: #ffffff;
+    border-left: 4px solid #007bff; /* Línea de color en el borde izquierdo */
+    max-width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Espaciado mínimo entre elementos */
+}
+
+/* Efecto hover */
+.product-card:hover {
+    transform: scale(1.01);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+/* Contenedor interno de la tarjeta, con diseño de dos columnas */
+.product-card-content {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px; /* Espacio reducido entre columnas */
+    align-items: flex-start;
+}
+
+/* Columna de información del producto */
+.product-info {
+    flex: 1;
+    padding-right: 5px; /* Espacio reducido a la derecha */
+    display: flex;
+    flex-direction: column;
+    gap: 4px; /* Espaciado mínimo entre elementos */
+}
+
+.product-info p {
+    font-size: 0.85em; /* Tamaño de fuente reducido */
+    color: #333;
+    margin: 0;
+    line-height: 1.2; /* Espacio reducido entre líneas */
+}
+
+.product-info p strong {
+    color: #007bff;
+}
+
+/* Estilo de mensaje de stock */
+.product-info em {
+    color: #d9534f;
+    font-style: italic;
+    font-weight: bold;
+    font-size: 0.85em;
+}
+
+/* Columna de tandas */
+.product-tandas {
+    flex: 1;
+    background-color: #f0f4f8;
+    padding: 6px; /* Reduce el padding */
+    border-radius: 6px; /* Bordes redondeados más pequeños */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
+    font-size: 0.8em; /* Tamaño de fuente reducido */
+}
+
+/* Encabezado de las tandas */
+.product-tandas h4 {
+    margin-top: 0;
+    font-size: 0.9em; /* Tamaño de fuente más pequeño */
+    color: #333;
+    margin-bottom: 4px;
+}
+
+/* Estilo de lista de tandas */
+.product-tandas ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.product-tandas li {
+    font-size: 0.8em; /* Tamaño de fuente reducido */
+    color: #444;
+    padding: 3px 0;
+    line-height: 1.2; /* Espacio reducido entre líneas */
+    border-bottom: 1px solid #e0e0e0;
+}
+::ng-deep .p-card-body {
+    padding: 0px !important;
+    
+}
+
+::ng-deep .p-card-content {
+    padding: 0px !important;
+    margin:10px
+}
+::ng-deep .p-card.p-component {
+    padding:10px
+}
+.product-image {
+    width: 100%; /* Ocupa el ancho completo del contenedor */
+    max-width: 150px; /* Ajusta el tamaño máximo según necesites */
+    height: auto; /* Mantiene la proporción de la imagen */
+    margin-bottom: 10px; /* Espacio debajo de la imagen */
     border-radius: 8px; /* Bordes redondeados */
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra suave */
-}
-
-.col {
-    flex: 1; /* Permite que las columnas se expandan equitativamente */
-}
-
-.col-3 {
-    flex: 0 0 25%; /* 3 columnas ocupa el 25% */
-}
-
-.col-7 {
-    flex: 0 0 58.33%; /* 7 columnas ocupa el 58.33% */
-}
-
-.col-2 {
-    flex: 0 0 16.67%; /* 2 columnas ocupa el 16.67% */
-}
-
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1); /* Sombra suave para la imagen */
+  }
+  

@@ -1,65 +1,70 @@
-<div class="flex justify-center self-center z-10">
-  <div class="p-12 bg-white mx-auto rounded-3xl w-96">
-    <div class="mb-7">
-      <h3 class="font-semibold text-2xl text-gray-800">Sign In</h3>
-      <p class="text-gray-400">Don't have an account? <a href="#" class="text-sm text-purple-700 hover:text-purple-700">Sign Up</a></p>
+<div class="login-container">
+  <div class="login-card">
+    <div class="login-header">
+      <h3>Iniciar Sesión</h3>
+      
     </div>
-    <div class="space-y-6">
-      <div>
+
+    <div *ngIf="errorMessage" class="error-message">
+      {{ errorMessage }}
+    </div>
+
+    <div class="login-form">
+      <!-- Campo de Email -->
+    <div class="p-field">
+      <p-floatLabel>
+        <input type="email" pInputText id="email" [(ngModel)]="email" class="custom-input"/>
+        <label for="email">Email</label>
+      </p-floatLabel>
+    </div>
+
+    <!-- Campo de Contraseña -->
+    <div class="p-field relative"> <!-- Añadir 'relative' para posicionar el icono -->
+      <p-floatLabel>
         <input 
-          [(ngModel)]="email" 
-          class="w-full text-sm px-4 py-3 bg-gray-200 focus:bg-gray-100 border border-gray-200 rounded-lg focus:outline-none focus:border-purple-400" 
-          type="email" 
-          placeholder="Email" 
-          (focus)="clearError()"
-        >
-      </div>
-      <div class="relative">
-        <input 
+          [type]="showPassword ? 'text' : 'password'" 
+          pInputText 
+          id="password" 
           [(ngModel)]="password" 
-          [type]="show ? 'text' : 'password'" 
-          class="text-sm text-gray-200 px-4 py-3 rounded-lg w-full bg-gray-200 focus:bg-gray-100 border border-gray-200 focus:outline-none focus:border-purple-400" 
-          placeholder="Password" 
-          (focus)="clearError()"
+          class="custom-input"
+        />
+        <label for="password">Contraseña</label>
+        <button 
+          type="button" 
+          (click)="togglePasswordVisibility()" 
+          class="toggle-password"
+          aria-label="Toggle password visibility"
         >
-        <div class="flex items-center absolute inset-y-0 right-0 mr-3 text-sm leading-5">
-          <svg 
-            (click)="togglePasswordVisibility()" 
-            class="h-4 text-purple-700 cursor-pointer" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="0 0 576 512" 
-            [ngClass]="{'hidden': !show, 'block': show }"
-          >
-            <path fill="currentColor" d="..."></path>
-          </svg>
-          <svg 
-            (click)="togglePasswordVisibility()" 
-            class="h-4 text-purple-700 cursor-pointer" 
-            fill="none" 
-            xmlns="http://www.w3.org/2000/svg" 
-            viewBox="0 0 640 512" 
-            [ngClass]="{'block': !show, 'hidden': show }"
-          >
-            <path fill="currentColor" d="..."></path>
-          </svg>
-        </div>
+          <i class="pi" [ngClass]="showPassword ? 'pi-eye-slash' : 'pi-eye'"></i>
+        </button>
+      </p-floatLabel>
+    </div>
+    
+    
+
+
+    <!-- Botón de Iniciar Sesión -->
+      <div class="button-container">
+        <button 
+          (click)="login()" 
+          class="custom-button w-full"
+          type="button"
+        >
+          <i class="pi pi-sign-in"></i> Ingresar
+        </button>
       </div>
-      <div class="flex items-center justify-between">
-        <div class="text-sm ml-auto">
-          <a href="#" class="text-purple-700 hover:text-purple-600">Forgot your password?</a>
-        </div>
+
+
+
+      <div class="divider">
+        <span class="divider-line"></span>
       </div>
-      <div>
-        <button (click)="login()" type="button" class="w-full flex justify-center bg-purple-800 hover:bg-purple-700 text-gray-100 p-3 rounded-lg tracking-wide font-semibold cursor-pointer transition ease-in duration-500">Sign in</button>
-      </div>
-      <div class="flex items-center justify-center space-x-2 my-5">
-        <span class="h-px w-16 bg-gray-100"></span>
-        <span class="text-gray-300 font-normal">or</span>
-        <span class="h-px w-16 bg-gray-100"></span>
-      </div>
-      <div class="flex justify-center gap-5 w-full ">
-        <!-- Botones de inicio de sesión con redes sociales -->
+
+      <!-- Botones de Redes Sociales -->
+      <div class="social-buttons">
+        <p>
+          Si no tienes cuenta, contacta a un administrador
+        </p>
       </div>
     </div>
   </div>

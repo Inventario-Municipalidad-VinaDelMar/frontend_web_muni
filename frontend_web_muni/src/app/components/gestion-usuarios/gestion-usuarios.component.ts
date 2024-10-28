@@ -10,10 +10,13 @@ import { DialogModule } from 'primeng/dialog';
 import { FormsModule } from '@angular/forms';
 import { Usuario } from '../../models/usuario.model';
 
+
+import { DividerModule } from 'primeng/divider'; // Para agregar separador
+
 @Component({
   selector: 'app-gestion-usuarios',
   standalone: true,
-  imports: [TableModule, PanelModule, CardModule,CommonModule,ButtonModule,DialogModule,FormsModule ],
+  imports: [TableModule, PanelModule, CardModule,CommonModule,ButtonModule,DialogModule,FormsModule,DividerModule ],
   templateUrl: './gestion-usuarios.component.html',
   styleUrls: ['./gestion-usuarios.component.scss'],
   providers: [MessageService], // Proveedor para los mensajes de PrimeNG

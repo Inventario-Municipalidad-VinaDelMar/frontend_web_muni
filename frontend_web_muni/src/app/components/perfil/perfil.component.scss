@@ -32,6 +32,7 @@
   }
   
   .perfil-imagen-container {
+    padding-top: 70px;
     display: flex;              /* Activa flexbox */
     justify-content: center;    /* Centra horizontalmente el contenido */
     align-items: center;        /* Centra verticalmente el contenido */
@@ -40,6 +41,7 @@
   
   
   .perfil-imagen {
+    
     width: 150px;
     height: 150px;
     border-radius: 50%;
@@ -92,7 +94,6 @@
     padding: 10px;
     border-radius: 20px;
     width: 100%;
-    background: #007ad9;
     color:white;
   }
   .perfil-boton-editar {

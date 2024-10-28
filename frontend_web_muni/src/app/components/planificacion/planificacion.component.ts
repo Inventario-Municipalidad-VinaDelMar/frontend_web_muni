@@ -1,6 +1,6 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Tanda } from '../../models/tanda.model';
 import { DialogModule } from 'primeng/dialog'; 
 import { Subscription } from 'rxjs';
@@ -14,6 +14,10 @@ import { ToastModule } from 'primeng/toast';
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SocketInventarioService } from '../../services/Sockets/socket-inventario.service';
 import { PlanificacionSocketService } from '../../services/Sockets/planificacion.socket.service';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { EnviosComponent } from "../envios/envios.component";
+import { TagModule } from 'primeng/tag';
+
 
 interface Producto {
   id: string;
@@ -27,9 +31,9 @@ interface Producto {
   selector: 'app-planificacion',
   standalone: true,
   templateUrl: './planificacion.component.html',
-  providers: [ConfirmationService, MessageService],
+  providers: [ConfirmationService, MessageService,ReactiveFormsModule, MultiSelectModule],
   styleUrls: ['./planificacion.component.scss'],
-  imports: [CommonModule, FormsModule, DialogModule,CalendarModule,DataViewModule,ToastModule,ConfirmDialogModule]
+  imports: [CommonModule, FormsModule, DialogModule, CalendarModule, DataViewModule, ToastModule, ConfirmDialogModule, EnviosComponent,TagModule,]
 })
 export class PlanificacionComponent implements OnInit, OnDestroy {
   productos: Producto[] = [];
@@ -39,8 +43,7 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
     martes: new Set<Producto>(),
     miercoles: new Set<Producto>(),
     jueves: new Set<Producto>(),
-    viernes: new Set<Producto>()
-};
+    viernes: new Set<Producto>()};
 
 
   searchTerm: string = '';
@@ -54,6 +57,8 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
   planificacion: any;
   
   
+  
+  @ViewChild(EnviosComponent) enviosComponent!: EnviosComponent;
   
   private productSubscription: Subscription = new Subscription();
   private planificacionSubscription: Subscription = new Subscription();
@@ -92,6 +97,8 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
     this.logWeekDates();
     this.loadProductos(); // Carga los productos
     this.productosFiltrado = [...this.productos];
+    
+    
   }
 
   ngOnDestroy() {
@@ -159,7 +166,6 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
                 urlImagen: detalle.urlImagen, // Incluyendo la URL de la imagen
                 cantidadPlanificada: detalle.cantidadPlanificada // Incluyendo la cantidad planificada
             };
-            console.log({ producto})
             // Añadir el producto al Set del día correspondiente
             this.productosPorDia[dia].add(producto);
         });
@@ -389,6 +395,19 @@ quitarDeDia(producto: Producto, dia: string) {
     const lunesFormatted = this.formatDateString(lunes);
     const viernesFormatted = this.formatDateString(viernes);
     this.planificacionSocketService.getPlanificacion(lunesFormatted, viernesFormatted);
+  }
+  updateWeek() {
+    const startOfWeek = this.getStartOfWeek(this.selectedDate); // Obtener el inicio de la semana
+    this.fechasSemana['lunes'] = this.formatDate(startOfWeek);
+    this.fechasSemana['viernes'] = this.formatDate(new Date(startOfWeek.getTime() + 4 * 24 * 60 * 60 * 1000)); // Viernes
+
+    // Cargar la planificación para la nueva semana seleccionada
+    this.logWeekDates();
+  }
+  getStartOfWeek(date: Date): Date {
+    const day = date.getDay(); // 0: domingo, 1: lunes, ..., 6: sábado
+    const diff = date.getDate() - day + (day === 0 ? -6 : 1); // Ajusta si es domingo
+    return new Date(date.setDate(diff));
   }
   
   

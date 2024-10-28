@@ -1,95 +1,84 @@
 <div class="table-container">
   <!-- Carga inicial con spinner y mensaje -->
   <div *ngIf="isLoading" class="loading-container">
-    <p-progressSpinner></p-progressSpinner>
     <p> Cargando datos... Por favor, espere. </p>
   </div>
 
   <!-- Mensaje de error cuando no hay respuesta del servicio -->
   <div *ngIf="hasError" class="error-container">
-    <h3>Error de Carga</h3><br>
+    <h3>Error de Carga</h3>
+    <img src="assets/img/no-producto.jpeg" alt="No hay productos" class="no-productos-image" />
     <h6>El servicio no está disponible en este momento. Intente más tarde.</h6>
   </div>
 
   <!-- Tabla de datos cuando se ha completado la carga sin errores -->
   <div *ngIf="!isLoading && !hasError">
-    <p-table 
-      [value]="productos2" 
-      [tableStyle]="{ 'min-width': '70rem' }" 
-      dataKey="id" 
-      [resizableColumns]="true" 
-      [expandedRowKeys]="expandedRows" 
-      [paginator]="true" 
-      [rows]="10"
-      styleClass="custom-table p-datatable-gridlines">
-      
+    <table class="custom-table">
       <!-- Encabezado de la tabla -->
-      <ng-template pTemplate="header">
+      <thead>
         <tr>
-          <th pResizableColumn class="th">Nombre del Producto</th>
-          <th pResizableColumn class="th">Cantidad Total</th>
-          <th pResizableColumn class="th">Productos por Vencer</th>
-          <th pResizableColumn class="th">Acciones</th>
+          <th>Nombre del Producto</th>
+          <th>Cantidad Total</th>
+          <th>Productos por Vencer</th>
+          <th>Fecha de Vencimiento Próxima</th>
+          <th>Acciones</th>
         </tr>
-      </ng-template>
+      </thead>
 
-      <!-- Cuerpo de la tabla con efecto de carga en las celdas -->
-      <ng-template pTemplate="body" let-producto>
-        <tr class="tr">
-          <td class="td" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
-            {{ isLoading ? '' : producto.nombre }}
-          </td>
-          <td class="td highlight-number" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
-            {{ isLoading ? '' : calcularCantidadTotal(producto) }} <!-- Mostrar total aquí -->
-          </td>
-          <td class="td highlight-number" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
-            {{ isLoading ? '' : calcularCantidadPorVencer(producto) }}
-          </td>
-          <td class="td" [ngClass]="{'loading-placeholder': isLoading, 'table-cell': !isLoading}">
-            <button *ngIf="!isLoading" pButton 
-                    [label]="expandedRows[producto.id] ? 'Minimizar' : 'Expandir'" 
-                    class="botones-expandir" 
-                    icon="pi" 
-                    [ngClass]="{'bi bi-caret-up': expandedRows[producto.id], 'bi bi-caret-down': !expandedRows[producto.id]}" 
-                    (click)="expandedRows[producto.id] = !expandedRows[producto.id]"></button>
-          </td>
-        </tr>
+      <!-- Cuerpo de la tabla -->
+      <tbody>
+        <!-- Bucle principal para cada producto, incluyendo la fila expandible -->
+        <ng-container *ngFor="let producto of productos2">
+          <!-- Fila principal del producto -->
+          <tr>
+            <td>{{ producto.nombre }}</td>
+            <td>{{ calcularCantidadTotal(producto) }}</td>
+            <td>{{ calcularCantidadPorVencer(producto) }}</td>
+            <td>{{ calcularFechaProxima(producto) }}</td>
+            <td>
+              <button 
+                class="boton-expandir" 
+                (click)="toggleExpansion(producto.id)">
+                {{ expandedRows[producto.id] ? 'Minimizar' : 'Expandir' }}
+              </button>
+            </td>
+          </tr>
 
-        <!-- Fila expandida que muestra detalles de las tandas (sin efecto de carga) -->
-        <tr *ngIf="expandedRows[producto.id]" class="expanded-row">
-          <td colspan="5" class="expanded-body">
-            <div class="expanded-content">
-              <p-table [value]="producto.tandas" [tableStyle]="{ 'min-width': '50rem' }" styleClass="p-datatable-gridlines">
-                <ng-template pTemplate="header">
+          <!-- Fila expandible para mostrar detalles de las tandas si está expandido -->
+          <tr *ngIf="expandedRows[producto.id]" class="expanded-row">
+            <td colspan="5">
+              <table class="expanded-content">
+                <thead>
                   <tr>
-                    <th class="th">Producto</th>
-                    <th class="th">Cantidad Actual</th>
-                    <th class="th">Fecha de Vencimiento</th>
-                    <th class="th">Fecha de Ingreso</th>
+                    <th>Tanda</th>
+                    <th>Cantidad Actual</th>
+                    <th>Fecha de Vencimiento</th>
+                    <th>Fecha de Ingreso</th>
+                    <th>Ubicacion</th>
                   </tr>
-                </ng-template>
-                <ng-template pTemplate="body" let-tanda>
-                  <tr>
-                    <td class="td">{{ tanda.producto }}</td>
-                    <td class="td">{{ tanda.cantidadActual }}</td>
-                    <td class="td">{{ tanda.fechaVencimiento | date: 'yyyy-MM-dd' }}</td>
-                    <td class="td">{{ tanda.fechaLlegada | date: 'yyyy-MM-dd' }}</td>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let tanda of producto.tandas?.slice(0, 10)" [ngClass]="calcularEstadoVencimiento(tanda)">
+                    <td>{{ tanda.producto }}</td>
+                    <td>{{ tanda.cantidadActual }}</td>
+                    <td>{{ tanda.fechaVencimiento | date: 'yyyy-MM-dd' }}</td>
+                    <td>{{ tanda.fechaLlegada | date: 'yyyy-MM-dd' }}</td>
+                    <td>{{ tanda.ubicacion }}</td>
+                    <td>{{ tanda.bodega }}</td>
                   </tr>
-                </ng-template>
-              </p-table>
-            </div>
-          </td>
-        </tr>
-      </ng-template>
+                </tbody>
+              </table>
+            </td>
+          </tr>
+        </ng-container>
+      </tbody>
 
       <!-- Pie de la tabla -->
-      <ng-template pTemplate="footer">
+      <tfoot>
         <tr>
-          <td colspan="5">
-            Total Productos: {{ productos2.length }}
-          </td>
+          <td colspan="5">Total Productos: {{ productos2.length }}</td>
         </tr>
-      </ng-template>
-    </p-table>
+      </tfoot>
+    </table>
   </div>
 </div>

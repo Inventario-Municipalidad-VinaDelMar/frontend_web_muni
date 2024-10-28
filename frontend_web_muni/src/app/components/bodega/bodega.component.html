@@ -1,39 +1,94 @@
-<div class="row">
-  <div class="contenido col">
-      <h2>DESPLIEGUE DE LISTA DE BODEGAS</h2>
-      <!-- Aquí puedes agregar la lista de bodegas -->
-      <ul>
-          <li *ngFor="let bodega of bodegas">{{ bodega.nombre }}</li>
-      </ul>
+<div class="contenido col">
+  <h2>DESPLIEGUE DE BODEGAS</h2>
+
+  <!-- Mostrar mensaje de error si no hay bodegas -->
+  <div *ngIf="!bodegas || bodegas.length === 0" class="error-message">
+    <img src="assets/img/no-bodegas.webp" alt="No hay bodegas disponibles" class="no-bodegas-icon">
+    <p>No hay bodegas disponibles, inténtelo más tarde.</p>
   </div>
+
+  <!-- Carrusel de bodegas -->
+  <p-carousel *ngIf="bodegas && bodegas.length > 0" [value]="bodegas" [numVisible]="1" [numScroll]="1" (onPage)="seleccionarBodega($event.page ?? 0)">
+    <ng-template pTemplate="item" let-bodega>
+      <p-card>
+        <div class="card-container">
+          <div class="info-section">
+            <h2>{{ bodega.nombre }}</h2>
+            <p><strong>Dirección:</strong> {{ bodega.direccion }}</p>
+            <p><strong>Encargado:</strong> {{ bodega.nombreEncargado }}</p>
+            <p><strong>ID:</strong> {{ bodega.id }}</p>
+            <p *ngIf="bodega.isDeleted"><em>Esta bodega ha sido eliminada.</em></p>
+          </div>
+          <div class="image-section">
+            <img src="assets/img/bodega.webp" alt="Icono Bodega" class="bodega-icon">
+          </div>
+        </div>
+      </p-card>
+    </ng-template>
+  </p-carousel>
 </div>
 
-<div class="row">
-  <div class="col-3">
-      <div class="contenido">
-          <h3>Listado de ubicaciones dentro de la bodega</h3>
-          <!-- Aquí puedes agregar el listado de ubicaciones -->
-          <ul>
-              <li *ngFor="let ubicacion of ubicaciones">{{ ubicacion.nombre }}</li>
-          </ul>
+
+<div class="main-container">
+  <!-- Columna de contenido principal (60%) -->
+  <div class="content-section">
+    <div class="product-list">
+      <h3>Productos en {{ bodegaSeleccionada?.nombre }}</h3>
+      
+      <div class="product-grid">
+        <!-- Mostrar mensaje centrado si no hay productos en la bodega seleccionada después de 1 segundo -->
+        <div *ngIf="!hayProductosEnBodegaSeleccionada && mostrarMensajeSinProductos" class="no-products-message">
+          <img src="assets/img/noProductsInBodega.webp" alt="No hay productos" class="no-products-icon">
+          <p>No hay productos disponibles en esta bodega.</p>
+        </div>
+        
+        <!-- Mostrar productos si están disponibles -->
+        <ng-container *ngFor="let producto of productos">
+          <p-card *ngIf="filtrarTandasPorBodega(producto.id)?.length" class="product-card">
+            <ng-template pTemplate="header">{{ producto.nombre }}</ng-template>
+            <ng-template pTemplate="content">
+              <div class="product-card-content">
+                <div class="product-info">
+                  <img *ngIf="producto.urlImagen" [src]="producto.urlImagen" alt="{{ producto.nombre }}" class="product-image">
+
+                  <p><strong>Descripcion:</strong> {{ producto.descripcion }}</p>
+                  <p *ngIf="producto.stock > 0"><strong>Stock:</strong> {{ producto.stock }}</p>
+                  <p *ngIf="producto.stock === 0"><em>Sin stock disponible</em></p>
+                </div>
+                <div class="product-tandas">
+                  <h4>Tandas en {{ bodegaSeleccionada?.nombre }}:</h4>
+                  <ul>
+                    <li *ngFor="let tanda of filtrarTandasPorBodega(producto.id)">
+                      Cantidad Actual: {{ tanda.cantidadActual }} | Fecha Vencimiento: {{ tanda.fechaVencimiento }}
+                    </li>
+                  </ul>
+                </div>
+              </div>
+            </ng-template>
+          </p-card>
+        </ng-container>
       </div>
+    </div>
   </div>
-  <div class="col-7">
-      <div class="contenido" id="lateral">
-          <h3>Datos de productos dentro de la bodega</h3>
-          <!-- Aquí puedes agregar el listado de productos -->
-          <ul>
-              <li *ngFor="let producto of productos">{{ producto.nombre }}</li>
-          </ul>
-      </div>
-  </div>
-  <div class="col-2">
-      <div class="contenido" id="lateral">
-          <h3>Categorías que existen en la bodega</h3>
-          <!-- Aquí puedes agregar el listado de categorías -->
-          <ul>
-              <li *ngFor="let categoria of categorias">{{ categoria.nombre }}</li>
-          </ul>
-      </div>
-  </div>
+
+  <div class="additional-section">
+    <p-panel header="Ubicaciones" styleClass="custom-panel" [style]="{ width: '100%', height: '100%' }">
+        <div class="panel-content">
+            <p class="panel-subheader">Ubicaciones en {{ bodegaSeleccionada?.nombre }}</p>
+            <div class="ubicaciones-list">
+                <ul>
+                    <li *ngFor="let ubicacion of ubicacionesUnicas" (click)="seleccionarUbicacion(ubicacion)">
+                        {{ ubicacion }}
+                    </li>
+                </ul>
+            </div>
+        </div>
+        <div *ngIf="ubicacionSeleccionada" class="listado-ubicacion">
+            <p class="panel-subheader">Productos en {{ ubicacionSeleccionada }}</p>
+            <ul>
+                <li *ngFor="let producto of productosEnUbicacion">{{ producto.nombre }}</li>
+            </ul>
+        </div>
+    </p-panel>
+</div>
 </div>
