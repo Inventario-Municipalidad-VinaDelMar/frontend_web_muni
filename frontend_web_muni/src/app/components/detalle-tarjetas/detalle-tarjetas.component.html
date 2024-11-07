@@ -1,80 +1,125 @@
 <div *ngIf="envioData">
-    <div class="header-container">
-        <button type="button" (click)="volver()" class="btn-volver bi bi-arrow-left">Volver</button>
-        <h2>Detalle del Envío</h2>
+  <div class="header-container">
+    <button type="button" (click)="volver()" class="btn-volver bi bi-arrow-left">Volver</button>
+    <h2>Detalle del Envío</h2>
+  </div>
+
+  <div class="envio-grid">
+    <!-- Movimientos e Incidentes -->
+    <aside class="left-column">
+      <!-- Movimientos -->
+      <div class="movimientos">
+        <div class="section-header">Movimientos</div>
+        <div class="movimientos-content">
+          <div *ngIf="envioData.movimientos && envioData.movimientos.length > 0; else noMovimientos">
+            <div *ngFor="let movimiento of envioData.movimientos" class="movimiento-card">
+              <p><strong>Producto:</strong> {{ movimiento.producto }}</p>
+              <p><strong>Cantidad Retirada:</strong> {{ movimiento.cantidadRetirada }}</p>
+              <p><strong>Fecha:</strong> {{ movimiento.fecha | date: 'dd/MM/yyyy'  }}</p>
+              <p><strong>Hora:</strong> {{ formatHora(movimiento.hora) }}</p>
+
+
+            </div>
+          </div>
+          <ng-template #noMovimientos>
+            <p>No hay movimientos registrados.</p>
+          </ng-template>
+        </div>
       </div>
-    <div class="envio-grid">
-      <!-- Columna Izquierda: Detalles del Solicitante y Administrador -->
-      <div class="left-column">
-        <p-fieldset legend="Solicitante" [toggleable]="true">
-          <p><strong>Nombre:</strong> {{ envioData.solicitante.nombre }} {{ envioData.solicitante.apellidoPaterno }} {{ envioData.solicitante.apellidoMaterno }}</p>
-          <p><strong>Email:</strong> {{ envioData.solicitante.email }}</p>
-          <p><strong>RUT:</strong> {{ envioData.solicitante.rut }}</p>
-          <p><strong>Roles:</strong> {{ envioData.solicitante.roles.join(', ') }}</p>
-        </p-fieldset>
-  
-        <p-fieldset legend="Administrador" [toggleable]="true">
-          <p><strong>Nombre:</strong> {{ envioData.administrador.nombre }} {{ envioData.administrador.apellidoPaterno }} {{ envioData.administrador.apellidoMaterno }}</p>
-          <p><strong>Email:</strong> {{ envioData.administrador.email }}</p>
-          <p><strong>RUT:</strong> {{ envioData.administrador.rut }}</p>
-          <p><strong>Roles:</strong> {{ envioData.administrador.roles.join(', ') }}</p>
-        </p-fieldset>
+
+      <!-- Incidentes -->
+      <div class="incidentes">
+        <div class="section-header">Incidentes</div>
+        <div class="incidentes-content">
+          <p>Espacio reservado para futuros incidentes.</p>
+        </div>
       </div>
-  
-      <!-- Columna Central: Información General del Envío y Movimientos -->
-      <div class="center-column">
-        <p-fieldset legend="Información General del Envío" [toggleable]="true" class="envio-info">
+    </aside>
+
+    <!-- Detalle del Envío -->
+    <main class="center-column">
+      <div class="detalle-envio">
+        <div class="section-header">Detalle del Envío</div>
+        <div class="detalle-envio-content">
           <p><strong>ID:</strong> {{ envioData.id }}</p>
-          <p><strong>Fecha:</strong> {{ envioData.fecha }}</p>
-          <p><strong>Hora de Inicio:</strong> {{ envioData.horaInicio }}</p>
-          <p><strong>Hora de Finalización:</strong> {{ envioData.horaFinalizacion || 'Pendiente' }}</p>
-          <p><strong>Status:</strong> {{ envioData.status }}</p>
-        </p-fieldset>
-  
-        <p-fieldset legend="Movimientos" [toggleable]="true" class="movimientos-info">
-          <p-carousel [value]="envioData.movimientos" [numVisible]="1" [numScroll]="1" [circular]="true" class="custom-carousel">
-            <ng-template pTemplate="item" let-movimiento>
-              <div class="movimiento-card">
-                <p><strong>Producto:</strong> {{ movimiento.producto }}</p>
-                <p><strong>Cantidad Retirada:</strong> {{ movimiento.cantidadRetirada }}</p>
-                <p><strong>Fecha:</strong> {{ movimiento.fecha }}</p>
-                <p><strong>Hora:</strong> {{ movimiento.hora }}</p>
-              </div>
-            </ng-template>
-          </p-carousel>
-        </p-fieldset>
+          <p><strong>Fecha:</strong> {{ envioData.fecha  | date: 'dd/MM/yyyy' }}</p>
+          <p><strong>Hora de Inicio:</strong> {{ formatHora(envioData.horaInicio) || 'No disponible' }}</p>
+          <p><strong>Hora de Finalización:</strong> {{ formatHora(envioData.horaFinalizacion )|| 'Pendiente' }}</p>
+          <p>
+            <strong>Status:</strong>
+            <span
+              class="status-text"
+              [ngClass]="{
+                'status-cargando': envioData.status === 'Cargando',
+                'status-en-envio': envioData.status === 'En envio',
+                'status-pendiente': envioData.status === 'Pendiente',
+                'status-finalizado': envioData.status === 'Finalizado'
+              }"
+            >
+              {{ envioData.status }}
+            </span>
+          </p>
+          
+        </div>
       </div>
-  
-      <!-- Columna Derecha: Carga Inicial y Carga Actual -->
-      <div class="right-column">
-        <p-fieldset legend="Carga Inicial" [toggleable]="true" class="carga-inicial-info">
-          <ul>
-            <li *ngFor="let producto of envioData.cargaInicial">
-              <div class="producto-card">
-                <p><strong>Producto:</strong> {{ producto.producto }}</p>
-                <p><strong>Cantidad:</strong> {{ producto.cantidad }}</p>
-                <img [src]="producto.urlImagen" alt="{{ producto.producto }}" />
-              </div>
-            </li>
-          </ul>
-        </p-fieldset>
-  
-        <p-fieldset legend="Carga Actual" [toggleable]="true" class="carga-actual-info">
-          <ul>
-            <li *ngFor="let producto of envioData.cargaActual">
-              <div class="producto-card">
-                <p><strong>Producto:</strong> {{ producto.producto }}</p>
-                <p><strong>Cantidad:</strong> {{ producto.cantidad }}</p>
-                <img [src]="producto.urlImagen" alt="{{ producto.producto }}" />
-              </div>
-            </li>
-          </ul>
-        </p-fieldset>
+
+      <!-- Comparación de Carga -->
+      <div class="carga-comparacion">
+        <div class="section-header">Comparación de Carga</div>
+        <table *ngIf="envioData.cargaInicial && envioData.cargaInicial.length > 0; else noCargaInicial" class="comparison-table">
+          <thead>
+            <tr>
+              <th>Producto</th>
+              <th>Carga Inicial</th>
+              <th>Carga Actual</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let producto of envioData.cargaInicial; let i = index">
+              <td class="producto-info">
+                <img [src]="producto.urlImagen" alt="{{ producto.producto }}" class="producto-img">
+                {{ producto.producto }}
+              </td>
+              <td>{{ producto.cantidad }}</td>
+              <td>{{ envioData.cargaActual[i]?.cantidad || 0 }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-template #noCargaInicial>
+          <p>No hay datos de carga inicial disponibles.</p>
+        </ng-template>
       </div>
-    </div>
+    </main>
+
+    <!-- Entregas -->
+    <aside class="right-column">
+      <div class="entregas">
+        <div class="section-header">Entregas</div>
+        <div class="entregas-content">
+          <div *ngIf="envioData.entregas && envioData.entregas.length > 0; else noEntregas">
+            <div *ngFor="let entrega of envioData.entregas" class="entrega-card">
+              <p><strong>Fecha:</strong> {{ entrega.fecha | date: 'dd/MM/yyyy'  }}</p>
+              <p><strong>Hora:</strong> {{ formatHora(entrega.hora) }}</p>
+              <p><strong>Comedor Solidario:</strong> {{ entrega.comedorSolidario }}</p>
+              <p><strong>Realizador:</strong> {{ entrega.copiloto.nombre }} {{ entrega.copiloto.apellidoPaterno }}</p>
+              <p><strong>Productos Entregados:</strong></p>
+              <ul>
+                <li *ngFor="let producto of entrega.productosEntregados">
+                  <img [src]="producto.urlImagen" alt="{{ producto.producto }}" width="50">
+                  {{ producto.cantidad }} x {{ producto.producto }}
+                </li>
+              </ul>
+            </div>
+          </div>
+          <ng-template #noEntregas>
+            <p>No hay entregas registradas.</p>
+          </ng-template>
+        </div>
+      </div>
+    </aside>
   </div>
-  
-  <div *ngIf="!envioData">
-    <p>Cargando datos del envío...</p>
-  </div>
-  
+</div>
+
+<div *ngIf="!envioData">
+  <p>Cargando datos del envío...</p>
+</div>

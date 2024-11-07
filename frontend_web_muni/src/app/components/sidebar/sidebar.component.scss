@@ -3,7 +3,7 @@
   flex-direction: column; /* Organiza los elementos en columna */
   background-color: #1b61a7;
   height: 100vh; /* Altura total */
-  padding: 20px;
+  padding: 10px;
   overflow-y: auto; /* Permite desplazamiento vertical */
   position: sticky; /* Mantiene la barra en su lugar */
   top: 0; /* Desde la parte superior */
@@ -47,7 +47,6 @@
   width: 150px;
   height: 150px;
   object-fit: cover;
-  margin-bottom: 10px;
 }
 
 .side-bar.collapsed img {
@@ -57,7 +56,7 @@
 .side-bar .categorias {
   display: flex;
   align-items: center;
-  padding: 15px 20px;
+  padding: 10px 15px;
   cursor: pointer;
   position: relative; 
   margin:5px;
@@ -68,7 +67,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 15px 20px;
+  padding: 10px 15px;
   cursor: pointer;
   position: relative; 
   margin:10px;

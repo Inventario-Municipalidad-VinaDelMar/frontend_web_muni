@@ -1,29 +1,28 @@
-<div class="contenido" [ngClass]="{ 'authenticated': userAuthenticated }">
-  <h3>{{ greetingMessage }}</h3>
-  <h4 *ngIf="!userAuthenticated">Por favor, inicia sesión para ver contenido personalizado</h4>
-  <h2 class="titulo-planificacion">Planificación Para Esta Semana</h2> <!-- Cambié a <h2> -->
+<div class="contenido">
+  <h2 class="titulo-planificacion">Planificación Para Esta Semana</h2>
   
-  <div class="semana mt-4">
+  <div class="semana">
     <div *ngFor="let day of daysOfWeek" 
-         class="day-container" 
+         class="calendar-day-container" 
          [class.active]="day.isToday"
          (click)="onSelectDate(day)">
-      <div class="day">
-        <h2>{{ day.day }}</h2>
-        <h6 class="fecha">{{ day.date }}</h6>
-        <h6 *ngIf="day.isToday" class="hoy">Hoy</h6>
+      <div class="calendar-day">
+        <h5 class="day-name">{{ translateDay(day.day) }}</h5>
+        <h1 class="day-number">{{ day.date | date: 'd' }}</h1>
+        <h6 class="month-name">{{ translateMonth(day.date | date: 'MMMM') }}</h6> <!-- Traduce el mes -->
+        <h6 *ngIf="day.isToday" class="hoy-indicator">Hoy</h6>
       </div>
     </div>
     <div class="plan-futuro" (click)="redirectToPlanificacion()">&#62;&#62;&#62;</div>
   </div>
+  
 </div>
 
 
 <div class="row mt-4">
   <div class="col-6">
-    <div class="contenido">
-      <h4>Tandas más recientes añadidas</h4>
-      <!-- Carrusel de tandas recientes -->
+    <div class="contenido tandas-recientes">
+      <h4 class="titulo-tandas">Tandas más recientes añadidas</h4>
       <p-carousel 
         [value]="tandasRecientes" 
         [numVisible]="1" 
@@ -31,9 +30,9 @@
         [circular]="true" 
         [autoplayInterval]="6000">
         
-        <ng-template pTemplate="item" let-tanda let-i="index">
+        <ng-template pTemplate="item" let-tanda>
           <div class="tanda-card">
-            <h5>Tanda #{{ tandasRecientes.indexOf(tanda) + 1 }}</h5>
+            <h5 class="tanda-title">Tanda #{{ tandasRecientes.indexOf(tanda) + 1 }}</h5>
             <p><strong>Producto:</strong> {{ tanda.producto }}</p>
             <p><strong>Cantidad Ingresada:</strong> {{ tanda.cantidadIngresada }}</p>
             <p><strong>Cantidad Actual:</strong> {{ tanda.cantidadActual }}</p>
@@ -44,61 +43,60 @@
           </div>
         </ng-template>
       </p-carousel>
-
+  
       <ng-template #noTandas>
         <p>No se encontraron tandas recientes.</p>
       </ng-template>
     </div>
   </div>
+  
 
   <div class="col-6">
-    <p-card header="Planificación del Día {{ selectedDayName }}" styleClass="contenido planificacion" [style]="{ 'width': '100%' }">
-      
-      <!-- Verifica si hay datos de planificación y si hay detalles -->
-      <div *ngIf="planningData && planningData.detalles?.length > 0; else noPlanificacion">
-        <p><strong>Fecha:</strong> {{ planningData.fecha }}</p>
-        <p><strong>Detalles:</strong></p>
-  
-        <!-- Scroll panel para los detalles de planificación -->
-        <p-scrollPanel [style]="{ 'max-height': '250px', 'overflow-y': 'auto', 'margin-top': '10px' }">
-          <ul style="list-style-type: none; padding: 0; margin: 0;">
-            <li *ngFor="let detalle of planningData.detalles" class="detalle-item" style="margin-bottom: 10px; padding: 10px; border-bottom: 1px solid #ddd;">
-              <div class="detalle-imagen">
-                <img [src]="detalle.urlImagen" alt="{{ detalle.producto }}" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;">
-              </div>
-              <p><strong>Producto:</strong> {{ detalle.producto }}</p>
-              <p><strong>Cantidad Planificada:</strong> {{ detalle.cantidadPlanificada }}</p>
-              <p><strong>Estado:</strong> 
-                <span [ngClass]="{ 'estado-completo': detalle.isComplete, 'estado-pendiente': !detalle.isComplete }">
-                  {{ detalle.isComplete ? 'Completo' : 'Pendiente' }}
-                </span>
-              </p>
-            </li>
-          </ul>
-        </p-scrollPanel>
+    <div class="contenido planificacion fade-in" *ngIf="planningData">
+      <div class="planificacion-header">
+        <h2 class="planificacion-title">Planificación del Día {{ selectedDayName }}</h2>
+        <div class="calendar-icon">
+          <h1>{{ planningData?.fecha | date: 'd' }}</h1>
+          <p>{{ translateMonth(planningData?.fecha | date: 'MMMM') }}</p>
+        </div>
       </div>
   
-      <!-- Mensaje cuando no hay planificación o detalles disponibles -->
+      <div *ngIf="planningData && planningData.detalles?.length > 0; else noPlanificacion">
+        <div class="detalle-lista">
+          <div *ngFor="let detalle of planningData.detalles" class="detalle-item fade-in">
+            <div class="detalle-content">
+              <div class="detalle-imagen">
+                <img [src]="detalle.urlImagen" alt="{{ detalle.producto }}" />
+              </div>
+              <div class="detalle-info">
+                <h5>{{ detalle.producto }}</h5>
+                <p><strong>Cantidad Planificada:</strong> {{ detalle.cantidadPlanificada }}</p>
+                <p><strong>Estado:</strong> 
+                  <span [ngClass]="{ 'estado-completo': detalle.isComplete, 'estado-pendiente': !detalle.isComplete }">
+                    {{ detalle.isComplete ? 'Completo' : 'Pendiente' }}
+                  </span>
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+  
       <ng-template #noPlanificacion>
         <p>No se encontró planificación para la fecha seleccionada.</p>
       </ng-template>
-      
-      <!-- Botón de planificación, visible en ambos casos -->
+  
       <button (click)="redirectToPlanificacion()" class="btn-redirect">
         <i class="bi bi-calendar-week"></i> Planificar
       </button>
-  
-    </p-card>
+    </div>
   </div>
   
-  
-  
+
   
 </div>
 
-  
 
-
-<div class="contenido">
-  dashboard
+<div >
+  <app-dashboard></app-dashboard>
 </div>

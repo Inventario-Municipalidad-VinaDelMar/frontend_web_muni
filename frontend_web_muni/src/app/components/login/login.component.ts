@@ -30,16 +30,23 @@ import { FloatLabelModule } from 'primeng/floatlabel';
   
     login() {
       this.clearError(); // Limpiar errores antes de iniciar sesión
-  
+    
       if (this.isValidEmail(this.email) && this.password) {
         this.authService.login(this.email, this.password).subscribe(
           response => {
             if (response.token) {
               this.authService.setAuthToken(response.token);
-              this.authService.setUser(response);
-              this.router.navigate(['/home']);
+              this.authService.setUser(response); // Guarda el usuario completo
+              
+              // Navegar a /home y recargar la página
+              this.router.navigate(['/home']).then(() => {
+                setTimeout(() => {
+                  window.location.reload();
+                }, 100); // Retraso breve para asegurar que la navegación se complete antes de recargar
+              });
             } else {
               this.setError('No se recibió un token. Verifica tus credenciales.');
+              console.error('No se recibió un token en la respuesta de login');
             }
           },
           error => {
@@ -51,6 +58,9 @@ import { FloatLabelModule } from 'primeng/floatlabel';
         this.setError('Por favor, introduce un email válido y una contraseña.');
       }
     }
+    
+    
+    
     togglePasswordVisibility() {
       this.showPassword = !this.showPassword; // Alternar visibilidad
     }

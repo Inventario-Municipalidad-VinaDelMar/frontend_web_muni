@@ -1,230 +1,417 @@
 .contenido {
-  padding: 15px; /* Menos padding */
-  border-radius: 10px; /* Bordes más redondeados */
-  background-color: #ffffff; /* Fondo blanco */
-}
-.contenido h3{
-  font-size: 1rem; 
-}
-.semana {
-  display: flex;
-  align-items: center;
+  margin:0;
+  margin-top: 0;
+  padding: 2%; /* Ajustado a porcentaje */
+  border-radius: 10px;
+  background-color: #ffffff;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 
-.plan-futuro {
+.titulo-planificacion {
+  margin-top: 2%;
+  font-size: 1.8rem;
+  color: #555;
+  text-align: center;
+  border-bottom: 2px solid #007bff;
+  padding-bottom: 1%;
+}
+
+
+.day-container {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 100%; /* Ocupa toda la altura del contenedor */
-}
-
-
-.semana::before {
-  position: absolute;
-  top: -5px; /* Ajusta la posición del borde superior */
-  left: -5px; /* Ajusta la posición del borde izquierdo */
-  right: -5px; /* Ajusta la posición del borde derecho */
-  border-radius: 15px; /* Redondear bordes */
-}
-
-.day-container {
-  flex: 1 1 18%; /* Mantiene el ancho como antes */
-  background: linear-gradient(to right, rgba(77, 180, 172, 1) 0%, rgba(25, 118, 210, 1) 60%); /* Degradado */
-  padding: 5px 0; /* Reduce el padding vertical para disminuir la altura */
+  padding: 2%;
   border-radius: 10px;
-  margin: 5px; /* Reduce el margen */
-  height: 50px; /* Establece una altura deseada, ajústalo según sea necesario */
-  display: flex; /* Permite alinear el contenido */
-  align-items: center; /* Centra verticalmente el contenido */
-  justify-content: center; /* Centra horizontalmente el contenido */
-  font-size: 0.9rem; /* Ajusta el tamaño de la fuente según lo necesites */
-  color:white;
+  background: linear-gradient(to right, #4db4ac, #1976d2);
+  color: white;
+  margin: 1%;
+  cursor: pointer;
+  transition: transform 0.2s ease;
 }
+
 .day-container:hover {
-  transform: scale(1.05); /* Aumenta el tamaño al 105% */
-  border: 1px solid #9bdeff; 
-  box-shadow: 0 0 5px rgba(179, 230, 255, 0.9); /* Sombra más intensa */
+  transform: scale(1.05);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
+
 .day-container.active {
-  background-color: #a2e2ff; /* Mantiene el mismo estilo que los demás */
+  background-color: #a2e2ff;
   border: 2px solid #4fc4ff;
   box-shadow: 0 0 20px rgba(228, 246, 255, 0.8), 0 0 40px rgba(241, 250, 255, 0.6);
 }
-.day {
-  display: flex;
-  flex-direction: column; /* Alinea el texto verticalmente */
-  text-align: center; /* Centra el texto horizontalmente */
-  padding: 5px; /* Espacio interno */
-  font-size: 0.8rem; /* Tamaño general */
+
+.p-card .p-card-body {
+ padding: 0; 
 }
 
-.day h2 {
-  font-size: 0.8rem; /* Tamaño del día */
-  margin: 0; /* Sin margen */
-}
 
-.day h6 {
-  font-size: 0.7rem; /* Tamaño para fechas */
-  margin: 0; /* Sin margen */
-}
 
-.hoy {
-  font-size: 0.5rem; /* Tamaño más pequeño para "Hoy" */
-  margin-top: 4px; /* Espaciado superior */
-  margin-bottom: 0; /* Sin margen inferior */
-}
-.titulo-planificacion {
-  margin-top: 4vh;
-  font-size: 1.5rem; /* Tamaño de fuente más grande */
-  color: #8e8f8f; /* Cambia el color para hacerlo más llamativo */
-  margin-bottom: 10px; /* Espacio debajo del título */
-  text-align: center; /* Centra el título horizontalmente */
-  border-bottom: 2px solid #def4ff; /* Línea inferior para enfatizar */
-  padding-bottom: 5px; /* Espacio entre el título y la línea */
-}
 
-/* Tarjeta de cada tanda */
-.tanda-card {
+.calendar-day {
+  width: 120px; /* Ancho fijo */
+  height: 120px; /* Alto fijo */
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border-radius: 10px;
   display: flex;
   flex-direction: column;
-  align-items: center; /* Centra los elementos */
+  align-items: center;
   justify-content: center;
-  border-radius: 10px;
-  background: #f7f9fc; /* Fondo claro */
-  box-shadow:8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+  transition: transform 0.3s, box-shadow 0.3s;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  overflow: hidden; /* Asegura que el contenido extra no se muestre */
+}
+
+.calendar-day:hover {
+  transform: scale(1.05);
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.calendar-day h5 {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.calendar-day h1 {
+  margin: 0;
+  font-size: 2rem;
+}
+
+.calendar-day h6 {
+  margin: 1%;
+  font-size: 0.8rem;
+}
+
+.hoy-indicator {
+  bottom: 0%;
+  font-size: 0.5rem;
+  color: #e3e3e3;
+}
+
+.calendar-day-container.active .calendar-day {
+  background: linear-gradient(19deg, #51a3fa, #007bff); /* Degradado actualizado */
+}
+
+.semana {
+  display: flex;
+  flex-wrap: wrap; /* Permite que los elementos se ajusten a la siguiente línea si es necesario */
+  justify-content: center; /* Centra los elementos horizontalmente */
+}
+
+.calendar-day-container {
+  flex: 1 1 calc(20% - 10px); /* Ajusta el tamaño para que quepan cinco por fila con espacio */
+  max-width: 20%; /* No permite que los elementos se expandan más allá del 20% */
+  min-width: 100px; /* Asegura que los días no sean demasiado pequeños */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
   transition: transform 0.2s ease-in-out;
-  text-align: center; /* Centra el texto */
-  max-width: 100%;
-  margin: 0 auto; /* Centrado */
 }
 
-
-/* Estilo del título de la tanda */
-.tanda-card h5 {
+.plan-futuro {
+  flex: 0 0 auto; /* Asegura que no se expanda o contraiga */
+  margin-left: auto; /* Lo empuja hacia el extremo derecho */
   font-size: 1.5rem;
+  color: #007bff;
+  cursor: pointer;
+  transition: color 0.3s;
+}
+
+.plan-futuro:hover {
+  color: #0056b3;
+}
+
+/* Media queries para mejorar la responsividad en pantallas más pequeñas */
+@media (max-width: 768px) {
+  .calendar-day-container {
+    flex: 1 1 calc(33.33% - 10px); /* Tres por fila en pantallas medianas */
+    max-width: 33.33%;
+  }
+}
+
+@media (max-width: 480px) {
+  .calendar-day-container {
+    flex: 1 1 calc(50% - 10px); /* Dos por fila en pantallas pequeñas */
+    max-width: 50%;
+  }
+
+  .plan-futuro {
+    width: 100%; /* Ocupa toda la fila en pantallas pequeñas */
+    text-align: center; /* Centra el contenido */
+    margin-left: 0; /* Resetea el margen izquierdo */
+  }
+}
+
+
+// PLANIFICACION SEMANAL
+
+
+
+.planificacion-header {
+  display: flex;
+  justify-content: space-between; /* Mantiene el título a la izquierda y el ícono a la derecha */
+  align-items: center;
+}
+
+.planificacion-title {
+  font-size: 1.8rem;
+  color: #1976d2; /* Azul suave */
   font-weight: bold;
-  color: #ffffff;
-  background-color: #007bff; /* Fondo azul para el título */
-  border-radius: 5px;
-  width: 100%;
-  margin-bottom: 15px;
+  margin: 0;
+  text-align: left;
 }
 
-/* Estilo de cada dato en la tarjeta */
-.tanda-card p {
-  font-size: 1rem;
-  color: #333;
-  border-radius: 5px;
-  background-color: #e9f5ff; /* Fondo azul claro para los datos */
-  border: 1px solid #b3d7ff; /* Borde más oscuro */
-  width: 100%;
-  max-width: 90%;
+
+.calendar-icon {
+  width: 80px;
+  height: 80px;
+  background-color: #2e58ff;
+  color: white;
+  border-radius: 12px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
-/* Negrita para los títulos de cada dato */
-.tanda-card p strong {
-  color: #555;
+.calendar-icon h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: bold;
 }
 
-/* Personalización del carrusel */
-.ui-carousel .ui-carousel-content {
-  padding-top: 15px;
+.calendar-icon p {
+  margin: 0;
+  font-size: 0.9rem;
+  font-style: italic;
 }
 
-/* Botones de navegación del carrusel */
-.ui-carousel .ui-carousel-prev,
-.ui-carousel .ui-carousel-next {
-  background-color: #007bff; /* Azul para los botones de navegación */
-  color: #ffffff;
-  border-radius: 50%;
-  width: 30px;
-  height: 30px;
-}
-
-.ui-carousel .ui-carousel-prev:hover,
-.ui-carousel .ui-carousel-next:hover {
-  background-color: #0056b3; /* Color más oscuro en hover */
-}
-
-/* Paginación personalizada del carrusel */
-.ui-carousel-indicators .ui-carousel-page {
-  background-color: #ddd;
-  width: 10px;
-  height: 10px;
-  margin: 0 4px;
-  border-radius: 50%;
-  transition: background-color 0.3s;
-}
-
-.ui-carousel-indicators .ui-carousel-page.ui-state-active {
-  background-color: #007bff; /* Azul para el indicador activo */
-}
-
-.contenido.planificacion {
-  padding: 15px;
-  border-radius: 10px;
+.detalle-lista {
+  max-height: 300px;
+  overflow-y: auto;
+  padding-right: 10px;
+  border-top: 1px solid #def4ff;
+  margin-top: 10px;
+  background-color: #ffffff;
+  border-radius: 0 0 10px 10px;
 }
 
 .detalle-item {
-  background-color: #f9f9f9;
-  border-radius: 5px;
-  margin-bottom: 5px;
-  padding: 10px;
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  margin-bottom: 10px;
+  background: linear-gradient(135deg, #007bff, #0056b3);
+  color: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.detalle-content {
+  display: flex;
+  width: 100%;
+}
+
+.detalle-imagen img {
+  width: 70px;
+  height: 70px;
+  object-fit: cover;
+  border-radius: 8px;
+}
+
+.detalle-info {
+  margin-left: 20px;
+  flex-grow: 1;
+}
+
+.detalle-info h5 {
+  font-size: 1.2rem;
+  margin-bottom: 8px;
+  color: #f1f1f1;
+}
+
+.detalle-info p {
+  margin: 0;
+  font-size: 1rem;
+  color: #d1d1d1;
 }
 
 .estado-completo {
-  color: green;
+  color: #c2fac5;
   font-weight: bold;
 }
 
 .estado-pendiente {
-  color: red;
+  color: #ff9c9a;
   font-weight: bold;
 }
-.row {
-  display: flex;
-  align-items: stretch; /* Hace que las columnas tengan la misma altura */
-}
 
-.col-6 {
-  display: flex;
-  flex-direction: column;
-}
-
-.contenido {
-  flex: 1; /* Permite que el contenido se expanda para ocupar el espacio completo */
-}
-
-.full-width-carousel {
-  width: 100%;
-  height: 100%;
-}
-
-.p-card.contenido.planificacion {
-  height: 100%;
-}
 .btn-redirect {
-  display: inline-flex;
-  align-items: center;
-  background-color: #007bff; /* Color de fondo azul */
-  color: #ffffff; /* Color de texto blanco */
+  background-color: #1976d2;
+  color: #fff;
   border: none;
-  padding: 8px 12px;
-  padding-top: 12px; /* Espacio adicional en la parte superior */
+  padding: 12px 25px;
   font-size: 1rem;
-  font-weight: bold;
-  border-radius: 5px;
+  border-radius: 8px;
   cursor: pointer;
-  transition: background-color 0.3s;
-  margin-top: 15px; /* También puedes usar margin-top para separar del contenido superior */
-}
-
-.btn-redirect i {
-  margin-right: 8px; /* Espacio entre el icono y el texto */
-  font-size: 1.2rem;
+  margin-top: 20px;
+  align-self: center;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
 }
 
 .btn-redirect:hover {
-  background-color: #0056b3; /* Color más oscuro en hover */
+  background-color: #1565c0;
+  transform: translateY(-3px);
 }
 
+
+/* Scrollbar estético para detalle-lista */
+.detalle-lista::-webkit-scrollbar {
+  width: 6px;
+}
+
+.detalle-lista::-webkit-scrollbar-thumb {
+  background-color: #007bff;
+  border-radius: 10px;
+}
+
+.detalle-lista::-webkit-scrollbar-track {
+  background: #e3f2fd;
+}
+
+
+//tandas recientes.
+
+.contenido.tandas-recientes {
+  padding: 3%;
+  border-radius: 12px;
+  background-color: #f9f9fc; /* Fondo suave */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.titulo-tandas {
+  font-size: 1.6rem;
+  color: #1976d2;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #e0e0e0;
+  padding-bottom: 10px;
+  text-align: center;
+  font-weight: bold;
+  text-transform: uppercase; /* Mayúsculas para un estilo más moderno */
+}
+
+.tanda-card {
+  background: linear-gradient(135deg, #e3f2fd, #f1f9ff); /* Degradado moderno */
+  padding: 20px;
+  border-radius: 10px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+
+.tanda-title {
+  font-size: 1.4rem;
+  color: #007bff;
+  margin-bottom: 10px;
+  font-weight: bold;
+  text-align: center;
+}
+
+.tanda-card p {
+  background:#ffffff;
+  font-size: 1rem;
+  color: #333;
+  margin: 8px 0;
+}
+
+.tanda-card p strong {
+  color: #555;
+}
+
+.p-carousel .p-carousel-content {
+  padding: 15px;
+}
+
+.p-carousel .p-carousel-prev,
+.p-carousel .p-carousel-next {
+  background-color: #007bff;
+  color: #ffffff;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  transition: background-color 0.3s;
+}
+
+
+.p-carousel-indicators .p-carousel-indicator {
+  background-color: #ccc;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+}
+
+.p-carousel-indicators .p-carousel-indicator-active {
+  background-color: #007bff;
+}
+
+
+//Dashboard
+.bar-container {
+  display: flex;
+  align-items: center;
+  margin: 10px 0;
+}
+
+.bar-label {
+  width: 100px;
+}
+
+.bar {
+  width: 100%;
+  background-color: #f3f3f3;
+  border: 1px solid #ccc;
+  height: 24px;
+  position: relative;
+}
+
+.bar-fill {
+  height: 100%;
+  background-color: #42A5F5;
+  text-align: right;
+  padding-right: 5px;
+  color: white;
+  line-height: 24px;
+}
+.col-6 .contenido {
+  display: flex;
+  flex-direction: column;
+  height: 100%; /* Ocupará el espacio completo de la columna */
+  max-height: 600px; /* Ajusta según la altura máxima deseada */
+  min-height: 400px; /* Ajusta según la altura mínima deseada */
+  overflow: hidden;
+  background-color: #ffffff;
+  padding: 2%;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.fade-in {
+  animation: fadeIn 1s ease-in-out;
+}

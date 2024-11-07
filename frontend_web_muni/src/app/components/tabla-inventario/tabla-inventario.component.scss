@@ -66,25 +66,26 @@
   }
   
   /* Colores de alerta para las tandas */
-  .vencido {
-    background-color: #ff4d4d; /* Rojo */
-    color: white;
-  }
-  
-  .porVencerEtapa1 {
-    background-color: #ffdb4d; /* Amarillo */
-    color: black;
-  }
-  
-  .porVencerEtapa2 {
-    background-color: #b3e0ff; /* Azul claro */
-    color: black;
-  }
-  
-  .seguro {
-    background-color: #b3ffb3; /* Verde */
-    color: black;
-  }
+.vencido {
+  background-color: #ff4d4d; /* Rojo para vencidos */
+  color: white;
+}
+
+.porVencerEtapa1 {
+  background-color: #ffa500; /* Naranja oscuro para por vencer (1-2 días) */
+  color: black;
+}
+
+.porVencerEtapa2 {
+  background-color: #ffd700; /* Amarillo para por vencer (3-7 días) */
+  color: black;
+}
+
+.seguro {
+  background-color: #4caf50; /* Verde para seguros */
+  color: black;
+}
+
   
   /* Contenedor de carga */
   .loading-container {
@@ -112,5 +113,33 @@
     width: 80px;
     opacity: 0.6;
     margin: 10px 0;
+  }
+  .alertas-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .contador {
+    padding: 10px;
+    border-radius: 5px;
+    font-weight: bold;
+    color: white;
+  }
+  
+  .alerta-vencido {
+    background-color: #ff4d4d; // Rojo para vencidos
+  }
+  
+  .alerta-por-vencer-1 {
+    background-color: #ffa500; // Naranja oscuro para por vencer (1-2 días)
+  }
+  
+  .alerta-por-vencer-2 {
+    background-color: #ffd700; // Amarillo para por vencer (3-7 días)
+  }
+  
+  .alerta-seguro {
+    background-color: #4caf50; // Verde para seguros
   }
   

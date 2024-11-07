@@ -1,74 +1,60 @@
 <div class="main-container">
   <!-- Título -->
-  
+  <div class="titulo-pagina">Envíos Generados</div>
 
-
-    <div class="contenido2">
-
-      <div class="titulo-pagina">Envios Generados</div>
-      <!-- Selector de fecha -->
-      <div class="calendar-container">
-        <h3>Selecciona una Fecha</h3>
-        <p-calendar [(ngModel)]="selectedDate" (onSelect)="onDateChange($event)" showIcon="true"></p-calendar>
-      </div>
-      
-
-      <!-- Contenedor de envíos recibidos -->
-      <div class="envios-container">
-        <h6>Envíos Recibidos para {{ selectedDate | date: 'EEEE, dd MMMM yyyy' }}</h6>
-        <div class="card-container">
-          <div *ngFor="let envio of enviosList" class="card" (click)="goToDetalle(envio.id)">
-            <div class="status">{{ envio.status }}</div>
-
-            <!-- Círculo superior derecho con el icono del camión -->
-            <div class="status-container">
-              <div class="circle-icon">
-                <img src="assets/img/camion.png" alt="Camión de envío" />
-              </div>
-            </div>
-
-            <!-- Contenido de la tarjeta -->
-            <div class="card-header">
-              <div class="info-header">
-                <p><strong>Autorizado por:</strong> {{ envio.solicitud.administrador.nombre }} {{ envio.solicitud.administrador.apellidoPaterno }}</p>
-                <p><strong>Fecha de creación:</strong> {{ envio.fecha | date: 'dd MMMM yyyy' }}</p>
-                <p>
-                  <strong>Hora de inicio:</strong> 
-                  <ng-container *ngIf="envio.horaInicio">
-                    {{ ((+envio.horaInicio.split(':')[0] % 12) || 12) }}:{{ envio.horaInicio.split(':')[1] }}
-                    {{ (+envio.horaInicio.split(':')[0] < 12) ? 'AM' : 'PM' }} 
-                    
-                  </ng-container>
-                  <ng-container *ngIf="!envio.horaInicio">
-                    No disponible
-                  </ng-container>
-                </p>
-                
-                
-                
-
-
-                <p *ngIf="envio.horaFinalizacion"><strong>Hora de término:</strong> {{ envio.horaFinalizacion | date: 'HH:mm' }}</p>
-              </div>
-            </div>
-
-            <!-- Lista de productos -->
-            <div class="products-container">
-              <div *ngFor="let producto of envio.productos" class="product-card">
-                <img [src]="producto.urlImagen" alt="{{ producto.producto }}" />
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div *ngIf="enviosList.length === 0" style="position: relative; text-align: center;">
-          <img src="assets/img/Designer.jpeg" alt="No hay envíos" style="max-width: 200px; height: auto; filter: blur(2px);">
-          <div style="position: absolute; top: 0; left: 0; right: 0; bottom: 0; background: rgba(255, 255, 255, 0.7); display: flex; align-items: center; justify-content: center;">
-            <p style="color: black;">No hay envíos recibidos para esta fecha.</p>
-          </div>
-        </div>
-        
-        
-      </div>
+  <!-- Selector de fecha -->
+  <div class="calendar-container">
+    <h3>Selecciona una Fecha</h3>
+    <div class="date-search-wrapper">
+      <mat-form-field appearance="fill" class="date-field">
+        <mat-label>Fecha</mat-label>
+        <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" (dateChange)="buscarEnvios()" placeholder="dd/MM/yyyy">
+        <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+        <mat-datepicker #picker></mat-datepicker>
+      </mat-form-field>
     </div>
   </div>
+
+  <!-- Contenedor de envíos recibidos -->
+  <div class="envios-container">
+    <h6 *ngIf="selectedDate">Envíos Recibidos para {{ getFormattedDate(selectedDate) }}</h6>
+    <div class="cards-wrapper">
+      <div *ngIf="enviosList.length > 0" class="card-container">
+        <div *ngFor="let envio of enviosList" class="card" (click)="goToDetalle(envio.id)">
+          <div class="status">{{ envio.status }}</div>
+
+          <!-- Círculo superior derecho con el icono del camión -->
+          <div class="status-container">
+            <div class="circle-icon">
+              <img src="assets/img/camion.png" alt="Camión de envío" />
+            </div>
+          </div>
+
+          <!-- Contenido de la tarjeta -->
+          <div class="card-header">
+            <div class="info-header">
+              <p><strong>Autorizado por:</strong> {{ envio.autorizante }}</p>
+              <p><strong>Fecha de creación:</strong> {{ getFormattedDate(envio.fecha) }}</p>
+              <p><strong>Hora de inicio:</strong> {{ formatHour(envio.horaInicioEnvio) }}</p>
+              <p *ngIf="envio.horaFinalizacion"><strong>Hora de término:</strong> {{ envio.horaFinalizacion | date: 'HH:mm' }}</p>
+            </div>
+          </div>
+
+          <!-- Lista de productos -->
+          <div class="products-container">
+            <div *ngFor="let producto of envio.productos" class="product-card">
+              <img [src]="producto.urlImagen" alt="{{ producto.producto }}" />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Mensaje si no hay envíos -->
+      <div *ngIf="enviosList.length === 0" class="no-envios-message">
+        <img src="assets/img/Designer.jpeg" alt="No hay envíos">
+        <p>No hay envíos recibidos para esta fecha.</p>
+      </div>
+      
+    </div>
+  </div>
+</div>

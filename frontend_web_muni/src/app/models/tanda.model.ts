@@ -8,4 +8,5 @@ export interface Tanda {
     producto: string;
     bodega: string;
     ubicacion: string;
+    esMerma:boolean;
   }

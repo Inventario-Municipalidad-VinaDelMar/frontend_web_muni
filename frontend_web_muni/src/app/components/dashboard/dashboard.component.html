@@ -1,0 +1,76 @@
+<div class="dashboard-container">
+  <div class="contenido">
+    <h1 class="titulo">Dashboard de Inventario</h1>
+    <p class="subtitulo">Visualización de métricas clave sobre entregas y mermas de productos.</p>
+
+
+  </div>
+    
+  
+    <div class="graph-container">
+        <div class="chart-box">
+            <h3>Entregas por Tiempo</h3>
+            <label for="timeViewSelect">Seleccionar Vista de Tiempo:</label>
+            <select id="timeViewSelect" (change)="handleTimeViewChange($event)">
+              <option value="daily">Diario</option>
+              <option value="weekly">Semanal</option>
+              <option value="monthly">Mensual</option>
+            </select>
+            <canvas #myChart></canvas>
+            <p id="totalDeliveriesDisplay" style="margin-top: 10px; font-weight: bold;"></p>
+          </div>
+          
+  
+          <div class="chart-box">
+            <h3>Productos por Comedor</h3>
+            <label for="comedorSelect">Seleccionar Comedor:</label>
+            <select id="comedorSelect" (change)="handleComedorChange($event)">
+              <option *ngFor="let comedor of getComedorKeys()" [value]="comedor">{{ comedor }}</option>
+            </select>
+            <canvas #comedorChart></canvas>
+            <p id="totalProductsDisplay" style="margin-top: 10px; font-weight: bold;"></p>
+          </div>
+          
+    </div>
+  
+    <div class="comparison-chart-container">
+        <div class="pie-chart">
+          <h3>Productos Entregados vs Productos Mermados</h3>
+          <ngx-charts-pie-chart
+            [view]="[500, 300]"
+            [scheme]="colorScheme"
+            [results]="chartData"
+            [gradient]="gradient"
+            [labels]="showLabels"
+            [legend]="false">
+          </ngx-charts-pie-chart>
+        </div>
+      
+        <div class="legend-info">
+          <div *ngFor="let data of chartData" class="legend-item">
+            <div [style.backgroundColor]="getColor(data.name)" class="legend-color"></div>
+            <span>{{ data.name }}: {{ (data.value / totalValue() * 100).toFixed(2) }}%</span>
+          </div>
+          <hr>
+          <div class="totals-container">
+            <div class="total-row">
+              <span>Total Envíos</span>
+              <span>{{ totalDeliveries() }}</span>
+            </div>
+            <div class="total-row">
+              <span>Total Productos Entregados</span>
+              <span>{{ calcularProductosEntregados() }}</span>
+            </div>
+            <div class="total-row">
+              <span>Total Productos en Tandas</span>
+              <span>{{ totalProductosEnTandas() }}</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      
+      
+      
+  </div>
+  

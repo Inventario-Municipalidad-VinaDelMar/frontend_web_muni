@@ -1,9 +1,14 @@
-import { Component } from '@angular/core';
-import { Router } from '@angular/router'; // Importar Router
+import { Component, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { SidebarComponent } from "./components/sidebar/sidebar.component";
 import { RouterOutlet } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TokenService } from './services/auth-token.service';
+import { PlanificacionSocketService } from './services/Sockets/planificacion.socket.service';
+import { SocketInventarioService } from './services/Sockets/socket-inventario.service';
+import { AuthService } from './services/Sockets/auth.service';
+import { DataLoadService } from './services/data-load.service'; // Importa el nuevo servicio
+import { EMPTY, map, of, switchMap } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -12,29 +17,42 @@ import { TokenService } from './services/auth-token.service';
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.scss']
 })
-export class AppComponent {
+export class AppComponent implements OnInit {
   title = 'frontend_web_muni';
-  isSidebarCollapsed = false; // Estado del sidebar
-  currentToken: string | null = null; // Almacenar el token actual
+  isSidebarCollapsed = false;
+  currentToken: string | null = null;
+  user: any = null;
 
-  constructor(private router: Router, private tokenService: TokenService,) { // Inyectar el Router y TokenService
-    // Suscribirse al tokenObservable para recibir actualizaciones del token
+  constructor(
+    private router: Router,
+    private tokenService: TokenService,
+    private inventarioSocketService: SocketInventarioService,
+    private planificacionSocketService: PlanificacionSocketService,
+    private authService: AuthService,
+    private dataLoadService: DataLoadService // Inyecta el servicio de carga de datos
+  ) {}
+
+  ngOnInit(): void {
+    // Suscríbete al token para asegurarte de que esté disponible antes de conectar el socket
     this.tokenService.getTokenObservable().subscribe(token => {
-      this.currentToken = token; // Actualizar el token actual
-      console.log('Token actualizado en AppComponent:', this.currentToken);
-      
-      // Aquí puedes manejar la lógica de redirección si el token es null
-      if (!this.currentToken) {
-        this.router.navigate(['/login']); // Redirigir a la página de login si no hay token
+      if (token) {
+        // Inicializa la conexión del socket solo si hay un token
+        console.log('Token disponible en AppComponent:', token);
+        this.inventarioSocketService.initializeConnection(token);
+        this.planificacionSocketService.initializeConnection(token);
+      } else {
+        console.log('Token no disponible en AppComponent. Esperando...');
       }
     });
   }
+  
+  
+  
 
   toggleSidebar() {
-    this.isSidebarCollapsed = !this.isSidebarCollapsed; // Cambiar el estado del sidebar
+    this.isSidebarCollapsed = !this.isSidebarCollapsed;
   }
 
-  // Método para verificar si la ruta actual es '/login'
   isLoginRoute(): boolean {
     return this.router.url === '/login';
   }

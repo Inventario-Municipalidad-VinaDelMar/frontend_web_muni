@@ -1,4 +1,15 @@
+
+<div class="alertas-container">
+  <div class="contador alerta-vencido">Vencidos: {{ contadorVencidos }}</div>
+  <div class="contador alerta-por-vencer-1">Por vencer (1-2 días): {{ contadorPorVencerEtapa1 }}</div>
+  <div class="contador alerta-por-vencer-2">Por vencer (3-7 días): {{ contadorPorVencerEtapa2 }}</div>
+  <div class="contador alerta-seguro">Seguros: {{ contadorSeguro }}</div>
+</div>
+
+
 <div class="table-container">
+  
+  
   <!-- Carga inicial con spinner y mensaje -->
   <div *ngIf="isLoading" class="loading-container">
     <p> Cargando datos... Por favor, espere. </p>
@@ -50,16 +61,15 @@
               <table class="expanded-content">
                 <thead>
                   <tr>
-                    <th>Tanda</th>
                     <th>Cantidad Actual</th>
                     <th>Fecha de Vencimiento</th>
                     <th>Fecha de Ingreso</th>
                     <th>Ubicacion</th>
+                    <th>Bodega</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let tanda of producto.tandas?.slice(0, 10)" [ngClass]="calcularEstadoVencimiento(tanda)">
-                    <td>{{ tanda.producto }}</td>
                     <td>{{ tanda.cantidadActual }}</td>
                     <td>{{ tanda.fechaVencimiento | date: 'yyyy-MM-dd' }}</td>
                     <td>{{ tanda.fechaLlegada | date: 'yyyy-MM-dd' }}</td>

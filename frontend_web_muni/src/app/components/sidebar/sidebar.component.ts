@@ -82,6 +82,9 @@ export class SidebarComponent {
       case 'planificación':
         this.router.navigate(['/planificacion']);
         break;
+      case 'envios':
+        this.router.navigate(['/envios']);
+        break;
       case 'cerrar sesión':
         this.logout();
         break;

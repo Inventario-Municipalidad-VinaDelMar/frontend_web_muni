@@ -11,11 +11,14 @@ import { CarouselModule } from 'primeng/carousel';
 import { CardModule } from 'primeng/card';
 import { PanelModule } from 'primeng/panel';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
+import { DashboardComponent } from "../dashboard/dashboard.component";
+import localeEs from '@angular/common/locales/es';
+import { LOCALE_ID } from '@angular/core';
 
 
 @Component({
   standalone:true,
-  imports:[CommonModule,CarouselModule,CardModule,PanelModule,ScrollPanelModule ],
+  imports: [CommonModule, CarouselModule, CardModule, PanelModule, ScrollPanelModule, DashboardComponent],
   selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.scss']
@@ -59,6 +62,40 @@ export class HomeComponent implements OnInit, OnDestroy {
     this.loadTandasRecientes();
     this.calculateWeekDates();
   }
+  translateMonth(month: string | null | undefined): string {
+    if (!month) return ''; // Maneja casos donde month es null o undefined
+    const monthTranslations: { [key: string]: string } = {
+      'January': 'Enero',
+      'February': 'Febrero',
+      'March': 'Marzo',
+      'April': 'Abril',
+      'May': 'Mayo',
+      'June': 'Junio',
+      'July': 'Julio',
+      'August': 'Agosto',
+      'September': 'Septiembre',
+      'October': 'Octubre',
+      'November': 'Noviembre',
+      'December': 'Diciembre'
+    };
+    return monthTranslations[month] || month;
+  }
+  
+  translateDay(day: string | null | undefined): string {
+    if (!day) return ''; // Maneja casos donde day es null o undefined
+    const dayTranslations: { [key: string]: string } = {
+      'Monday': 'Lunes',
+      'Tuesday': 'Martes',
+      'Wednesday': 'Miércoles',
+      'Thursday': 'Jueves',
+      'Friday': 'Viernes',
+      'Saturday': 'Sábado',
+      'Sunday': 'Domingo'
+    };
+    return dayTranslations[day] || day;
+  }
+  
+  
 
   setUserGreeting(): void {
     const user = this.authService.getUser();
@@ -97,7 +134,6 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   loadPlanificacion(fecha: string): void {
-    console.log('Cargando planificación para la fecha:', fecha);
     this.planificacionSocketService.getPlanificacionIndividual(fecha);
 
     const planificacionSubscription = this.planificacionSocketService.onLoadPlanificacionData()

@@ -1,25 +1,23 @@
-
 // Custom Theming for Angular Material
 // For more information: https://material.angular.io/guide/theming
-@use '@angular/material' as mat;
-// Plus imports for other components in your app.
 
-// Include the common styles for Angular Material. We include this here so that you only
-// have to load a single css file for Angular Material in your app.
-// Be sure that you only ever include this mixin once!
+// Coloca las reglas @use al principio
+@use '@angular/material' as mat;
+
+// Importa los estilos de PrimeNG y Bootstrap después de las reglas @use
+@import "primeng/resources/themes/lara-light-blue/theme.css";
+@import "primeng/resources/primeng.css";
+@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
+
+// Incluye los estilos comunes para Angular Material
 @include mat.core();
 
-// Define the palettes for your theme using the Material Design palettes available in palette.scss
-// (imported above). For each palette, you can optionally specify a default, lighter, and darker
-// hue. Available color palettes: https://material.io/design/color/
+// Define las paletas para tu tema
 $frontend_web_muni-primary: mat.define-palette(mat.$indigo-palette);
 $frontend_web_muni-accent: mat.define-palette(mat.$pink-palette, A200, A100, A400);
-
-// The warn palette is optional (defaults to red).
 $frontend_web_muni-warn: mat.define-palette(mat.$red-palette);
 
-// Create the theme object. A theme consists of configurations for individual
-// theming systems such as "color" or "typography".
+// Crea el objeto del tema
 $frontend_web_muni-theme: mat.define-light-theme((
   color: (
     primary: $frontend_web_muni-primary,
@@ -30,23 +28,16 @@ $frontend_web_muni-theme: mat.define-light-theme((
   density: 0
 ));
 
-// Include theme styles for core and each component used in your app.
-// Alternatively, you can import and @include the theme mixins for each component
-// that you are using.
+// Incluye los estilos de todos los componentes de Angular Material usando el tema personalizado
 @include mat.all-component-themes($frontend_web_muni-theme);
 
-@import "primeng/resources/themes/lara-light-blue/theme.css";
-@import "primeng/resources/primeng.css";
-@import url("https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css");
-
-
+// Estilos personalizados para tu aplicación
 body {
     margin: 0;
 }
 
 .contenido { 
     text-align: center;
-    margin-top: 10px;
     border-radius: 10px;
     padding: 10px;
     background-color: rgb(255, 255, 255);
@@ -60,3 +51,11 @@ body {
     }
 }
 
+html, body { 
+    height: 100%; 
+}
+
+body { 
+    margin: 0; 
+    font-family: Roboto, "Helvetica Neue", sans-serif; 
+}

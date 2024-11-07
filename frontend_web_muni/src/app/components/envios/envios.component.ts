@@ -1,82 +1,112 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit } from '@angular/core';
+import { ChangeDetectorRef, Component, OnInit } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { CalendarModule } from 'primeng/calendar';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MAT_DATE_LOCALE, MAT_DATE_FORMATS, DateAdapter, MatNativeDateModule } from '@angular/material/core';
+import { MatInputModule } from '@angular/material/input';
 import { EnviosSocketService } from '../../services/envios.service';
-import { TableModule } from 'primeng/table';
 import { Router } from '@angular/router';
 import { Envio } from '../../models/envio.model';
+
+export const MY_DATE_FORMATS = {
+  parse: {
+    dateInput: 'DD/MM/YYYY',
+  },
+  display: {
+    dateInput: 'DD/MM/YYYY',
+    monthYearLabel: 'MMMM YYYY',
+    dateA11yLabel: 'LL',
+    monthYearA11yLabel: 'MMMM YYYY'
+  },
+};
+
 
 @Component({
   selector: 'app-envios',
   standalone: true,
   templateUrl: './envios.component.html',
   styleUrls: ['./envios.component.scss'],
+  providers: [
+    { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
+    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS } // Configura el idioma español en este componente
+  ],
   imports: [
     CommonModule,
     FormsModule,
-    CalendarModule,
-    TableModule
+    MatDatepickerModule,
+    MatNativeDateModule,
+    MatInputModule
   ]
 })
 export class EnviosComponent implements OnInit {
-  selectedDate: Date | null = null; // Guardamos la fecha seleccionada
-  enviosList: Envio[] = []; // Almacena la lista de envíos recibidos
+  selectedDate: Date | null = null;
+  enviosList: Envio[] = [];
   envioIds: Set<string> = new Set();
 
-  constructor(private enviosSocketService: EnviosSocketService, private router: Router) {
-    // Suscribirse a los envíos recibidos desde el socket
-    this.enviosSocketService.onLoadEnviosByFecha().subscribe((data: Envio | Envio[]) => {
-      this.procesarEnvios(data);
-    });
-  }
+  daysOfWeek = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+  monthsOfYear = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+
+  constructor(
+    private enviosSocketService: EnviosSocketService,
+    private router: Router,
+    private adapter: DateAdapter<any>
+  ) {}
 
   ngOnInit() {
-    // Establecemos la fecha actual como la fecha seleccionada
+    this.adapter.setLocale('es-ES'); // Configura la localización en español
+    this.adapter.getFirstDayOfWeek = () => 1;
     this.selectedDate = new Date();
-    
-    // Asegurarse de que la hora sea medianoche
     this.selectedDate.setHours(0, 0, 0, 0);
-  
-    // Cargar envíos de hoy inmediatamente al iniciar
-    this.cargarEnvios(this.formatDate(this.selectedDate));
+    this.buscarEnvios(); // Cargar envíos para la fecha actual
   }
 
-  // Método para cargar los envíos de una fecha específica
+  // Función para traducir y formatear la fecha en español
+  getFormattedDate(date: Date | string): string {
+    // Si el parámetro es un string, conviértelo a Date usando los componentes de la fecha
+    if (typeof date === 'string') {
+      const [year, month, day] = date.split('-').map(Number); // Asume formato 'YYYY-MM-DD'
+      date = new Date(year, month - 1, day); // Crear Date en zona local
+    }
+  
+    const dayNames = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    const monthNames = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+  
+    const dayName = dayNames[date.getDay()];
+    const day = date.getDate();
+    const monthName = monthNames[date.getMonth()];
+    const year = date.getFullYear();
+  
+    return `${dayName}, ${day} ${monthName} ${year}`;
+  }
+  
+
+  // Función para capitalizar la primera letra (opcional para mejorar presentación)
+  capitalize(word: string): string {
+    return word.charAt(0).toUpperCase() + word.slice(1);
+  }
+
+  buscarEnvios() {
+    if (this.selectedDate) {
+      const fechaSeleccionada = this.formatDate(this.selectedDate);
+      this.cargarEnvios(fechaSeleccionada);
+    }
+  }
+
   cargarEnvios(fechaSeleccionada: string) {
-    // Limpiar la lista actual de envíos y los IDs
     this.enviosList = [];
     this.envioIds.clear();
-
-    // Llamar al servicio para cargar los envíos de la fecha seleccionada
     this.enviosSocketService.loadEnviosByFecha(fechaSeleccionada).subscribe({
-      next: (data: Envio[]) => {
-        this.procesarEnvios(data);
-        console.log("Envíos cargados para la fecha:", fechaSeleccionada);
-      },
-      error: (error) => {
-        console.error("Error al cargar envíos:", error);
-      }
+      next: (data: Envio[]) => this.procesarEnvios(data),
+      error: (error) => console.error('Error al cargar envíos:', error),
     });
   }
 
-  // Este método se llama cuando se selecciona una nueva fecha
-  onDateChange(selectedDate: Date) {
-    // Establecer la nueva fecha seleccionada
-    this.selectedDate = selectedDate;
-
-    // Formateamos la nueva fecha seleccionada y cargamos los envíos
-    const fechaSeleccionada = this.formatDate(selectedDate);
-    this.cargarEnvios(fechaSeleccionada);
-  }
-
-  // Procesar envíos recibidos y agregarlos a la lista
   procesarEnvios(data: Envio | Envio[]) {
     if (Array.isArray(data)) {
-      data.forEach(envio => {
+      data.forEach((envio) => {
         if (!this.envioIds.has(envio.id)) {
           this.enviosList.push(envio);
-          this.envioIds.add(envio.id); // Agrega el ID al Set para evitar duplicados
+          this.envioIds.add(envio.id);
         }
       });
     } else {
@@ -85,16 +115,27 @@ export class EnviosComponent implements OnInit {
         this.envioIds.add(data.id);
       }
     }
-
-    console.log("Envíos recibidos:", this.enviosList);
   }
 
-  // Formatear la fecha a 'YYYY-MM-DD'
   formatDate(date: Date): string {
-    return date.toISOString().split('T')[0]; // Devuelve 'YYYY-MM-DD'
+    return date.toISOString().split('T')[0];
   }
 
   goToDetalle(envioId: string) {
     this.router.navigate(['/detalle-envio', envioId]);
+  }
+
+  // Función para formatear la hora en formato de 12 horas con AM/PM
+  formatHour(hour: string | null): string {
+    if (!hour) {
+      return 'No disponible';
+    }
+
+    const [hours, minutes] = hour.split(':');
+    const hourInt = parseInt(hours, 10);
+    const period = hourInt < 12 ? 'AM' : 'PM';
+    const hour12 = hourInt % 12 || 12; // Convierte a formato de 12 horas
+
+    return `${hour12}:${minutes} ${period}`;
   }
 }

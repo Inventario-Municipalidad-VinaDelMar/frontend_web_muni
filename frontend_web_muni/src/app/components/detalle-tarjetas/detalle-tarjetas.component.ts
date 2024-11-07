@@ -2,7 +2,6 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, RouterModule } from '@angular/router';
 import { EnviosSocketService } from '../../services/envios.service';
-import { Envio } from '../../models/envio.model';
 import { DetalleEnvio } from '../../models/detalle-envio.model';
 import { Location } from '@angular/common';
 
@@ -15,36 +14,51 @@ import { PanelModule } from 'primeng/panel';
 @Component({
   selector: 'app-detalle-tarjetas',
   standalone: true,
-  imports: [CommonModule, RouterModule, CardModule, PanelModule,CarouselModule,FieldsetModule],
+  imports: [CommonModule, RouterModule, CardModule, PanelModule, CarouselModule, FieldsetModule],
   templateUrl: './detalle-tarjetas.component.html',
   styleUrls: ['./detalle-tarjetas.component.scss']
 })
 export class DetalleTarjetasComponent implements OnInit {
-  envioId: string = ''; // El ID del envío
-  envioData: DetalleEnvio | null = null; // Datos del envío específico
-  
+  envioId: string = '';
+  envioData: DetalleEnvio | null = null;
 
   constructor(
     private location: Location,
     private route: ActivatedRoute,
-    private enviosSocketService: EnviosSocketService // Inyecta el servicio de envíos
+    private enviosSocketService: EnviosSocketService
   ) {}
 
-  ngOnInit() {
-    // Captura el ID del envío desde la URL
+  ngOnInit(): void {
     this.route.params.subscribe(params => {
-      this.envioId = params['id']; // Asigna el ID de la URL a `envioId`
-
-      // Llama al servicio para obtener los datos del envío usando `getEnvioById`
-      this.enviosSocketService.getEnvioById(this.envioId).subscribe(envio => {
-        this.envioData = envio; // Asigna los datos del envío al componente
-        console.log('Datos del envío:', envio);
-      }, error => {
-        console.error('Error al cargar los datos del envío:', error);
+      this.envioId = params['id'];
+      this.enviosSocketService.getEnvioById(this.envioId).subscribe({
+        next: (envio) => {
+          this.envioData = envio;
+          console.log('Datos del envío:', envio);
+        },
+        error: (err) => {
+          console.error('Error al cargar los datos del envío:', err);
+        }
       });
     });
   }
-  volver() {
+
+  formatHora(hora: string | null): string {
+    if (!hora) {
+      return 'No disponible';
+    }
+  
+    const [hours, minutes] = hora.split(':');
+    const hourInt = parseInt(hours, 10);
+  
+    const period = hourInt >= 12 ? 'PM' : 'AM';
+    const hour12 = hourInt % 12 || 12;
+  
+    return `${hour12}:${minutes} ${period}`;
+  }
+  
+
+  volver(): void {
     this.location.back();
   }
 }

@@ -8,6 +8,7 @@ import { PlanificacionComponent } from './components/planificacion/planificacion
 import { LoginComponent } from './components/login/login.component';
 // Cambiar la importación de AuthGuard a authGuard
 import { authGuard } from './guards/auth.guard';
+import { EnviosComponent } from './components/envios/envios.component';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'home', pathMatch: 'full' },
@@ -18,6 +19,7 @@ export const routes: Routes = [
   { path: 'bodegas', component: BodegaComponent, canActivate: [authGuard] },
   { path: 'inventario', component: InventarioComponent, canActivate: [authGuard] },
   { path: 'planificacion', component: PlanificacionComponent, canActivate: [authGuard] },
+  { path: 'envios', component: EnviosComponent, canActivate: [authGuard] },
   {
     path: 'detalle-envio/:id',
     loadComponent: () => import('./components/detalle-tarjetas/detalle-tarjetas.component').then(c => c.DetalleTarjetasComponent)
