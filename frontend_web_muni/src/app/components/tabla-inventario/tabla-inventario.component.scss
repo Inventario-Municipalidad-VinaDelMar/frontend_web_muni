@@ -1,145 +1,315 @@
+/* Contenedores de alertas */
+
+/* Estilo para el título de la sección */
+
+
+.section-title::after {
+  content: '';
+  display: block;
+  width: 50px;
+  height: 3px;
+  background-color: #0077B6;
+  margin: 8px auto 0; /* Para centrar la línea debajo del título */
+  border-radius: 2px;
+}
+
+.alertas-container {
+  
+  display: flex;
+  justify-content: center; /* Centra los elementos horizontalmente */
+  align-items: center;
+  gap: 20px; /* Espacio entre cada contador */
+  margin-bottom: 20px;
+  padding: 15px;
+  background-color: #f9fafb; /* Fondo ligero para resaltar */
+  border-radius: 10px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1); /* Sombra ligera */
+}
+
+.contador {
+  cursor: pointer;
+  padding: 12px 20px; /* Padding más amplio */
+  border-radius: 8px;
+  font-weight: bold;
+  text-align: center;
+  color: white;
+  font-size: 1.1em;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.2); /* Sombra para destacar cada contador */
+  min-width: 150px; /* Ancho mínimo para uniformidad */
+}
+.alerta-vencido {
+  background-color: #ff4d4d;
+}
+
+.alerta-por-vencer-1 {
+  background-color: #ffa500;
+}
+
+.alerta-por-vencer-2 {
+  background-color: #ffd700;
+}
+
+.alerta-seguro {
+  background-color: #4caf50;
+}
+
 /* Contenedor principal de la tabla */
 .table-container {
-    width: 100%;
-    padding: 20px;
-    background-color: #f4f6f9; /* Fondo ligero */
-    border-radius: 8px;
-    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
-    font-family: Arial, sans-serif;
-  }
-  
-  /* Estilo de la tabla */
-  .custom-table {
-    width: 100%;
-    border-collapse: collapse;
-    background-color: white;
-    border-radius: 8px;
-    overflow: hidden;
-  }
-  
-  /* Encabezado de la tabla */
-  .custom-table thead {
-    background-color: #0077B6;
-    color: white;
-    font-weight: bold;
-  }
-  
-  .custom-table th, .custom-table td {
-    padding: 12px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  
-  /* Botón de expansión */
-  .boton-expandir {
-    background-color: #0077B6;
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    font-size: 0.9em;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.3s ease;
-  }
-  
-  .boton-expandir:hover {
-    background-color: #005f8a;
-  }
-  
-  /* Estilo para la fila expandida */
-  .expanded-row {
-    background-color: #EAF4FA;
-  }
-  
-  /* Tabla expandida */
-  .expanded-content {
-    width: 100%;
-    margin-top: 10px;
-    border-collapse: collapse;
-  }
-  
-  .expanded-content th, .expanded-content td {
-    padding: 8px;
-    text-align: center;
-    border-bottom: 1px solid #ddd;
-  }
-  
-  /* Colores de alerta para las tandas */
-.vencido {
-  background-color: #ff4d4d; /* Rojo para vencidos */
+  width: 100%;
+  padding: 20px;
+  background-color: #f4f6f9;
+  border-radius: 8px;
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+}
+
+/* Tabla */
+.custom-table {
+  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  border-collapse: collapse;
+  background-color: white;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.custom-table thead {
+  background-color: #0077B6;
   color: white;
+  font-weight: bold;
+}
+
+.custom-table th, .custom-table td {
+  padding: 12px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+.boton-expandir {
+  background-color: #0077B6;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  font-size: 0.9em;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.boton-expandir:hover {
+  background-color: #005f8a;
+  transform: scale(1.05);
+}
+
+/* Fila expandida */
+.expanded-row {
+  background-color: #EAF4FA;
+}
+
+/* Tabla expandida */
+.expanded-content {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+}
+
+.expanded-content th, .expanded-content td {
+  padding: 8px;
+  text-align: center;
+  border-bottom: 1px solid #ddd;
+}
+
+/* Estados de vencimiento */
+.vencido {
+  background-color: #ffcccc;
+  color: #a00;
 }
 
 .porVencerEtapa1 {
-  background-color: #ffa500; /* Naranja oscuro para por vencer (1-2 días) */
-  color: black;
+  background-color: #ffdead;
+  color: #a55;
 }
 
 .porVencerEtapa2 {
-  background-color: #ffd700; /* Amarillo para por vencer (3-7 días) */
-  color: black;
+  background-color: #ffffcc;
+  color: #555;
 }
 
 .seguro {
-  background-color: #4caf50; /* Verde para seguros */
-  color: black;
+  background-color: #e0ffe0;
+  color: #357a38;
 }
 
-  
-  /* Contenedor de carga */
-  .loading-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 200px;
-    flex-direction: column;
-    color: #333;
-    font-size: 1.2em;
+/* Contenedor de carga */
+.loading-container, .error-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  flex-direction: column;
+  color: #333;
+  font-size: 1.2em;
+}
+
+.no-productos-image {
+  width: 80px;
+  opacity: 0.6;
+  margin: 10px 0;
+}
+
+.boton-mostrar-todos {
+  background-color: #122766;  /* Verde */
+  color: #ffffff;              /* Texto blanco */
+  border: none;
+  padding: 8px 16px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.boton-transparente {
+  color:black;
+  background-color: transparent;  /* Fondo transparente */
+  opacity: 0.5;                   /* Opcional: Ajusta la opacidad */
+  cursor: default;                /* Deshabilita el puntero */
+  border: 2px dashed rgba(10, 68, 114, 0.5);
+}
+
+.boton-mostrar-todos:hover {
+  box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+}
+
+.boton-mostrar-todos:focus {
+  outline: none;
+}
+
+
+.header-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;  /* Centra el contenido */
+  padding: 10px 0;
+}
+
+.section-title {
+  flex-grow: 1;  /* Hace que el título ocupe el espacio central */
+  font-size: 1.8em;
+  font-weight: bold;
+  color: #0077B6; /* Azul para hacer juego con los elementos */
+  text-align: center;
+  margin: 0;
+}
+
+.search-container {
+  position: relative;
+  max-width: 400px;
+  width: 100%;
+  padding: 8px;
+  background-color: #ffffff;
+  border-radius: 25px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+}
+
+.search-icon {
+  position: absolute;
+  left: 15px;
+  font-size: 18px;
+  color: #0d6efd;
+}
+
+.search-input {
+  width: 100%;
+  padding: 10px 15px 10px 40px;
+  font-size: 16px;
+  border: none;
+  border-radius: 25px;
+  outline: none;
+  background-color: transparent;
+  color: #333;
+  transition: box-shadow 0.3s ease;
+
+  &::placeholder {
+    color: #6c757d;
   }
-  
-  /* Contenedor de error */
-  .error-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-    text-align: center;
-    color: #f44336;
-    font-size: 1.1em;
+
+  &:focus {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    background-color: #ffffff;
   }
-  
-  .no-productos-image {
-    width: 80px;
-    opacity: 0.6;
-    margin: 10px 0;
+  &:hover {
+    background-color: #f6f6f6; /* Gris más oscuro en hover */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
-  .alertas-container {
-    display: flex;
-    gap: 15px;
-    margin-bottom: 20px;
+}
+
+
+.export-button-container {
+  display: flex;
+  justify-content: flex-end; /* Alinea el botón a la derecha */
+  margin: 20px 0;            /* Añade espacio vertical alrededor del botón */
+}
+
+.export-button {
+  background-color: #0077B6; /* Azul similar al de "Expandir" */
+  color: #ffffff;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+
+  /* Sombra para dar efecto de elevación */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+  /* Cambia el color y la sombra en hover */
+  &:hover {
+    background-color: #0056b3; /* Azul más oscuro en hover */
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
-  
-  .contador {
-    padding: 10px;
-    border-radius: 5px;
-    font-weight: bold;
-    color: white;
+
+  /* Cambia el color y quita la sombra al hacer clic */
+  &:active {
+    background-color: #004494;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   }
-  
-  .alerta-vencido {
-    background-color: #ff4d4d; // Rojo para vencidos
+}
+
+.p-dialog .dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 15px;
+}
+
+.confirm-button {
+  background-color: #007bff; /* Azul similar al de exportar */
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #0056b3; /* Azul más oscuro en hover */
   }
-  
-  .alerta-por-vencer-1 {
-    background-color: #ffa500; // Naranja oscuro para por vencer (1-2 días)
+}
+
+.cancel-button {
+  background-color: #6c757d; /* Color gris para cancelar */
+  color: #ffffff;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+
+  &:hover {
+    background-color: #5a6268; /* Gris más oscuro en hover */
   }
-  
-  .alerta-por-vencer-2 {
-    background-color: #ffd700; // Amarillo para por vencer (3-7 días)
-  }
-  
-  .alerta-seguro {
-    background-color: #4caf50; // Verde para seguros
-  }
-  
+}

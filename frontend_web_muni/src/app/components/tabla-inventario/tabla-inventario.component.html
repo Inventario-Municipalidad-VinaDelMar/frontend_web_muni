@@ -1,14 +1,47 @@
-
 <div class="alertas-container">
-  <div class="contador alerta-vencido">Vencidos: {{ contadorVencidos }}</div>
-  <div class="contador alerta-por-vencer-1">Por vencer (1-2 días): {{ contadorPorVencerEtapa1 }}</div>
-  <div class="contador alerta-por-vencer-2">Por vencer (3-7 días): {{ contadorPorVencerEtapa2 }}</div>
-  <div class="contador alerta-seguro">Seguros: {{ contadorSeguro }}</div>
+  <div class="contador alerta-vencido" (click)="filtrarPorEstado('vencido')">
+    Vencidos: {{ contadorVencidos }}
+  </div>
+  <div class="contador alerta-por-vencer-1" (click)="filtrarPorEstado('porVencerEtapa1')">
+    Por vencer (1-2 días): {{ contadorPorVencerEtapa1 }}
+  </div>
+  <div class="contador alerta-por-vencer-2" (click)="filtrarPorEstado('porVencerEtapa2')">
+    Por vencer (3-7 días): {{ contadorPorVencerEtapa2 }}
+  </div>
+  <div class="contador alerta-seguro" (click)="filtrarPorEstado('seguro')">
+    Seguros: {{ contadorSeguro }}
+  </div>
+  <button (click)="mostrarTodos()" [ngClass]="{'boton-transparente': !estadoFiltroActual}" class="boton-mostrar-todos">
+    Mostrar Todos
+  </button>
+  
+
+
 </div>
 
 
 <div class="table-container">
+  <div class="header-container">
+    <h2 class="section-title">
+      Estado del Inventario de Productos 
+      <span *ngIf="estadoFiltroActual">- {{ obtenerTituloFiltro(estadoFiltroActual) }}</span>
+    </h2>
+    <div class="search-container">
+      <span class="search-icon">
+        <i class="bi bi-search"></i> <!-- Icono de búsqueda de Bootstrap -->
+      </span>
+      <input 
+        type="text" 
+        placeholder="Buscar productos o tandas..." 
+        [(ngModel)]="terminoBusqueda" 
+        (input)="filtrarProductos()"
+        class="search-input"
+      />
+    </div>
+  </div>
   
+  
+
   
   <!-- Carga inicial con spinner y mensaje -->
   <div *ngIf="isLoading" class="loading-container">
@@ -25,7 +58,6 @@
   <!-- Tabla de datos cuando se ha completado la carga sin errores -->
   <div *ngIf="!isLoading && !hasError">
     <table class="custom-table">
-      <!-- Encabezado de la tabla -->
       <thead>
         <tr>
           <th>Nombre del Producto</th>
@@ -35,27 +67,19 @@
           <th>Acciones</th>
         </tr>
       </thead>
-
-      <!-- Cuerpo de la tabla -->
       <tbody>
-        <!-- Bucle principal para cada producto, incluyendo la fila expandible -->
-        <ng-container *ngFor="let producto of productos2">
-          <!-- Fila principal del producto -->
+        <ng-container *ngFor="let producto of productosPaginados;">
           <tr>
             <td>{{ producto.nombre }}</td>
             <td>{{ calcularCantidadTotal(producto) }}</td>
             <td>{{ calcularCantidadPorVencer(producto) }}</td>
             <td>{{ calcularFechaProxima(producto) }}</td>
             <td>
-              <button 
-                class="boton-expandir" 
-                (click)="toggleExpansion(producto.id)">
+              <button class="boton-expandir" (click)="toggleExpansion(producto.id)">
                 {{ expandedRows[producto.id] ? 'Minimizar' : 'Expandir' }}
               </button>
             </td>
           </tr>
-
-          <!-- Fila expandible para mostrar detalles de las tandas si está expandido -->
           <tr *ngIf="expandedRows[producto.id]" class="expanded-row">
             <td colspan="5">
               <table class="expanded-content">
@@ -64,15 +88,15 @@
                     <th>Cantidad Actual</th>
                     <th>Fecha de Vencimiento</th>
                     <th>Fecha de Ingreso</th>
-                    <th>Ubicacion</th>
+                    <th>Ubicación</th>
                     <th>Bodega</th>
                   </tr>
                 </thead>
                 <tbody>
                   <tr *ngFor="let tanda of producto.tandas?.slice(0, 10)" [ngClass]="calcularEstadoVencimiento(tanda)">
                     <td>{{ tanda.cantidadActual }}</td>
-                    <td>{{ tanda.fechaVencimiento | date: 'yyyy-MM-dd' }}</td>
-                    <td>{{ tanda.fechaLlegada | date: 'yyyy-MM-dd' }}</td>
+                    <td>{{ tanda.fechaVencimiento | date:'dd-MM-yyyy' }}</td>
+                    <td>{{ tanda.fechaLlegada | date:'dd-MM-yyyy' }}</td>
                     <td>{{ tanda.ubicacion }}</td>
                     <td>{{ tanda.bodega }}</td>
                   </tr>
@@ -82,13 +106,38 @@
           </tr>
         </ng-container>
       </tbody>
-
-      <!-- Pie de la tabla -->
       <tfoot>
         <tr>
-          <td colspan="5">Total Productos: {{ productos2.length }}</td>
+          <td colspan="5">
+            Total Productos: {{ productos.length }}, total tandas: {{ getTotalTandas() }}
+          </td>
         </tr>
       </tfoot>
+      
     </table>
+  
+    <!-- Componente de paginación -->
+    <p-paginator 
+      [rows]="productosPorPagina" 
+      [totalRecords]="productos.length" 
+      (onPageChange)="cambiarPagina($event)">
+    </p-paginator>
   </div>
+
+  <div *ngIf="!hasError" class="export-button-container">
+    <button (click)="confirmExport()" class="export-button">
+      Exportar Inventario a Excel
+    </button>
+  </div>
+  
+  
+  <p-dialog [(visible)]="mostrarDialogo" [draggable]="false" modal="true" header="Confirmación de Exportación">
+    <p>¿Estás seguro de que deseas exportar el inventario a Excel?</p>
+    <div class="dialog-footer">
+      <button (click)="onConfirm()" class="confirm-button">Confirmar</button>
+      <button (click)="onCancel()" class="cancel-button">Cancelar</button>
+    </div>
+  </p-dialog>
+  
+  
 </div>

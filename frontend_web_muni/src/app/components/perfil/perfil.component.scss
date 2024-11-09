@@ -1,23 +1,33 @@
 
-  .perfil-header {
-    text-align: center;
-    background-color: #ffffff;
-    color: #000000;
-    padding: 20px;
-    border-radius: 12px 12px 0 0;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .perfil-header h2 {
-    margin: 0;
-    font-size: 24px;
-  }
-  
-  .perfil-header p {
-    font-size: 18px;
-    margin-top: 8px;
-    opacity: 0.8;
-  }
+.perfil-header {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #0054e6, #007ad9);
+  color: #ffffff;
+  padding-top: 10px;
+  border-radius: 12px 12px 0 0;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  text-align: center;
+}
+
+.perfil-header h2 {
+  margin: 0;
+  font-size: 36px; /* Tamaño del título aumentado */
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.perfil-header p {
+  font-size: 20px; /* Tamaño del párrafo ajustado */
+  margin-top: 8px;
+  opacity: 0.9;
+  color: #e0e0e0;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+}
+
   
   .perfil-main {
     display: flex;
@@ -75,6 +85,7 @@
   
   
   .perfil-opciones {
+    text-align: center;
     flex: 1;
   }
   
@@ -140,4 +151,3 @@
     color:black;
     
   }
-  

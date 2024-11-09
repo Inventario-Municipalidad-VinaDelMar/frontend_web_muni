@@ -59,3 +59,32 @@ body {
     margin: 0; 
     font-family: Roboto, "Helvetica Neue", sans-serif; 
 }
+
+
+
+/* Cambiar el color del encabezado del acordeón */
+.p-accordion .p-accordion-header {
+  color: #000000; /* Cambia el color del texto */
+  border: none; /* Quita el borde si lo prefieres */
+}
+
+/* Cambiar el color del texto del encabezado al pasar el ratón */
+.p-accordion .p-accordion-header a {
+  background: linear-gradient(135deg, #f0f4f8, #d9e2ec); /* Degradado de gris claro a un tono azul grisáceo */
+  color: #000000; /* Cambia el color al color deseado */
+  text-decoration: none;
+
+}
+
+.p-accordion .p-accordion-header a:hover {
+  background: linear-gradient(135deg, #d9e2ec, #c8d0da); /* Degradado de gris claro a un tono azul grisáceo */
+  color: #00416c; /* Cambia esto al color que prefieras cuando se hace hover */
+}
+
+/* Cambiar el color de fondo del contenido del acordeón */
+.p-accordion .p-accordion-content {
+  background: linear-gradient(135deg, #f0f4f8, #d9e2ec); /* Degradado de gris claro a un tono azul grisáceo */
+  color: #333333; /* Color del texto */
+  padding: 16px; /* Espaciado interno para un aspecto más aireado */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Sombra sutil para resaltar la sección */
+}

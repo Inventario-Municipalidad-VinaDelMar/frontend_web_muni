@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Socket } from 'ngx-socket-io';
 import { filter } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { Tanda } from '../../models/tanda.model';
 import { TokenService } from '../auth-token.service';
 import { AuthService } from './auth.service';
@@ -10,6 +10,7 @@ import { AuthService } from './auth.service';
   providedIn: 'root',
 })
 export class SocketInventarioService {
+  private inventoryUpdates = new BehaviorSubject<Tanda | null>(null);
   private socketConnected = false;
 
   constructor(
@@ -51,7 +52,7 @@ export class SocketInventarioService {
     this.socketConnected = true;
   }
 
-  private disconnectSocket(): void {
+  disconnectSocket(): void {
     if (this.socketConnected) {
       this.socket.disconnect();
       this.socketConnected = false;
@@ -71,7 +72,10 @@ export class SocketInventarioService {
     });
 
     this.socket.on('connect_error', (error: any) => {
-      console.error('Error en la conexión del socket de Inventario:', error);
+      console.error('Error en la conexión del socket de Planificación:', error);
+      if (error.message.includes('Token not valid')) {
+        this.reconnectSocket(); // Llama a la reconexión si el token es inválido
+      }
     });
 
     // Detecta si el token ha expirado y reconecta automáticamente
@@ -130,13 +134,21 @@ export class SocketInventarioService {
     return this.socket.fromEvent('loadAllBodegas');
   }
 
-  listenTandaCreate(): Observable<Tanda> {
-    return this.socket.fromEvent<Tanda>('newTandaCreated');
-  }
+// Escucha cuando se crea una nueva tanda
+listenNewTandaCreated(): Observable<Tanda> {
+  return this.socket.fromEvent<Tanda>('newTandaCreated');
+}
 
-  listenStockCategoriaChanged(): Observable<any> {
-    return this.socket.fromEvent('stockCategoriaChange');
-  }
+// Escucha cuando se actualiza una tanda existente
+listenNewTandaUpdate(): Observable<Tanda> {
+  return this.socket.fromEvent<Tanda>('newTandaUpdate');
+}
+
+// Escucha cambios en el stock de productos
+listenStockProductoChange(): Observable<any> {
+  return this.socket.fromEvent('stockProductoChange');
+}
+
 
   getTandasByProductoId(idProducto: string): void {
     if (this.socketConnected) {
@@ -148,5 +160,9 @@ export class SocketInventarioService {
 
   onLoadTandasByProductoId(idProducto: string): Observable<any> {
     return this.socket.fromEvent(`${idProducto}-tanda`);
+  }
+
+  getInventoryUpdates(): Observable<Tanda | null> {
+    return this.inventoryUpdates.asObservable();
   }
 }

@@ -69,7 +69,7 @@ export class PlanificacionSocketService implements OnDestroy {
   /**
    * Desconecta el socket si está conectado.
    */
-  private disconnectSocket(): void {
+  disconnectSocket(): void {
     if (this.socketConnected) {
       this.socket.disconnect();
       this.socketConnected = false;

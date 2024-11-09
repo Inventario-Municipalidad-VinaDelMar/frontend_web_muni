@@ -18,14 +18,17 @@ export class AuthService {
   // Método para refrescar el token
   refreshToken(): Observable<any> {
     const idToken = this.tokenService.getToken(); // Obtener el token actual
-
+    
+    console.log('Token actual antes de renovar:', idToken); // Log para verificar el token actual antes de enviarlo
+  
     return this.http.post<any>(`${this.apiUrl}/token/renew`, { idToken }).pipe(
       tap(response => {
         this.setAuthToken(response.accessToken); // Actualiza el access token
-        console.log('Token actualizado:', response.accessToken); // Log para verificar
+        console.log('Token actualizado:', response.accessToken); // Log para verificar el nuevo token
       })
     );
   }
+  
 
   setAuthToken(token: string): void {
     this.tokenService.setToken(token);

@@ -39,17 +39,35 @@ export interface Producto {
   urlImagen: string;
   cantidad: number;
 }
+export interface ProductoAfectado {
+  cantidad: number;
+  producto: string;
+  productoId: string;
+  urlImagen: string;
+}
+
+export interface Incidente {
+  id: string;
+  fecha: string;
+  hora: string;
+  descripcion: string;
+  type: string;
+  evidenciaFotograficaUrl: string;
+  productosAfectados: ProductoAfectado[];
+}
 
 export interface Envio {
   id: string;
-  fecha: string;  // Fecha de creación del envío
-  horaCreacion: string; // Nueva propiedad para almacenar la hora de creación
-  horaInicioEnvio: string; // Cambiado para coincidir con el JSON proporcionado
-  ultimaActualizacion: string; // Nueva propiedad
+  fecha: string;
+  horaCreacion: string;
+  horaInicioEnvio: string;
+  ultimaActualizacion: string;
   horaFinalizacion: string | null;
   status: string;
-  autorizante: string; // Nombre del autorizante en string
-  solicitante: string; // Nombre del solicitante en string
+  autorizante: string;
+  solicitante: string;
   productos: Producto[];
-  entregas: any[]; // Para almacenar posibles datos adicionales de entregas
+  entregas: any[];
+  incidentes: Incidente[]; // Asegúrate de que esté siempre definido como un arreglo, no como undefined
 }
+

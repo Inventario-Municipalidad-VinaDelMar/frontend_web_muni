@@ -84,11 +84,14 @@
             </div>
         </div>
         <div *ngIf="ubicacionSeleccionada" class="listado-ubicacion">
-            <p class="panel-subheader">Productos en {{ ubicacionSeleccionada }}</p>
-            <ul>
-                <li *ngFor="let producto of productosEnUbicacion">{{ producto.nombre }}</li>
-            </ul>
-        </div>
+          <button class="btn btn-link" (click)="ubicacionSeleccionada = null">
+              <i class="bi bi-arrow-up"></i>
+          </button>
+          <p class="panel-subheader">Productos en {{ ubicacionSeleccionada }}</p>
+          <ul>
+              <li *ngFor="let producto of productosEnUbicacion">{{ producto.nombre }}</li>
+          </ul>
+      </div>
     </p-panel>
 </div>
 </div>

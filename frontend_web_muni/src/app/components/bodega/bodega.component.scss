@@ -166,7 +166,6 @@ h2{
     width: 100%;
     gap: 20px;
     padding: 20px;
-    height: 60vh;
 }
 
 /* Configuración para la columna de contenido principal (60%) */
@@ -178,7 +177,6 @@ h2{
     border-radius: 8px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     overflow: auto;
-    max-height: 80vh; /* Altura máxima para permitir el desplazamiento */
     position: relative;
 }
 
@@ -236,12 +234,9 @@ h2{
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
     display: flex;
     flex-direction: column;
-    height: 100%; /* Asegura que el contenedor ocupe toda la altura */
 }
 
 .additional-section p-panel {
-    width: 100%;
-    height: 100%; /* Expande el panel a toda la altura del contenedor */
     display: flex;
     flex-direction: column;
 }
@@ -254,7 +249,6 @@ h2{
     flex-direction: column;
     color: #34495e;
     overflow-y: auto; /* Permite el desplazamiento en caso de contenido adicional */
-    max-height: 200px; /* Limita la altura para evitar que se extienda */
 }
 
 .panel-subheader {
@@ -267,7 +261,6 @@ h2{
 }
 
 .ubicaciones-list {
-    max-height: 100px; /* Altura máxima para la lista de ubicaciones */
     overflow-y: auto; /* Permite desplazamiento vertical en la lista de ubicaciones */
     background-color: #f9fafc;
     border-radius: 8px;
@@ -276,12 +269,14 @@ h2{
 }
 
 .ubicaciones-list ul {
+    
     list-style: none;
     padding: 0;
     margin: 0;
 }
 
 .ubicaciones-list li {
+    cursor: pointer;
     font-size: 0.95em;
     color: #2c3e50;
     padding: 6px 10px;
@@ -292,6 +287,7 @@ h2{
 }
 
 .ubicaciones-list li:hover {
+    
     background-color: #e0f7fa;
 }
 
@@ -318,7 +314,6 @@ h2{
 
 
 .productos-list {
-    max-height: 150px; /* Define una altura máxima para la lista de productos */
     padding: 8px;
     background-color: #ffffff;
     border-radius: 6px;
@@ -338,7 +333,6 @@ h2{
     padding: 4px 0;
 }
 .listado-ubicacion {
-    max-height: 25vh; /* Limita la altura máxima */
     overflow-y: auto; /* Activa el desplazamiento vertical */
     padding: 0 8px;
     background-color: #ffffff;
@@ -444,7 +438,6 @@ h2{
     padding: 6px; /* Reduce el padding */
     border-radius: 6px; /* Bordes redondeados más pequeños */
     box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.05);
-    font-size: 0.8em; /* Tamaño de fuente reducido */
 }
 
 /* Encabezado de las tandas */
@@ -463,7 +456,6 @@ h2{
 }
 
 .product-tandas li {
-    font-size: 0.8em; /* Tamaño de fuente reducido */
     color: #444;
     padding: 3px 0;
     line-height: 1.2; /* Espacio reducido entre líneas */

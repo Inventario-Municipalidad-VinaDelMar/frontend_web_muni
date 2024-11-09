@@ -2,6 +2,8 @@ import { Component, Input } from '@angular/core';
 import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PlanificacionSocketService } from '../../services/Sockets/planificacion.socket.service';
+import { SocketInventarioService } from '../../services/Sockets/socket-inventario.service';
+import { EnviosSocketService } from '../../services/envios.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -14,7 +16,12 @@ export class SidebarComponent {
   @Input() collapsed = false;
   activeCategory: string = 'home';
 
-  constructor(private router: Router,) {}
+  constructor(
+    private router: Router,
+    private planificacionSocketService: PlanificacionSocketService,
+    private inventarioSocketService: SocketInventarioService, // Inyecta otros servicios de sockets aquí
+    private enviosSocketService: EnviosSocketService
+  ) {}
 
   ngOnInit(): void {
     this.router.events.subscribe((event) => {
@@ -95,8 +102,15 @@ export class SidebarComponent {
 
   logout(): void {
     console.log('Cerrar sesión');
+    
+    // Desconectar todos los sockets
+    this.planificacionSocketService.disconnectSocket();
+    this.inventarioSocketService.disconnectSocket(); // Llama a los métodos de desconexión de otros servicios de sockets
+    this.enviosSocketService.disconnect();
+    
     localStorage.removeItem('authToken'); // Eliminar el token de autenticación
     this.router.navigate(['/login']); // Redirigir a la página de login
   }
+
   
 }

@@ -1,8 +1,7 @@
 :host {
   display: block;
   padding: 16px;
-  font-family: Arial, sans-serif;
-  background: linear-gradient(135deg, #0056b3, #007bff);
+  font-family: 'Arial', sans-serif;
   color: #333;
 }
 
@@ -14,8 +13,9 @@
   padding: 16px;
   background: linear-gradient(135deg, #0044cc, #0066ff);
   color: #ffffff;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+  margin-bottom: 20px;
 }
 
 h2 {
@@ -38,10 +38,6 @@ h2 {
   transition: background 0.3s ease;
 }
 
-.btn-volver:hover {
-  background-color: rgba(255, 255, 255, 0.15);
-  border-radius: 4px;
-}
 
 /* Layout principal */
 .envio-grid {
@@ -51,126 +47,262 @@ h2 {
   margin-top: 20px;
 }
 
-/* Estilo de columnas */
-.left-column, .center-column, .right-column {
-  background-color: #ffffff;
-  border-radius: 12px;
-  padding: 16px;
-  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
-  overflow: hidden;
+/* Movimientos (Columna izquierda, Fila superior) */
+.movimientos-section, .detalle-section {
   display: flex;
   flex-direction: column;
+  height: 100%;
+  background-color: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.section-header {
+  background-color: #007bff;
+  color: #ffffff;
+  text-align: center;
+  font-weight: bold;
+  padding: 8px;
+  border-radius: 8px 8px 0 0;
+}
+
+.movimientos-content {
+  flex-grow: 1; /* Asegura que el contenido ocupe todo el espacio vertical disponible */
+  padding: 16px;
+  background-color: #f9f9f9;
+  overflow-y: auto; /* Permite el desplazamiento si el contenido es demasiado grande */
+  border-radius: 0 0 8px 8px;
+}
+
+.p-accordion .p-accordion-header {
+  background-color: #e3f2fd;
+  color: #333;
+  font-weight: bold;
+}
+
+.movimiento-details {
+  padding: 10px;
+  font-size: 0.9rem;
+  color: #555;
+}
+
+
+
+/* Detalle del Envío (Columna central, Fila superior) */
+.detalle-section .detalle-envio-content, .movimientos-section .movimientos-content {
+  flex-grow: 1;
+  overflow-y: auto; /* Permite desplazamiento interno si el contenido excede el tamaño */
+}
+
+
+/* Incidentes (Columna izquierda y central, Fila inferior) */
+/* Sección de Incidentes */
+.incidentes-section {
+  grid-column: 1 / 3;
+  grid-row: 2 / 3;
+  padding: 20px;
+  text-align: center;
+  background-color: #f3f4f6;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+/* Contenedor de tarjetas de incidentes */
+.incidentes-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 16px;
+  justify-content: center;
+  align-items: flex-start;
+}
+
+/* Tarjetas individuales de incidentes */
+.incidente-card {
+  border-radius: 10px;
+  width: 280px;
+  height: 420px;
+  padding: 16px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 0 6px rgba(0, 0, 0, 0.05);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+
+/* Encabezado de cada tarjeta de incidente */
+.incidente-header {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #020079;
+  font-size: 0.95rem;
+}
+
+/* Contenido informativo de cada tarjeta */
+.incidente-content {
+  flex-grow: 1;
+  margin-top: 8px;
+  color: #444;
+}
+
+.incidente-content p {
+  font-size: 0.85rem;
+  margin: 4px 0;
+}
+
+.incidente-content strong {
+  color: #020079;
+  font-weight: 600;
+}
+
+/* Imagen de evidencia fotográfica */
+.evidencia-img {
+  cursor:pointer;
+  width: 100%;
+  height: auto;
+  max-height: 100px;
+  margin-top: 8px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  object-fit: cover;
+}
+
+/* Productos Afectados */
+.incidente-content ul {
+  padding: 0;
+  margin: 8px 0;
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  max-height: 100px; /* Ajusta este valor según el espacio que quieras asignar */
+  overflow-y: auto;
+}
+
+.incidente-content li {
+  display: flex;
+  align-items: center;
+  font-size: 0.85rem;
+  color: #555;
+}
+
+.incidente-content li img {
+  
+  width: 24px;
+  height: 24px;
+  margin-right: 6px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+/* Insignia para el tipo de incidente */
+.incidente-type-badge {
+  background-color: #020079;
+  color: #ffffff;
+  padding: 4px 8px;
+  font-size: 0.75rem;
+  font-weight: bold;
+  border-radius: 4px;
+  display: inline-block;
+  position: absolute;
+  top: 12px;
+  right: 12px;
+}
+
+/* Detalle adicional */
+.incidente-detail {
+  font-size: 0.9rem;
+  color: #666;
+  background-color: #f0f1f5;
+  padding: 6px 8px;
+  border-radius: 8px;
+  margin-top: 10px;
+}
+
+
+/* Entregas (Columna derecha, Todas las filas) */
+.entregas-section {
+  grid-column: 3 / 4;
+  grid-row: 1 / 3;
+  background-color: #ffffff;
+  padding: 16px;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 /* Secciones de encabezado */
 .section-header {
   background: linear-gradient(135deg, #007bff, #0056b3);
   color: #ffffff;
-  padding: 10px;
-  font-size: 1.3rem;
+  padding: 12px;
+  font-size: 1.2rem;
   font-weight: bold;
   text-align: center;
-  border-radius: 10px 10px 0 0;
-  position: sticky;
-  top: 0;
-  z-index: 1;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  text-transform: uppercase;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
 }
 
-/* Tarjetas de movimientos y entregas */
-.movimiento-card, .entrega-card {
-  background: linear-gradient(135deg, #f1f4f9, #e1e9f5);
+/* Tarjetas de contenido */
+.movimiento-card, .entrega-card, .incidente-card {
+  background: linear-gradient(135deg, #efefef, #f5faff);
   padding: 16px;
   border-radius: 12px;
-  box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.15);
-  text-align: left;
+  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.15);
   margin-bottom: 16px;
   font-size: 1rem;
-}
-
-.movimiento-card p, .entrega-card p {
-  margin: 8px 0;
   color: #333;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
-entrega-card {
-  background: #f8f9fa;
-  border-radius: 8px;
-  box-shadow: 0px 4px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 12px;
-  padding: 10px;
-  text-align: left;
-  display: grid;
-  grid-template-columns: auto 1fr;
-  gap: 8px;
-  align-items: center;
-}
-
-.entrega-card p {
-  margin: 4px 0;
-}
-
-.entrega-card .entrega-info {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-}
-
-.entrega-card ul {
-  padding: 0;
-  margin: 8px 0;
-  list-style: none;
-}
-
-.entrega-card li {
-  display: flex;
-  align-items: center;
-  margin: 4px 0;
-  font-size: 0.9rem;
-}
-
-.entrega-card li img {
-  margin-right: 8px;
-  width: 35px;
-  height: 35px;
-  border-radius: 4px;
+.movimiento-card:hover, .entrega-card:hover, .incidente-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0px 8px 16px rgba(0, 0, 0, 0.2);
 }
 
 /* Contenido de detalle de envío */
 .detalle-envio-content p {
-  padding: 10px;
+  padding: 8px 12px;
   background-color: #f0f0f0;
-  text-align: center;
+  text-align: left;
   font-size: 1rem;
   color: #555;
-  margin: 8px 0;
+  margin: 6px 0;
+  border-radius: 8px;
 }
 
-
+/* Status Badge */
 .status-text {
   font-weight: bold;
-  padding: 4px 8px;
-  border-radius: 4px;
+  padding: 6px 10px;
+  border-radius: 6px;
   display: inline-block;
 }
 
 .status-cargando {
   color: #ffffff;
-  background-color: #ff9800; /* Color para "Cargando" */
+  background-color: #ff9800;
 }
 
 .status-en-envio {
   color: #ffffff;
-  background-color: #4caf50; /* Color para "En Envío" */
+  background-color: #4caf50;
 }
 
 .status-pendiente {
   color: #ffffff;
-  background-color: #f44336; /* Color para "Pendiente" */
+  background-color: #f44336;
 }
 
 .status-finalizado {
   color: #ffffff;
-  background-color: #2196f3; /* Color para "Finalizado" */
+  background-color: #2196f3;
 }
 
 /* Comparación de carga */
@@ -187,6 +319,7 @@ entrega-card {
   width: 100%;
   border-collapse: collapse;
   font-size: 1rem;
+  margin-top: 10px;
 }
 
 .comparison-table th, .comparison-table td {
@@ -199,38 +332,32 @@ entrega-card {
   background-color: #007bff;
   color: #ffffff;
   font-weight: bold;
-  position: sticky;
-  top: 0;
 }
 
 .comparison-table tr:nth-child(even) {
   background-color: #f8f9fa;
 }
 
-.producto-info {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
-.producto-img {
-  width: 50px;
-  height: 50px;
-  border-radius: 4px;
-  margin-right: 12px;
+/* Imagen de productos y evidencia fotográfica */
+.producto-img, .evidencia-img {
+  width: 30px;
+  height: auto;
+  border-radius: 6px;
+  margin-right: 8px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilos de desplazamiento */
-.movimientos-content, .entregas-content {
+/* Contenedores de desplazamiento */
+.movimientos-content, .entregas-content, .incidentes-content {
   overflow-y: auto;
-  max-height: 400px;
   padding: 16px;
   background-color: #f8f9fa;
   border-radius: 12px;
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
 }
 
+/* Estilo para mensajes sin datos */
 .no-data-message {
   color: #555;
   font-size: 1rem;
@@ -239,4 +366,49 @@ entrega-card {
   background-color: #f8f9fa;
   border-radius: 12px;
   margin-top: 16px;
+}
+
+/* Ajustes para listas de productos */
+.entrega-card ul, .incidente-card ul {
+  padding: 0;
+  margin: 8px 0;
+  list-style: none;
+}
+
+.entrega-card li, .incidente-card li {
+  display: flex;
+  align-items: center;
+  margin: 4px 0;
+  font-size: 0.9rem;
+}
+
+.entrega-card li img, .incidente-card li img {
+  
+  margin-right: 8px;
+  width: 35px;
+  height: 35px;
+  border-radius: 4px;
+}
+
+
+//modal de imagen
+
+.modal-image {
+  
+  width: 100%;
+  max-width: 80vw; /* Ajusta el ancho máximo de la imagen */
+  max-height: 80vh; /* Ajusta la altura máxima de la imagen */
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  object-fit: contain; /* Asegura que toda la imagen se muestre sin recortes */
+}
+.exceso {
+  color: red;
+  font-weight: bold;
+}
+
+.faltante {
+  color: green;
+  font-weight: bold;
 }

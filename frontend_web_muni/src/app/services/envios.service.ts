@@ -35,12 +35,26 @@ export class EnviosSocketService {
     });
   }
 
+  // Método para escuchar el evento de productos por fecha
+  listenToProductosByFecha(): Observable<Envio[]> {
+    return new Observable<Envio[]>((observer) => {
+      this.socket.on('loadEnviosByFecha', (data: Envio[]) => {
+        console.log('Productos recibidos para la fecha:', data);
+        observer.next(data); // Emitir los datos al suscriptor cada vez que se recibe una actualización
+      });
+
+      return () => {
+        this.socket.off('loadEnviosByFecha');
+      };
+    });
+  }
+
   loadEnviosByFecha(fecha: string): Observable<Envio[]> {
     const token = this.tokenService.getToken();
 
     if (!token) {
       console.error('Token no disponible. No se puede enviar el mensaje.');
-      return new Observable<Envio[]>(); // Retornar un observable vacío
+      return new Observable<Envio[]>(); // Retorna un observable vacío en caso de error
     }
 
     const mensaje = {
@@ -48,30 +62,27 @@ export class EnviosSocketService {
       token: token,
     };
 
-    // Emitir el mensaje para solicitar envíos por fecha
     this.socket.emit('getEnviosByFecha', mensaje);
 
-    // Devolver un observable que escucha la respuesta
     return new Observable<Envio[]>((observer) => {
       this.socket.on('loadEnviosByFecha', (data: Envio[]) => {
-        console.log('Datos recibidos:', data);
-        observer.next(data); // Enviar los datos recibidos al observador
-        observer.complete(); // Completar el observable después de recibir los datos
+        console.log('Productos recibidos para la fecha:', data);
+        observer.next(data); // Emitir los datos recibidos al observador
       });
 
-      // Limpiar el listener al completar el observable
       return () => {
-        this.socket.off('loadEnviosByFecha');
+        this.socket.off('loadEnviosByFecha'); // Limpiar el listener al completar el observable
       };
     });
   }
 
+  // Método adicional para obtener envío por ID si es necesario
   getEnvioById(idEnvio: string): Observable<DetalleEnvio> {
     const token = this.tokenService.getToken();
 
     if (!token) {
       console.error('Token no disponible. No se puede enviar el mensaje.');
-      return new Observable<DetalleEnvio>(); // Retornar un observable vacío
+      return new Observable<DetalleEnvio>();
     }
 
     const mensaje = {
@@ -92,18 +103,6 @@ export class EnviosSocketService {
 
       return () => {
         this.socket.off(eventoRespuesta);
-      };
-    });
-  }
-
-  onLoadEnviosByFecha(): Observable<Envio[]> {
-    return new Observable<Envio[]>((observer) => {
-      this.socket.on('loadEnviosByFecha', (data: Envio[]) => {
-        console.log('Datos recibidos:', data);
-        observer.next(data); // Enviar los datos recibidos al observador
-      });
-      return () => {
-        this.socket.off('loadEnviosByFecha');
       };
     });
   }

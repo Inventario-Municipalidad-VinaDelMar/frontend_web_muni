@@ -1,22 +1,26 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { Tanda } from '../../models/tanda.model';
-import { DialogModule } from 'primeng/dialog'; 
 import { Subscription } from 'rxjs';
-import { CalendarModule } from 'primeng/calendar';
-import { ConfirmationService, MessageService, PrimeNGConfig } from 'primeng/api';
 import { EnviarService } from '../../services/enviar.service';
 import { Detalle, DiaPlanificacion, DiasPlanificacion } from '../../models/dia-envio.model';
 import { TokenService } from '../../services/auth-token.service';
-import { DataViewModule } from 'primeng/dataview';
-import { ToastModule } from 'primeng/toast';
-import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { SocketInventarioService } from '../../services/Sockets/socket-inventario.service';
 import { PlanificacionSocketService } from '../../services/Sockets/planificacion.socket.service';
-import { MultiSelectModule } from 'primeng/multiselect';
 import { EnviosComponent } from "../envios/envios.component";
-import { TagModule } from 'primeng/tag';
+import { ButtonModule } from 'primeng/button'; // Para los botones de navegación y el botón de guardar
+import { PanelModule } from 'primeng/panel'; // Para el encabezado de panel "Planificación Semanal"
+import { CardModule } from 'primeng/card'; // Para los contenedores de productos y días de la semana
+import { CalendarModule } from 'primeng/calendar'; // Para el selector de fecha en "Buscar por día"
+import { InputTextModule } from 'primeng/inputtext'; // Para el campo de búsqueda de productos
+import { ChipModule } from 'primeng/chip'; // Para mostrar los productos en chips
+import { MessageModule } from 'primeng/message'; // Para mensajes de no coincidencias y no hay productos asignados
+import { ToastModule } from 'primeng/toast'; // Para mensajes de confirmación y notificaciones
+import { ConfirmDialogModule } from 'primeng/confirmdialog'; 
+import { DialogModule } from 'primeng/dialog';
+import { MultiSelectModule } from 'primeng/multiselect';
+import { ConfirmationService, MessageService, PrimeNGConfig } from 'primeng/api';
+import { DividerModule } from 'primeng/divider';
 
 
 interface Producto {
@@ -33,7 +37,23 @@ interface Producto {
   templateUrl: './planificacion.component.html',
   providers: [ConfirmationService, MessageService,ReactiveFormsModule, MultiSelectModule],
   styleUrls: ['./planificacion.component.scss'],
-  imports: [CommonModule, FormsModule, DialogModule, CalendarModule, DataViewModule, ToastModule, ConfirmDialogModule, EnviosComponent,TagModule,]
+  imports: [
+    CommonModule,
+    FormsModule,
+    DialogModule,
+    CalendarModule,
+    ToastModule,
+    ConfirmDialogModule,
+    EnviosComponent,
+    ButtonModule,
+    PanelModule,
+    CardModule,
+    ChipModule,
+    MessageModule,
+    DividerModule
+    
+
+  ]
 })
 export class PlanificacionComponent implements OnInit, OnDestroy {
   productos: Producto[] = [];

@@ -1,35 +1,25 @@
 import { Component, OnInit } from '@angular/core';
 import { MessageService } from 'primeng/api'; // Para mostrar mensajes
-import { TableModule } from 'primeng/table'; // Para usar p-table
-import { PanelModule } from 'primeng/panel'; // Para usar p-panel
-import { CardModule } from 'primeng/card'; // Para usar p-card
-import { AuthService } from '../../services/Sockets/auth.service';
-import { CommonModule } from '@angular/common';
-import { ButtonModule } from 'primeng/button';
-import { DialogModule } from 'primeng/dialog';
-import { FormsModule } from '@angular/forms';
 import { Usuario } from '../../models/usuario.model';
-
-
-import { DividerModule } from 'primeng/divider'; // Para agregar separador
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 
 @Component({
   selector: 'app-gestion-usuarios',
   standalone: true,
-  imports: [TableModule, PanelModule, CardModule,CommonModule,ButtonModule,DialogModule,FormsModule,DividerModule ],
+  imports: [CommonModule,FormsModule],
   templateUrl: './gestion-usuarios.component.html',
   styleUrls: ['./gestion-usuarios.component.scss'],
   providers: [MessageService], // Proveedor para los mensajes de PrimeNG
 })
-
 export class GestionUsuariosComponent {
   usuarios: Usuario[] = []; // Lista de usuarios
   usuarioSeleccionado: Usuario | null = null; // Usuario seleccionado
-  mostrarDialogoAgregar: boolean = false; // Controla la visibilidad del diálogo
-  nuevoUsuario: Usuario = { id: '', rut: '', email: '', nombre: '', apellidoPaterno: '', apellidoMaterno: '', roles: [] }; // Nuevo usuario
+  mostrarDialogoAgregar: boolean = false; // Controla la visibilidad del diálogo de agregar usuario
+  mostrarDialogoDetalles: boolean = false; // Controla la visibilidad del diálogo de detalles de usuario
+  nuevoUsuario: Partial<Usuario> = { rut: '', email: '', nombre: '', apellidoPaterno: '', apellidoMaterno: '', roles: [] }; // Nuevo usuario
 
   constructor() {
-    // Inicializa la lista de usuarios
     this.obtenerUsuarios();
   }
 
@@ -43,7 +33,7 @@ export class GestionUsuariosComponent {
         nombre: 'Juan',
         apellidoPaterno: 'Pérez',
         apellidoMaterno: 'Gómez',
-        roles: ['administrador']
+        roles: ['administrador'],
       },
       {
         id: '2',
@@ -52,33 +42,49 @@ export class GestionUsuariosComponent {
         nombre: 'María',
         apellidoPaterno: 'López',
         apellidoMaterno: 'Martínez',
-        roles: ['usuario']
-      }
+        roles: ['usuario'],
+      },
     ];
   }
 
-  mostrarDetalles() {
-    // Método para mostrar detalles del usuario seleccionado
-    console.log(this.usuarioSeleccionado);
-  }
-
+  // Métodos para el diálogo de agregar usuario
   abrirDialogoAgregar() {
-    this.mostrarDialogoAgregar = true; // Muestra el diálogo para agregar un nuevo usuario
+    this.mostrarDialogoAgregar = true;
   }
 
   cerrarDialogoAgregar() {
-    this.mostrarDialogoAgregar = false; // Oculta el diálogo
-    this.nuevoUsuario = { id: '', rut: '', email: '', nombre: '', apellidoPaterno: '', apellidoMaterno: '', roles: [] }; // Reinicia el nuevo usuario
+    this.mostrarDialogoAgregar = false;
+    this.nuevoUsuario = { rut: '', email: '', nombre: '', apellidoPaterno: '', apellidoMaterno: '', roles: [] };
   }
 
   guardarUsuario() {
-    // Método para guardar el nuevo usuario (simulación)
-    this.usuarios.push({ ...this.nuevoUsuario, id: (this.usuarios.length + 1).toString() });
-    this.cerrarDialogoAgregar(); // Cierra el diálogo después de guardar
+    if (this.nuevoUsuario && this.nuevoUsuario.rut && this.nuevoUsuario.nombre) {
+      const nuevoId = this.usuarios.length > 0 ? (parseInt(this.usuarios[this.usuarios.length - 1].id, 10) + 1).toString() : '1';
+      const usuario: Usuario = {
+        id: nuevoId,
+        rut: this.nuevoUsuario.rut,
+        nombre: this.nuevoUsuario.nombre,
+        apellidoPaterno: this.nuevoUsuario.apellidoPaterno || '',
+        apellidoMaterno: this.nuevoUsuario.apellidoMaterno || '',
+        email: this.nuevoUsuario.email || '',
+        roles: this.nuevoUsuario.roles ? this.nuevoUsuario.roles.toString().split(',').map(role => role.trim()) : [],
+      };
+
+      this.usuarios.push(usuario);
+      this.cerrarDialogoAgregar();
+    } else {
+      console.error('Faltan campos obligatorios en el nuevo usuario');
+    }
   }
 
-  abrirDialogoEditar(usuario: Usuario) {
-    // Método para abrir el diálogo de edición (a implementar)
-    console.log('Editar usuario:', usuario);
+  // Métodos para el diálogo de detalles de usuario
+  seleccionarUsuario(usuario: Usuario) {
+    this.usuarioSeleccionado = usuario;
+    this.mostrarDialogoDetalles = true;
+  }
+
+  cerrarDialogoDetalles() {
+    this.mostrarDialogoDetalles = false;
+    this.usuarioSeleccionado = null;
   }
 }

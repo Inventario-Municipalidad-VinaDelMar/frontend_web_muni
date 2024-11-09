@@ -33,11 +33,12 @@
     align-items: flex-start;
     gap: 20px;
     flex-wrap: wrap;
+    margin: 10px;
   }
   
   .chart-box {
     flex: 1 1 48%;
-    background-color: #fff;
+    background: linear-gradient(135deg, #f0f4f8, #d9e2ec); /* Degradado de gris claro a un tono azul grisáceo */
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
@@ -54,7 +55,7 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
-    background-color: #fff;
+    background: linear-gradient(135deg, #f0f4f8, #d9e2ec); /* Degradado de gris claro a un tono azul grisáceo */
     padding: 20px;
     border-radius: 8px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);

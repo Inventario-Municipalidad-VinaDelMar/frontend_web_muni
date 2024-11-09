@@ -1,7 +1,7 @@
 export interface DetalleEnvio {
   id: string;
   fecha: string;
-  horaInicio: string;
+  horaInicioEnvio: string; // Cambia esto de `horaInicio` a `horaInicioEnvio`
   horaFinalizacion: string | null;
   status: string;
   administrador: Persona;
@@ -10,7 +10,17 @@ export interface DetalleEnvio {
   entregas: Entrega[];
   cargaInicial: Producto[];
   cargaActual: Producto[];
+  incidente: Incidente[];
 }
+
+
+export interface Incidente {
+  id: string;
+  descripcion: string;
+  fecha: string;
+  // Otros campos de incidente
+}
+
 
 export interface Persona {
   id: string;
