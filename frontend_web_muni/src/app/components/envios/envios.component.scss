@@ -152,17 +152,33 @@
 }
 
 /* Estado del envío */
+/* Estilo predeterminado para "sin cargar" (sin clase adicional) */
 .status {
   position: absolute;
   top: 10px;
   left: 10px;
-  background-color: #cce4ff;
-  color: #007bff;
   padding: 5px;
   border-radius: 5px;
   font-weight: bold;
   z-index: 1;
+  background-color: #fff3cd; /* Amarillo claro */
+  color: #856404;
+  
 }
+
+/* Estilo para el estado "en envio" */
+.status-en-envio {
+  background-color: #d4edda; /* Verde claro */
+  color: #155724;
+}
+
+/* Estilo para el estado "finalizado" */
+.status-finalizado {
+  
+  background-color: #cce4ff;
+  color: #007bff;
+}
+
 
 .no-envios-message {
   display: flex;

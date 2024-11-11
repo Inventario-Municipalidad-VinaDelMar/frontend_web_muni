@@ -70,15 +70,26 @@
       <tbody>
         <ng-container *ngFor="let producto of productosPaginados;">
           <tr>
-            <td>{{ producto.nombre }}</td>
+            <td>
+              <div style="display: flex; flex-direction: column; align-items: center;">
+                <img [src]="producto.urlImagen" alt="Imagen de {{ producto.nombre }}" width="50" height="50" style="margin-bottom: 5px; border-radius: 5px;">
+                <span>{{ producto.nombre }}</span>
+              </div>
+            </td>
+            
+            
             <td>{{ calcularCantidadTotal(producto) }}</td>
             <td>{{ calcularCantidadPorVencer(producto) }}</td>
             <td>{{ calcularFechaProxima(producto) }}</td>
             <td>
-              <button class="boton-expandir" (click)="toggleExpansion(producto.id)">
+              <button class="boton-expandir margin-right-10" (click)="toggleExpansion(producto.id)">
                 {{ expandedRows[producto.id] ? 'Minimizar' : 'Expandir' }}
               </button>
+              <button type="button" class="btn btn-transparent-border btn-sm" (click)="abrirDialogoEditarProducto(producto)">
+                <i class="bi bi-pencil"></i> 
+              </button>
             </td>
+            
           </tr>
           <tr *ngIf="expandedRows[producto.id]" class="expanded-row">
             <td colspan="5">
@@ -90,6 +101,7 @@
                     <th>Fecha de Ingreso</th>
                     <th>Ubicación</th>
                     <th>Bodega</th>
+                    <th>Acciones</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -99,6 +111,18 @@
                     <td>{{ tanda.fechaLlegada | date:'dd-MM-yyyy' }}</td>
                     <td>{{ tanda.ubicacion }}</td>
                     <td>{{ tanda.bodega }}</td>
+                    <td>
+                      <button type="button" class="btn btn-transparent-border btn-sm" (click)="editarTanda(tanda)">
+                        <i class="bi bi-pencil"></i> 
+                      </button>
+                      <button type="button" class="btn btn-transparent-border btn-sm" (click)="confirmarEliminarTanda(tanda)">
+                        <i class="bi bi-trash"></i>
+                      </button>
+                      
+                    </td>
+                    
+                    
+                    
                   </tr>
                 </tbody>
               </table>
@@ -124,20 +148,237 @@
     </p-paginator>
   </div>
 
-  <div *ngIf="!hasError" class="export-button-container">
-    <button (click)="confirmExport()" class="export-button">
-      Exportar Inventario a Excel
+  <div *ngIf="!hasError" class="export-button-container my-3 d-flex justify-content-center gap-3">
+    <!-- Botón para exportar a Excel -->
+    <button type="button" class="btn btn-success d-flex align-items-center gap-2" (click)="mostrarDialogo2 = true">
+      <i class="bi bi-file-earmark-excel"></i> Exportar Inventario a Excel
+    </button>
+  
+    <!-- Botón para agregar un nuevo producto -->
+    <button type="button" class="btn btn-primary d-flex align-items-center gap-2" (click)="mostrarDialogo = true">
+      <i class="bi bi-plus-circle"></i> Agregar Producto Nuevo
+    </button>
+  
+    <!-- Botón para añadir una nueva tanda -->
+    <button type="button" class="btn btn-secondary d-flex align-items-center gap-2" (click)="abrirDialogoTanda()">
+      <i class="bi bi-plus-circle"></i> Añadir Tanda
     </button>
   </div>
   
+
+
+
+
+
+
+  <p-dialog [(visible)]="mostrarDialogo" [modal]="true" [draggable]="false" header="Añadir Producto" class="text-center">
+    <div class="container-fluid">
+      <!-- Icono de encabezado -->
+      <div class="mb-3">
+        <i class="bi bi-box-seam display-4 text-primary"></i>
+      </div>
+      
+      <div class="row mb-3">
+        <div class="col-12">
+          <label for="nombre" class="form-label fw-bold">Nombre del Producto</label>
+          <input id="nombre" type="text" class="form-control" [(ngModel)]="nuevoProducto.nombre" placeholder="Ingrese el nombre del producto" />
+        </div>
+      </div>
   
-  <p-dialog [(visible)]="mostrarDialogo" [draggable]="false" modal="true" header="Confirmación de Exportación">
+      <div class="row mb-3">
+        <div class="col-12">
+          <label for="descripcion" class="form-label fw-bold">Descripción</label>
+          <textarea id="descripcion" rows="3" class="form-control" [(ngModel)]="nuevoProducto.descripcion" placeholder="Ingrese una breve descripción"></textarea>
+        </div>
+      </div>
+  
+      <div class="row mb-3">
+        <div class="col-12">
+          <label for="urlImagen" class="form-label fw-bold">Imagen del Producto</label>
+          <input type="file" class="form-control" id="urlImagen" (change)="onFileSelected($event)" />
+        </div>
+      </div>
+    </div>
+  
+    <!-- Pie de diálogo con botones alineados -->
+    <p-footer class="d-flex justify-content-center gap-3 mt-4">
+      <button type="button" class="btn btn-success d-flex align-items-center gap-2" (click)="addProduct()">
+        <i class="bi bi-check-circle"></i> Añadir
+      </button>
+      <button type="button" class="btn btn-secondary d-flex align-items-center gap-2" (click)="mostrarDialogo = false">
+        <i class="bi bi-x-circle"></i> Cancelar
+      </button>
+    </p-footer>
+  </p-dialog>
+  
+
+
+
+
+
+  
+  <p-dialog [(visible)]="mostrarDialogo2" [draggable]="false" modal="true" header="Confirmación de Exportación">
     <p>¿Estás seguro de que deseas exportar el inventario a Excel?</p>
     <div class="dialog-footer">
       <button (click)="onConfirm()" class="confirm-button">Confirmar</button>
       <button (click)="onCancel()" class="cancel-button">Cancelar</button>
     </div>
   </p-dialog>
+
+
+
+
+  <p-dialog [(visible)]="mostrarDialogo3" [modal]="true" [draggable]="false" header="{{ esEdicion ? 'Editar Tanda' : 'Añadir Tanda' }}" styleClass="custom-dialog" [style]="{ width: '500px', maxWidth: '90vw' }">
+    <div class="container-fluid">
+      <div class="mb-3 text-center">
+        <i class="bi bi-clipboard-data display-4 text-primary"></i>
+      </div>
   
+      <div class="row mb-3">
+        <div class="col-12">
+          <label for="cantidadIngresada" class="form-label fw-bold">Cantidad Ingresada</label>
+          <input id="cantidadIngresada" type="number" class="form-control" [(ngModel)]="nuevaTanda.cantidadIngresada" placeholder="Ingrese cantidad ingresada" />
+          <div *ngIf="errores.cantidadIngresada" class="text-danger small">{{ errores.cantidadIngresada }}</div>
+        </div>
+      </div>
   
+      <div class="row mb-3">
+        <div class="col-12">
+          <label for="cantidadActual" class="form-label fw-bold">Cantidad Actual</label>
+          <input id="cantidadActual" type="number" class="form-control" [(ngModel)]="nuevaTanda.cantidadActual" placeholder="Ingrese cantidad actual" />
+          <div *ngIf="errores.cantidadActual" class="text-danger small">{{ errores.cantidadActual }}</div>
+        </div>
+      </div>
+  
+      <div class="row mb-3">
+        <div class="col-12">
+          <label for="fechaLlegada" class="form-label fw-bold">Fecha de Llegada</label>
+          <input id="fechaLlegada" type="date" class="form-control" [(ngModel)]="nuevaTanda.fechaLlegada" />
+          <div *ngIf="errores.fechaLlegada" class="text-danger small">{{ errores.fechaLlegada }}</div>
+        </div>
+      </div>
+  
+      <div class="row mb-3">
+        <div class="col-12">
+          <label for="fechaVencimiento" class="form-label fw-bold">Fecha de Vencimiento</label>
+          <input id="fechaVencimiento" type="date" class="form-control" [(ngModel)]="nuevaTanda.fechaVencimiento" />
+          <div *ngIf="errores.fechaVencimiento" class="text-danger small">{{ errores.fechaVencimiento }}</div>
+        </div>
+      </div>
+  
+      <div class="row mb-3">
+        <div class="col-12">
+          <label for="productoId" class="form-label fw-bold">Producto</label>
+          <select id="productoId" class="form-control" [(ngModel)]="nuevaTanda.productoId">
+            <option *ngFor="let producto of productoOpciones" [value]="producto.id">{{ producto.nombre }}</option>
+          </select>
+          <div *ngIf="errores.productoId" class="text-danger small">{{ errores.productoId }}</div>
+        </div>
+      </div>
+  
+      <div class="row mb-3">
+        <div class="col-12">
+          <label for="bodega" class="form-label fw-bold">Bodega</label>
+          <select id="bodega" class="form-control" [(ngModel)]="nuevaTanda.bodega">
+            <option *ngFor="let bodega of bodegaOpciones" [value]="bodega">{{ bodega }}</option>
+          </select>
+          <div *ngIf="errores.bodega" class="text-danger small">{{ errores.bodega }}</div>
+        </div>
+      </div>
+  
+      <div class="row mb-3">
+        <div class="col-12">
+          <label for="ubicacion" class="form-label fw-bold">Ubicación</label>
+          <select id="ubicacion" class="form-control" [(ngModel)]="nuevaTanda.ubicacion">
+            <option *ngFor="let ubicacion of ubicacionOpciones" [value]="ubicacion">{{ ubicacion }}</option>
+          </select>
+          <div *ngIf="errores.ubicacion" class="text-danger small">{{ errores.ubicacion }}</div>
+        </div>
+      </div>
+  
+      <div class="row mb-3">
+        <div class="col-12 form-check">
+          <input type="checkbox" class="form-check-input" id="esMerma" [(ngModel)]="nuevaTanda.esMerma" />
+          <label for="esMerma" class="form-check-label fw-bold">Es Merma</label>
+        </div>
+      </div>
+    </div>
+  
+    <p-footer class="d-flex justify-content-center gap-3 mt-4">
+      <button type="button" class="btn btn-success d-flex align-items-center gap-2" (click)="esEdicion ? guardarCambiosTanda() : addTanda()">
+        <i class="bi bi-check-circle"></i> {{ dialogLabel }}
+      </button>
+      <button type="button" class="btn btn-cancel-blue d-flex align-items-center gap-2" (click)="cerrarDialogoConfirmacionEliminar()">
+        <i class="bi bi-x-circle"></i> Cancelar
+      </button>
+      
+      
+    </p-footer>
+  </p-dialog>
+  
+  <p-dialog [(visible)]="mostrarDialogoConfirmacionEliminar" 
+          [modal]="true" 
+          [draggable]="false" 
+          header="Confirmar Eliminación" 
+          styleClass="custom-dialog" 
+          [style]="{ width: '400px', maxWidth: '90vw' }">
+  
+  <div class="container text-center">
+    <p>¿Estás seguro de que deseas eliminar la tanda con ID: {{ tandaSeleccionada?.id }}?</p>
+  </div>
+
+  <p-footer class="d-flex justify-content-center gap-3 mt-4">
+    <button type="button" class="btn btn-danger" (click)="eliminarTanda()">
+      <i class="bi bi-trash"></i> Eliminar
+    </button>
+    <button type="button" class="btn btn-secondary" (click)="cerrarDialogoConfirmacionEliminar()">
+      <i class="bi bi-x-circle"></i> Cancelar
+    </button>
+  </p-footer>
+</p-dialog>
+
+<p-dialog [(visible)]="mostrarDialogoEditarProducto" [modal]="true" [draggable]="false" header="Editar Producto" class="text-center">
+  <div class="container-fluid">
+    <div class="mb-3">
+      <i class="bi bi-box-seam display-4 text-primary"></i>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-12">
+        <label for="nombreProducto" class="form-label fw-bold">Nombre del Producto</label>
+        <input id="nombreProducto" type="text" class="form-control" [(ngModel)]="productoEditable.nombre" placeholder="Ingrese el nombre del producto" />
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-12">
+        <label for="descripcionProducto" class="form-label fw-bold">Descripción</label>
+        <textarea id="descripcionProducto" rows="3" class="form-control" [(ngModel)]="productoEditable.descripcion" placeholder="Ingrese una breve descripción"></textarea>
+      </div>
+    </div>
+
+    <div class="row mb-3">
+      <div class="col-12">
+        <label for="urlImagenProducto" class="form-label fw-bold">Imagen del Producto</label>
+        <input type="file" class="form-control" id="urlImagenProducto" (change)="onFileSelected($event)" />
+      </div>
+    </div>
+  </div>
+
+  <p-footer class="d-flex justify-content-center gap-3 mt-4">
+    <button type="button" class="btn btn-success d-flex align-items-center gap-2" (click)="guardarCambiosProducto()">
+      <i class="bi bi-check-circle"></i> Guardar
+    </button>
+    <button type="button" class="btn btn-secondary d-flex align-items-center gap-2" (click)="cerrarDialogoEditarProducto()">
+      <i class="bi bi-x-circle"></i> Cancelar
+    </button>
+  </p-footer>
+</p-dialog>
+
+
+
+
+
+
+
 </div>

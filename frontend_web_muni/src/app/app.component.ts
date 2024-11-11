@@ -6,7 +6,8 @@ import { CommonModule } from '@angular/common';
 import { TokenService } from './services/auth-token.service';
 import { PlanificacionSocketService } from './services/Sockets/planificacion.socket.service';
 import { SocketInventarioService } from './services/Sockets/socket-inventario.service';
-import { EMPTY, Subscription } from 'rxjs';
+import { EnviosSocketService } from './services/envios.service'; // Asegúrate de importar EnviosSocketService
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-root',
@@ -27,22 +28,41 @@ export class AppComponent implements OnInit, OnDestroy {
     private tokenService: TokenService,
     private inventarioSocketService: SocketInventarioService,
     private planificacionSocketService: PlanificacionSocketService,
+    private enviosSocketService: EnviosSocketService // Agrega EnviosSocketService si también es necesario
   ) {}
 
   ngOnInit(): void {
-    // Suscríbete al token para asegurarte de que esté disponible antes de conectar el socket
+    // Suscríbete al token para asegurarte de que esté disponible antes de conectar los sockets
     this.tokenService.getTokenObservable().subscribe(token => {
-      if (token) {
+      if (token && token !== this.currentToken) {
+        // Solo inicializa las conexiones si el token es nuevo o ha cambiado
+        this.currentToken = token;
         console.log('Token disponible en AppComponent:', token);
-        this.inventarioSocketService.initializeConnection(token);
-        this.planificacionSocketService.initializeConnection(token);
         
+        // Inicia las conexiones de socket
+        this.initializeSocketConnections(token);
+
         // Agrega las suscripciones a los eventos del socket de inventario
         this.listenToInventarioEvents();
-      } else {
+      } else if (!token) {
         console.log('Token no disponible en AppComponent. Esperando...');
       }
     });
+  }
+
+  // Método para inicializar las conexiones de socket
+  private initializeSocketConnections(token: string): void {
+    if (!this.inventarioSocketService.isConnected()) {
+      this.inventarioSocketService.initializeConnection(token);
+    }
+
+    if (!this.planificacionSocketService.isConnected()) {
+      this.planificacionSocketService.initializeConnection(token);
+    }
+
+    if (!this.enviosSocketService.isConnected()) { // Si necesitas la conexión del socket de envíos
+      this.enviosSocketService.initSocketConnection();
+    }
   }
 
   // Método para escuchar los eventos del socket de inventario
@@ -50,21 +70,18 @@ export class AppComponent implements OnInit, OnDestroy {
     // Escucha cuando se crea una nueva tanda
     const newTandaCreatedSub = this.inventarioSocketService.listenNewTandaCreated().subscribe((tanda) => {
       console.log('Nueva tanda creada:', tanda);
-      // Acción cuando se detecta una nueva tanda creada
       this.handleInventoryUpdate();
     });
 
     // Escucha cuando se actualiza una tanda existente
     const newTandaUpdateSub = this.inventarioSocketService.listenNewTandaUpdate().subscribe((tanda) => {
       console.log('Tanda actualizada:', tanda);
-      // Acción cuando se detecta una actualización en una tanda
       this.handleInventoryUpdate();
     });
 
     // Escucha cambios en el stock de productos
     const stockProductoChangeSub = this.inventarioSocketService.listenStockProductoChange().subscribe((producto) => {
       console.log('Cambio en stock de producto:', producto);
-      // Acción cuando hay un cambio en el stock de productos
       this.handleInventoryUpdate();
     });
 
@@ -74,14 +91,15 @@ export class AppComponent implements OnInit, OnDestroy {
 
   // Método para manejar la actualización del inventario
   private handleInventoryUpdate(): void {
-    // Aquí puedes realizar la acción deseada cuando se detecte un cambio en el inventario
-    // Por ejemplo, puedes refrescar la vista o actualizar un estado compartido
     console.log('Inventario actualizado');
   }
 
   // Método para limpiar las suscripciones al destruir el componente
   ngOnDestroy(): void {
     this.subscriptions.forEach(sub => sub.unsubscribe());
+    this.inventarioSocketService.disconnectSocket(); // Desconecta el socket si se destruye el AppComponent
+    this.planificacionSocketService.disconnectSocket(); // Desconecta el socket de planificación también
+    this.enviosSocketService.disconnect(); // Desconecta el socket de envíos si es necesario
   }
 
   toggleSidebar() {

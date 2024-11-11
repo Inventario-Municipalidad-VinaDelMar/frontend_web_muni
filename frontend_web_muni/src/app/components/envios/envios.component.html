@@ -21,7 +21,11 @@
     <div class="cards-wrapper">
       <div *ngIf="enviosList.length > 0" class="card-container">
         <div *ngFor="let envio of enviosList" class="card" (click)="goToDetalle(envio.id)">
-          <div class="status">{{ envio.status }}</div>
+          <div class="status" [ngClass]="getStatusClass(envio.status)">
+            {{ envio.status }}
+          </div>
+          
+          
 
           <!-- Círculo superior derecho con el icono del camión -->
           <div class="status-container">

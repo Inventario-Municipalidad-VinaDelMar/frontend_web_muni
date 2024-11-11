@@ -47,7 +47,7 @@ export class DetalleTarjetasComponent implements OnInit {
     solicitante: '',
     productos: [],
     entregas: [],
-    incidentes: [] // Inicializar incidentes como un arreglo vacío
+    incidentes: [] 
   };
   isModalOpen = false;
   modalImageUrl: string | null = null;
@@ -56,7 +56,6 @@ export class DetalleTarjetasComponent implements OnInit {
     this.isModalOpen = true;
     this.modalImageUrl = imageUrl;
   }
-
   closeModal(): void {
     this.isModalOpen = false;
     this.modalImageUrl = null;
@@ -68,7 +67,6 @@ export class DetalleTarjetasComponent implements OnInit {
     private route: ActivatedRoute,
     private enviosSocketService: EnviosSocketService
   ) {}
-
   ngOnInit(): void {
     this.route.params.subscribe(params => {
       this.envioId = params['id'];
@@ -77,10 +75,12 @@ export class DetalleTarjetasComponent implements OnInit {
         next: (envio) => {
           this.envioData = envio;
           console.log('Datos del envío inicial:', envio);
+          console.log('entrega: ',envio.entregas[0])
   
           // Luego, cargamos los envíos por la fecha actual
           const fechaActual = envio.fecha;
           this.cargarEnviosPorFecha(fechaActual);
+          console.log('Datos del envío cargarEnviosPorFecha:');
         },
         error: (err) => {
           console.error('Error al cargar los datos del envío:', err);
@@ -93,11 +93,10 @@ export class DetalleTarjetasComponent implements OnInit {
   cargarEnviosPorFecha(fecha: string): void {
     this.enviosSocketService.loadEnviosByFecha(fecha).subscribe({
       next: (envios: Envio[]) => {
-        // Filtra los envíos que coinciden con el ID de detalleEnvio
         const envioCoincidente = envios.find(envio => envio.id === this.envioData?.id);
   
         if (envioCoincidente) {
-          this.envioData2 = envioCoincidente; // Almacena el envío coincidente
+          this.envioData2 = envioCoincidente;
           console.log('Datos del envío para la fecha coincidente:', this.envioData2);
         } else {
           console.warn('No se encontró un envío que coincida con el ID del detalleEnvio en la fecha especificada');
@@ -109,8 +108,11 @@ export class DetalleTarjetasComponent implements OnInit {
     });
   }
   
+  
   getDiferenciaProductos() {
+    
     if (!this.envioData?.cargaInicial || !this.envioData?.cargaActual) {
+      console.warn("Carga inicial o carga actual no está disponible en envioData.");
       return [];
     }
   
@@ -130,10 +132,6 @@ export class DetalleTarjetasComponent implements OnInit {
     return diferencias;
   }
   
-
-  
-  
-
   formatHora(hora: string | null): string {
     if (!hora) {
       return 'No disponible';

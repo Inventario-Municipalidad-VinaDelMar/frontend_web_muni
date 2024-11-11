@@ -21,16 +21,44 @@
     <div class="productos-container">
       
       <div class="buscador text-center">Productos para planificar</div>
+      <div class="color-legend">
+        <div class="legend-item">
+          <span class="color-box vencido"></span> Vencidos
+        </div>
+        <div class="legend-item">
+          <span class="color-box porvencer1"></span> Por vencer (1-2 días)
+        </div>
+        <div class="legend-item">
+          <span class="color-box porvencer2"></span> Por vencer (3-7 días)
+        </div>
+        <div class="legend-item">
+          <span class="color-box seguro"></span> Seguros
+        </div>
+        <div class="legend-item">
+          <span class="color-box null"></span> Sin fecha
+        </div>
+      </div>
+      
       <div class="productos-container-scroll" id="productos" (dragover)="allowDrop($event)" (drop)="dropToMainList($event)">
-        <div class="producto" *ngFor="let producto of productosFiltrado" [attr.id]="producto.id" draggable="true" (dragstart)="drag($event)" (click)="showProductoDisponible(producto)">
+        <div class="producto" 
+             *ngFor="let producto of productosFiltrado" 
+             [attr.id]="producto.id" 
+             draggable="true" 
+             (dragstart)="drag($event)" 
+             (click)="showProductoDisponible(producto)">
           <div class="card">
-            <div class="p-card-title">{{ producto.nombre }}</div>
+            <div class="p-card-title" [ngClass]="getExpiryClass(producto)">
+              {{ producto.nombre }}
+            </div>
           </div>
         </div>
         <div class="no-coincidencias" *ngIf="productosFiltrado.length === 0">
           No hay coincidencias.
         </div>
       </div>
+      
+
+      
 
       <div class="buscador-container d-flex align-items-center">
     <label for="producto-buscar" class="buscador-label mr-2">Buscar productos:</label>
@@ -74,7 +102,15 @@
 
 
     <p-toast></p-toast>
-    <p-confirmDialog></p-confirmDialog>
+    <p-confirmDialog>
+      <ng-template pTemplate="footer">
+        <div class="custom-confirm-dialog-footer">
+          <button pButton label="No" icon="pi pi-times" class="p-button-no"></button>
+          <button pButton label="Sí" icon="pi pi-check" class="p-button-yes"></button>
+        </div>
+      </ng-template>
+    </p-confirmDialog>
+    
 
     <div class="button-container">
       <button (click)="confirm()" class="custom-button" aria-label="Guardar planificación">

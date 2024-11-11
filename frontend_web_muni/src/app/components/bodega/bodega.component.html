@@ -1,4 +1,4 @@
-<div class="contenido col">
+<div class="contenido col d-flex flex-column">
   <h2>DESPLIEGUE DE BODEGAS</h2>
 
   <!-- Mostrar mensaje de error si no hay bodegas -->
@@ -12,13 +12,24 @@
     <ng-template pTemplate="item" let-bodega>
       <p-card>
         <div class="card-container">
+          <!-- Sección de Información -->
           <div class="info-section">
             <h2>{{ bodega.nombre }}</h2>
             <p><strong>Dirección:</strong> {{ bodega.direccion }}</p>
             <p><strong>Encargado:</strong> {{ bodega.nombreEncargado }}</p>
             <p><strong>ID:</strong> {{ bodega.id }}</p>
             <p *ngIf="bodega.isDeleted"><em>Esta bodega ha sido eliminada.</em></p>
+            <div class="crud-actions">
+              <button class="btn btn-link text-primary" (click)="abrirDialogoEditarBodega(bodega)" title="Editar Bodega">
+                <i class="pi pi-pencil"></i>
+              </button>
+              <button class="btn btn-link text-danger" (click)="abrirDialogoEliminarBodega(bodega)" title="Eliminar Bodega">
+                <i class="pi pi-trash"></i>
+              </button>
+            </div>
           </div>
+
+          <!-- Sección de Imagen -->
           <div class="image-section">
             <img src="assets/img/bodega.webp" alt="Icono Bodega" class="bodega-icon">
           </div>
@@ -26,7 +37,13 @@
       </p-card>
     </ng-template>
   </p-carousel>
+
+  <!-- Botón Añadir Bodegas al final -->
+  <button class="btn btn-primary d-flex align-items-center btn-create align-self-end" (click)="mostrarDialogoCrearBodega = true" title="Añadir Bodegas">
+    <i class="pi pi-plus-circle me-2"></i> Añadir Bodegas
+  </button>
 </div>
+
 
 
 <div class="main-container">
@@ -73,25 +90,140 @@
 
   <div class="additional-section">
     <p-panel header="Ubicaciones" styleClass="custom-panel" [style]="{ width: '100%', height: '100%' }">
-        <div class="panel-content">
-            <p class="panel-subheader">Ubicaciones en {{ bodegaSeleccionada?.nombre }}</p>
-            <div class="ubicaciones-list">
-                <ul>
-                    <li *ngFor="let ubicacion of ubicacionesUnicas" (click)="seleccionarUbicacion(ubicacion)">
-                        {{ ubicacion }}
-                    </li>
-                </ul>
-            </div>
-        </div>
-        <div *ngIf="ubicacionSeleccionada" class="listado-ubicacion">
-          <button class="btn btn-link" (click)="ubicacionSeleccionada = null">
-              <i class="bi bi-arrow-up"></i>
-          </button>
-          <p class="panel-subheader">Productos en {{ ubicacionSeleccionada }}</p>
+      <div class="panel-content">
+        <p class="panel-subheader">Ubicaciones en {{ bodegaSeleccionada?.nombre }}</p>
+        <div class="ubicaciones-list">
           <ul>
-              <li *ngFor="let producto of productosEnUbicacion">{{ producto.nombre }}</li>
+            <li *ngFor="let ubicacion of getUbicacionesArray()" class="ubicacion-item">
+              <span (click)="seleccionarUbicacion(ubicacion)">{{ ubicacion }}</span>
+              <div class="action-icons">
+                <button class="btn btn-link" (click)="abrirDialogoEditarUbicacion(ubicacion)">
+                  <i class="pi pi-pencil" title="Editar"></i>
+                </button>
+                <button class="btn btn-link text-danger" (click)="abrirDialogoEliminarUbicacion(ubicacion)">
+                  <i class="pi pi-trash" title="Eliminar"></i>
+                </button>
+              </div>
+            </li>
+            
           </ul>
+        </div>
+        <button class="btn btn-primary mt-3 d-flex align-items-center btn-add" (click)="mostrarDialogoCrearUbicacion = true" title="Agregar Ubicaciones">
+          <i class="pi pi-plus-circle me-2"></i> Agregar Ubicaciones
+      </button>
+      
       </div>
     </p-panel>
+
+    <!-- Listado de tandas en la ubicación seleccionada con paneles expandibles que inician colapsados -->
+    <p-panel header="Tandas en {{ ubicacionSeleccionada }}" *ngIf="productosEnUbicacion.length > 0" styleClass="custom-panel">
+      <ng-container *ngFor="let producto of productosEnUbicacion">
+        <p-panel header="{{ producto.nombre }}" toggleable [collapsed]="true">
+          <ul>
+            <li *ngFor="let tanda of filtrarTandasPorUbicacion(producto.id)">
+              Cantidad Actual: {{ tanda.cantidadActual }} | Fecha Vencimiento: {{ tanda.fechaVencimiento }}
+            </li>
+          </ul>
+        </p-panel>
+      </ng-container>
+    </p-panel>
+    <p *ngIf="productosEnUbicacion.length === 0 && ubicacionSeleccionada" class="no-tandas-message">
+      No hay tandas en la ubicación seleccionada.
+    </p>
+    
+
+    
+  
+    <!-- Dialog Crear Ubicación -->
+    <p-dialog [(visible)]="mostrarDialogoCrearUbicacion"[draggable]="false" [modal]="true" header="Crear Ubicación">
+      <div>
+        <label>Nombre de la Ubicación</label>
+        <input type="text" class="form-control" [(ngModel)]="nuevaUbicacion" placeholder="Ingrese el nombre de la ubicación" />
+      </div>
+      <p-footer>
+        <button type="button" class="btn btn-success" (click)="crearUbicacion()">Guardar</button>
+        <button type="button" class="btn btn-secondary" (click)="mostrarDialogoCrearUbicacion = false">Cancelar</button>
+      </p-footer>
+    </p-dialog>
+  
+    <!-- Dialog Editar Ubicación -->
+    <p-dialog [(visible)]="mostrarDialogoEditarUbicacion" [draggable]="false"[modal]="true" header="Editar Ubicación">
+      <div>
+        <label>Nombre de la Ubicación</label>
+        <input type="text" class="form-control" [(ngModel)]="ubicacionEditable" placeholder="Modificar el nombre de la ubicación" />
+      </div>
+      <p-footer>
+        <button type="button" class="btn btn-success" (click)="guardarCambiosUbicacion()">Guardar</button>
+        <button type="button" class="btn btn-secondary" (click)="mostrarDialogoEditarUbicacion = false">Cancelar</button>
+      </p-footer>
+    </p-dialog>
+  
+    <!-- Dialog Confirmación Eliminar Ubicación -->
+    <p-dialog [(visible)]="mostrarDialogoEliminarUbicacion"[draggable]="false" [modal]="true" header="Eliminar Ubicación">
+      <p>¿Estás seguro de que deseas eliminar esta ubicación?</p>
+      <p-footer>
+        <button type="button" class="btn btn-danger" (click)="eliminarUbicacion()">Eliminar</button>
+        <button type="button" class="btn btn-secondary" (click)="mostrarDialogoEliminarUbicacion = false">Cancelar</button>
+      </p-footer>
+    </p-dialog>
+  </div>
+  
 </div>
-</div>
+
+
+<!-- Dialog Crear Bodega -->
+<p-dialog [(visible)]="mostrarDialogoCrearBodega" [modal]="true" [draggable]="false" header="Crear Bodega" class="text-center">
+  <div class="container-fluid">
+    <div class="row mb-3">
+      <div class="col-12">
+        <label class="form-label fw-bold">Nombre de la Bodega</label>
+        <input type="text" class="form-control" [(ngModel)]="bodegaNueva.nombre" placeholder="Ingrese el nombre de la bodega" />
+      </div>
+      <div class="col-12 mt-3">
+        <label class="form-label fw-bold">Dirección</label>
+        <input type="text" class="form-control" [(ngModel)]="bodegaNueva.direccion" placeholder="Ingrese la dirección" />
+      </div>
+      <div class="col-12 mt-3">
+        <label class="form-label fw-bold">Encargado</label>
+        <input type="text" class="form-control" [(ngModel)]="bodegaNueva.nombreEncargado" placeholder="Nombre del encargado" />
+      </div>
+    </div>
+  </div>
+  <p-footer class="d-flex justify-content-center gap-3">
+    <button type="button" class="btn btn-success" (click)="crearBodega()">Guardar</button>
+    <button type="button" class="btn btn-secondary" (click)="mostrarDialogoCrearBodega = false">Cancelar</button>
+  </p-footer>
+</p-dialog>
+
+<!-- Dialog Editar Bodega -->
+<p-dialog [(visible)]="mostrarDialogoEditarBodega" [modal]="true" [draggable]="false" header="Editar Bodega" class="text-center">
+  <div class="container-fluid">
+    <div class="row mb-3">
+      <div class="col-12">
+        <label class="form-label fw-bold">Nombre de la Bodega</label>
+        <input type="text" class="form-control" [(ngModel)]="bodegaEditable.nombre" placeholder="Ingrese el nombre de la bodega" />
+      </div>
+      <div class="col-12 mt-3">
+        <label class="form-label fw-bold">Dirección</label>
+        <input type="text" class="form-control" [(ngModel)]="bodegaEditable.direccion" placeholder="Ingrese la dirección" />
+      </div>
+      <div class="col-12 mt-3">
+        <label class="form-label fw-bold">Encargado</label>
+        <input type="text" class="form-control" [(ngModel)]="bodegaEditable.nombreEncargado" placeholder="Nombre del encargado" />
+      </div>
+    </div>
+  </div>
+  <p-footer class="d-flex justify-content-center gap-3">
+    <button type="button" class="btn btn-success" (click)="guardarCambiosBodega()">Guardar</button>
+    <button type="button" class="btn btn-secondary" (click)="mostrarDialogoEditarBodega = false">Cancelar</button>
+  </p-footer>
+</p-dialog>
+
+<!-- Dialog Confirmar Eliminación de Bodega -->
+<p-dialog [(visible)]="mostrarDialogoEliminarBodega" [modal]="true" [draggable]="false" header="Confirmar Eliminación" class="text-center">
+  <p>¿Estás seguro de que deseas eliminar esta bodega?</p>
+  <p-footer class="d-flex justify-content-center gap-3">
+    <button type="button" class="btn btn-danger" (click)="eliminarBodega()">Eliminar</button>
+    <button type="button" class="btn btn-secondary" (click)="mostrarDialogoEliminarBodega = false">Cancelar</button>
+  </p-footer>
+</p-dialog>

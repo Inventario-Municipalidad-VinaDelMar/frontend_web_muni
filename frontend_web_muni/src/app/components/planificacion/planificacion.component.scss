@@ -305,3 +305,95 @@ input {
   padding: 10px;
 }
 
+.vencido {
+  background-color: #ff4d4d !important; /* Rojo */
+  color: white;
+}
+
+.porvencer1 {
+  background-color: #ff9800 !important; /* Naranja */
+  color: white;
+}
+
+.porvencer2 {
+  background-color: #ffeb3b !important; /* Amarillo */
+  color: black;
+}
+
+.seguro {
+  background-color: #4caf50 !important; /* Verde */
+  color: white;
+}
+
+.null {
+  background-color: #e0e0e0 !important; /* Gris */
+  color: black;
+}
+.color-legend {
+  display: flex;
+  gap: 20px;               /* Espacio entre cada item */
+  margin: 20px auto;       /* Centrado horizontal y margen superior */
+  padding: 15px;           /* Espaciado interno */
+  align-items: center;
+  justify-content: center; /* Centrar los elementos dentro del contenedor */
+  border: 1px solid #ccc;  /* Borde alrededor de la leyenda */
+  border-radius: 8px;      /* Bordes redondeados */
+  background-color: #f9f9f9; /* Fondo claro */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+}
+
+.color-box {
+  width: 20px;
+  height: 20px;
+  margin-right: 8px;
+  border-radius: 4px;
+}
+
+/* Colores correspondientes */
+.color-box.vencido {
+  background-color: #ff4d4d; /* Rojo */
+}
+
+.color-box.porvencer1 {
+  background-color: #ff9800; /* Naranja */
+}
+
+.color-box.porvencer2 {
+  background-color: #ffeb3b; /* Amarillo */
+}
+
+.color-box.seguro {
+  background-color: #4caf50; /* Verde */
+}
+
+.color-box.null {
+  background-color: #e0e0e0; /* Gris */
+}
+/* Personalización de los botones del diálogo */
+.custom-confirm-dialog-footer .p-button-yes {
+  background-color: #007bff; /* Azul primario */
+  color: white;
+  border: none;
+  margin-left: 10px; /* Espacio entre los botones */
+}
+
+.custom-confirm-dialog-footer .p-button-yes:hover {
+  background-color: #0056b3; /* Azul oscuro al pasar el mouse */
+}
+
+.custom-confirm-dialog-footer .p-button-no {
+  background-color: #e0e0e0; /* Gris claro */
+  color: #333;
+  border: none;
+  margin-right: 10px; /* Espacio entre los botones */
+}
+
+.custom-confirm-dialog-footer .p-button-no:hover {
+  background-color: #b0b0b0; /* Gris más oscuro al pasar el mouse */
+}

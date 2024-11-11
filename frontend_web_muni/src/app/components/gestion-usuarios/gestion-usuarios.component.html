@@ -1,5 +1,6 @@
 <div class="gestion-usuarios-container">
   <div class="overlay" *ngIf="mostrarDialogoAgregar || mostrarDialogoDetalles"></div>
+  <div class="overlay" *ngIf="mostrarDialogoEditar || mostrarDialogoAgregar || mostrarDialogoDetalles"></div>
 
   <!-- Encabezado con botón de agregar usuario -->
   <div class="header">
@@ -10,26 +11,76 @@
   <!-- Tarjeta con la tabla de usuarios -->
   <div class="usuarios-list-card">
     <h3>Listado de Usuarios</h3>
-    <table class="usuarios-table" *ngIf="usuarios.length > 0; else noUsuarios">
-      <thead>
-        <tr>
-          <th>ID</th>
-          <th>RUT</th>
-          <th>Nombre Completo</th>
-          <th>Email</th>
-          <th>Roles</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let usuario of usuarios" (click)="seleccionarUsuario(usuario)" class="table-row">
-          <td>{{ usuario.id }}</td>
-          <td>{{ usuario.rut }}</td>
-          <td>{{ usuario.nombre }} {{ usuario.apellidoPaterno }} {{ usuario.apellidoMaterno }}</td>
-          <td>{{ usuario.email }}</td>
-          <td>{{ usuario.roles.join(', ') }}</td>
-        </tr>
-      </tbody>
-    </table>
+    <!-- Botones Editar y Eliminar en cada fila -->
+<table class="usuarios-table" *ngIf="usuarios.length > 0; else noUsuarios">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>RUT</th>
+      <th>Nombre Completo</th>
+      <th>Email</th>
+      <th>Roles</th>
+      <th>Acciones</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let usuario of usuarios">
+      <td>{{ usuario.id }}</td>
+      <td>{{ usuario.rut }}</td>
+      <td>{{ usuario.nombre }} {{ usuario.apellidoPaterno }} {{ usuario.apellidoMaterno }}</td>
+      <td>{{ usuario.email }}</td>
+      <td>{{ usuario.roles.join(', ') }}</td>
+      <td>
+        <button (click)="abrirDialogoEditar(usuario)" class="icon-button" title="Editar">
+          <i class="pi pi-pencil"></i> <!-- Icono de edición -->
+        </button>
+        <button (click)="eliminarUsuario(usuario.id)" class="icon-button" title="Eliminar">
+          <i class="pi pi-trash"></i> <!-- Icono de eliminar -->
+        </button>
+      </td>
+      
+    </tr>
+  </tbody>
+</table>
+
+<!-- Diálogo para editar usuario -->
+<div class="custom-dialog" *ngIf="mostrarDialogoEditar">
+  <div class="custom-dialog-content">
+    <h3>Editar Usuario</h3>
+    <div class="p-fluid">
+      <div class="field">
+        <label for="rut">RUT</label>
+        <input id="rut" [(ngModel)]="usuarioEditable.rut" type="text" />
+      </div>
+      <div class="field">
+        <label for="nombre">Nombre</label>
+        <input id="nombre" [(ngModel)]="usuarioEditable.nombre" type="text" />
+      </div>
+      <div class="field">
+        <label for="apellidoPaterno">Apellido Paterno</label>
+        <input id="apellidoPaterno" [(ngModel)]="usuarioEditable.apellidoPaterno" type="text" />
+      </div>
+      <div class="field">
+        <label for="apellidoMaterno">Apellido Materno</label>
+        <input id="apellidoMaterno" [(ngModel)]="usuarioEditable.apellidoMaterno" type="text" />
+      </div>
+      <div class="field">
+        <label for="email">Email</label>
+        <input id="email" [(ngModel)]="usuarioEditable.email" type="email" />
+      </div>
+      <div class="field">
+        <label for="roles">Roles</label>
+        <input id="roles" [(ngModel)]="usuarioEditable.roles" type="text" />
+      </div>
+      <div class="dialog-footer d-flex justify-content-end gap-2">
+        <button class="btn btn-primary" (click)="guardarCambiosUsuario()">Guardar</button>
+        <button class="btn btn-secondary" (click)="cerrarDialogoEditar()">Cancelar</button>
+      </div>
+      
+    </div>
+  </div>
+</div>
+
     <ng-template #noUsuarios>
       <p class="no-usuarios">No hay usuarios registrados.</p>
     </ng-template>
@@ -81,10 +132,11 @@
           <label for="roles">Roles</label>
           <input id="roles" [(ngModel)]="nuevoUsuario.roles" type="text" placeholder="Ejemplo: administrador, usuario" />
         </div>
-        <div class="dialog-footer">
-          <button class="btn-save" (click)="guardarUsuario()">Guardar</button>
-          <button class="btn-cancel" (click)="cerrarDialogoAgregar()">Cancelar</button>
+        <div class="dialog-footer d-flex justify-content-end gap-2">
+          <button class="btn btn-primary" (click)="guardarUsuario()">Guardar</button>
+          <button class="btn btn-secondary" (click)="cerrarDialogoAgregar()">Cancelar</button>
         </div>
+        
       </div>
     </div>
   </div>

@@ -90,7 +90,9 @@ export class SidebarComponent {
         this.router.navigate(['/planificacion']);
         break;
       case 'envios':
-        this.router.navigate(['/envios']);
+        this.router.navigate(['/envios']).then(() => {
+          window.location.reload(); // Recarga la página al navegar a envios
+        });
         break;
       case 'cerrar sesión':
         this.logout();

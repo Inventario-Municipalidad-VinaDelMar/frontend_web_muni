@@ -141,4 +141,15 @@ export class EnviosComponent implements OnInit, OnDestroy {
       this.subscription.unsubscribe(); // Liberar suscripción en `ngOnDestroy`
     }
   }
+
+  getStatusClass(status: string): string {
+    if (status === 'En envio') {
+      return 'status-en-envio';
+    } else if (status === 'Finalizado') {
+      return 'status-finalizado';
+    }
+    return ''; // No aplica ninguna clase adicional si es "sin cargar"
+  }
+  
+  
 }

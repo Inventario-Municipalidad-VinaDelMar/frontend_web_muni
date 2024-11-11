@@ -246,70 +246,163 @@
   }
 }
 
-
-.export-button-container {
-  display: flex;
-  justify-content: flex-end; /* Alinea el botón a la derecha */
-  margin: 20px 0;            /* Añade espacio vertical alrededor del botón */
+/* Estilo común para todos los diálogos */
+.p-dialog .container-fluid {
+  padding: 20px;
 }
 
-.export-button {
-  background-color: #0077B6; /* Azul similar al de "Expandir" */
-  color: #ffffff;
-  border: none;
-  padding: 10px 20px;
-  font-size: 16px;
+.p-dialog h3,
+.p-dialog header {
+  font-weight: 600;
+  color: #0277bd;
+  text-align: center;
+  margin-bottom: 15px;
+}
+
+/* Estilo para el diálogo de Añadir Producto */
+.p-dialog .text-center {
+  text-align: center;
+}
+
+.p-dialog i.display-4.text-primary {
+  font-size: 2.5rem;
+  color: #0277bd;
+}
+
+.p-dialog .form-label.fw-bold {
+  font-weight: bold;
+  color: #0277bd;
+  display: block;
+  margin-bottom: 5px;
+}
+
+.p-dialog .form-control {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #b0bec5;
   border-radius: 5px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  margin-bottom: 15px;
+  transition: border-color 0.3s;
+}
 
-  /* Sombra para dar efecto de elevación */
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-
-  /* Cambia el color y la sombra en hover */
-  &:hover {
-    background-color: #0056b3; /* Azul más oscuro en hover */
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
-  }
-
-  /* Cambia el color y quita la sombra al hacer clic */
-  &:active {
-    background-color: #004494;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
+.p-dialog .form-control:focus {
+  border-color: #4fc3f7;
+  outline: none;
 }
 
 .p-dialog .dialog-footer {
   display: flex;
-  justify-content: flex-end;
-  gap: 10px;
+  justify-content: center;
+  gap: 12px;
   margin-top: 15px;
 }
 
-.confirm-button {
-  background-color: #007bff; /* Azul similar al de exportar */
-  color: #ffffff;
+/* Botón de añadir */
+.p-dialog .btn-success {
+  background-color: #4fc3f7;
+  color: white;
   border: none;
-  padding: 8px 16px;
   border-radius: 5px;
+  padding: 10px 20px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
 
-  &:hover {
-    background-color: #0056b3; /* Azul más oscuro en hover */
-  }
+.p-dialog .btn-success:hover {
+  background-color: #29b6f6;
+}
+
+/* Botón de cancelar */
+.p-dialog .btn-secondary {
+  background-color: #f44336;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.p-dialog .btn-secondary:hover {
+  background-color: #e57373;
+}
+
+/* Estilo para el diálogo de Confirmación de Exportación */
+.confirm-button {
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  padding: 10px 20px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
+
+.confirm-button:hover {
+  background-color: #388e3c;
 }
 
 .cancel-button {
-  background-color: #6c757d; /* Color gris para cancelar */
-  color: #ffffff;
+  background-color: #f44336;
+  color: white;
   border: none;
-  padding: 8px 16px;
   border-radius: 5px;
+  padding: 10px 20px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  font-weight: 600;
+  transition: background-color 0.3s;
+}
 
-  &:hover {
-    background-color: #5a6268; /* Gris más oscuro en hover */
-  }
+.cancel-button:hover {
+  background-color: #e57373;
+}
+
+/* Estilo para el diálogo de Añadir/Editar Tanda */
+.p-dialog.custom-dialog .form-check-input {
+  margin-right: 8px;
+}
+
+.p-dialog.custom-dialog .form-check-label {
+  font-weight: bold;
+  color: #0277bd;
+}
+
+.p-dialog .text-danger.small {
+  color: #f44336;
+  font-size: 0.85rem;
+}
+
+.p-dialog select.form-control {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #b0bec5;
+  border-radius: 5px;
+  margin-bottom: 15px;
+  transition: border-color 0.3s;
+}
+
+.p-dialog select.form-control:focus {
+  border-color: #4fc3f7;
+  outline: none;
+}
+/* Estilo personalizado para el botón de cancelar en azul */
+.btn-cancel-blue {
+  background-color: #007bff !important; /* Azul Bootstrap */
+  color: white !important; /* Texto blanco */
+  border: none !important; /* Sin borde */
+  padding: 10px 20px;
+  border-radius: 5px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn-cancel-blue:hover {
+  background-color: #0056b3 !important; /* Azul más oscuro al pasar el ratón */
+}
+.margin-right-10 {
+  margin-right: 40%;
 }

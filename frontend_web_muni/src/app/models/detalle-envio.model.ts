@@ -12,6 +12,11 @@ export interface DetalleEnvio {
   cargaActual: Producto[];
   incidente: Incidente[];
 }
+export interface Delivery {
+  date: string;
+  products: { name: string; quantity: number }[];
+  comedor: string;
+}
 
 
 export interface Incidente {

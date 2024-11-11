@@ -52,7 +52,7 @@
   
 
   <div class="col-6">
-    <div class="contenido planificacion fade-in" *ngIf="planningData">
+    <div class="contenido planificacion " *ngIf="planningData">
       <div class="planificacion-header">
         <h2 class="planificacion-title">Planificación del Día {{ selectedDayName }}</h2>
         <div class="calendar-icon">
@@ -62,7 +62,7 @@
       </div>
   
       <div *ngIf="planningData && planningData.detalles?.length > 0; else noPlanificacion">
-        <div class="detalle-lista">
+        <div class="detalle-lista fade-in">
           <div *ngFor="let detalle of planningData.detalles" class="detalle-item fade-in">
             <div class="detalle-content">
               <div class="detalle-imagen">

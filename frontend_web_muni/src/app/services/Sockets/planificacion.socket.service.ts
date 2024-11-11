@@ -51,6 +51,9 @@ export class PlanificacionSocketService implements OnDestroy {
       this.connectSocket(token);
     }
   }
+  isConnected(): boolean {
+    return this.socketConnected;
+  }
 
   /**
    * Conecta el socket con el token actual.

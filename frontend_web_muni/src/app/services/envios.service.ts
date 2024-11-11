@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Socket, SocketIoConfig } from 'ngx-socket-io';
-import { Observable } from 'rxjs';
+import { Observable, BehaviorSubject } from 'rxjs';
 import { TokenService } from './auth-token.service';
 import { Envio } from '../models/envio.model';
 import { DetalleEnvio } from '../models/detalle-envio.model';
@@ -9,9 +9,30 @@ import { DetalleEnvio } from '../models/detalle-envio.model';
   providedIn: 'root',
 })
 export class EnviosSocketService {
-  private socket: Socket;
+  private socket: Socket | null = null;
+  private socketConnected = false;
+  private isInitialized = false; // Flag para asegurar que solo se inicialice una vez
+  private enviosSubject = new BehaviorSubject<Envio[]>([]);
+  envios$ = this.enviosSubject.asObservable();
 
   constructor(private tokenService: TokenService) {
+    this.initializeSocket();
+  }
+
+  initSocketConnection(): void {
+    this.initializeSocket();
+  }
+
+  isConnected(): boolean {
+    return this.socketConnected;
+  }
+
+  private initializeSocket() {
+    if (this.isInitialized) {
+      console.log('El socket ya ha sido inicializado.');
+      return;
+    }
+
     const config: SocketIoConfig = {
       url: 'http://34.176.26.41/logistica/envios',
       options: {
@@ -22,39 +43,25 @@ export class EnviosSocketService {
     };
 
     this.socket = new Socket(config);
-    this.initSocket();
-  }
 
-  initSocket() {
     this.socket.on('connect', () => {
       console.log('Conectado al socket de logística envíos');
+      this.socketConnected = true;
     });
 
     this.socket.on('disconnect', () => {
       console.log('Desconectado del socket de logística envíos');
+      this.socketConnected = false;
     });
+
+    this.isInitialized = true;
   }
 
-  // Método para escuchar el evento de productos por fecha
-  listenToProductosByFecha(): Observable<Envio[]> {
-    return new Observable<Envio[]>((observer) => {
-      this.socket.on('loadEnviosByFecha', (data: Envio[]) => {
-        console.log('Productos recibidos para la fecha:', data);
-        observer.next(data); // Emitir los datos al suscriptor cada vez que se recibe una actualización
-      });
-
-      return () => {
-        this.socket.off('loadEnviosByFecha');
-      };
-    });
-  }
-
-  loadEnviosByFecha(fecha: string): Observable<Envio[]> {
+   loadEnviosByFecha(fecha: string): Observable<Envio[]> {
     const token = this.tokenService.getToken();
-
     if (!token) {
       console.error('Token no disponible. No se puede enviar el mensaje.');
-      return new Observable<Envio[]>(); // Retorna un observable vacío en caso de error
+      return new Observable<Envio[]>(); // Retorna un observable vacío si no hay token
     }
 
     const mensaje = {
@@ -62,24 +69,41 @@ export class EnviosSocketService {
       token: token,
     };
 
-    this.socket.emit('getEnviosByFecha', mensaje);
+    console.log('Emitir mensaje al socket con fecha:', mensaje);
 
+    if (this.socket) {
+      this.socket.emit('getEnviosByFecha', mensaje);
+    } else {
+      console.error('Socket no inicializado.');
+    }
+
+    // Escucha el evento 'loadEnviosByFecha' y devuelve un Observable de los datos
     return new Observable<Envio[]>((observer) => {
-      this.socket.on('loadEnviosByFecha', (data: Envio[]) => {
-        console.log('Productos recibidos para la fecha:', data);
-        observer.next(data); // Emitir los datos recibidos al observador
-      });
+      if (this.socket) {
+        this.socket.on('loadEnviosByFecha', (data: Envio[]) => {
+          console.log('Productos recibidos para la fecha:', data);
+          observer.next(data);
+        });
+      }
 
       return () => {
-        this.socket.off('loadEnviosByFecha'); // Limpiar el listener al completar el observable
+        if (this.socket) {
+          this.socket.off('loadEnviosByFecha');
+          console.log('Listener "loadEnviosByFecha" eliminado.');
+        }
       };
     });
   }
 
-  // Método adicional para obtener envío por ID si es necesario
+  // Método para escuchar el evento de productos por fecha usando BehaviorSubject
+listenToProductosByFecha(): Observable<Envio[]> {
+  return this.envios$; // Devuelve el observable de enviosSubject para que otros componentes puedan suscribirse
+}
+
+
+  // Método adicional para obtener envío por ID
   getEnvioById(idEnvio: string): Observable<DetalleEnvio> {
     const token = this.tokenService.getToken();
-
     if (!token) {
       console.error('Token no disponible. No se puede enviar el mensaje.');
       return new Observable<DetalleEnvio>();
@@ -90,25 +114,40 @@ export class EnviosSocketService {
       token: token,
     };
 
-    this.socket.emit('getEnvioById', mensaje);
+    if (this.socket) {
+      this.socket.emit('getEnvioById', mensaje);
+    } else {
+      console.error('Socket no inicializado.');
+    }
 
     return new Observable<DetalleEnvio>((observer) => {
       const eventoRespuesta = `${idEnvio}-loadEnvioById`;
 
-      this.socket.on(eventoRespuesta, (data: DetalleEnvio) => {
-        console.log(`Datos recibidos para ${eventoRespuesta}:`, data);
-        observer.next(data);
-        observer.complete();
-      });
+      if (this.socket) {
+        this.socket.off(eventoRespuesta); // Asegura que no haya listeners duplicados
+        this.socket.on(eventoRespuesta, (data: DetalleEnvio) => {
+          console.log(`Datos recibidos para ${eventoRespuesta}:`, data);
+          observer.next(data);
+          observer.complete();
+        });
+      }
 
       return () => {
-        this.socket.off(eventoRespuesta);
+        if (this.socket) {
+          this.socket.off(eventoRespuesta);
+          console.log(`Listener "${eventoRespuesta}" eliminado.`);
+        }
       };
     });
   }
 
   disconnect() {
-    this.socket.disconnect();
-    console.log('Desconectado manualmente del socket de logística envíos');
+    if (this.socket) {
+      this.socket.disconnect();
+      this.socketConnected = false;
+      this.isInitialized = false;
+      console.log('Desconectado manualmente del socket de logística envíos');
+      this.socket = null;
+    }
   }
 }

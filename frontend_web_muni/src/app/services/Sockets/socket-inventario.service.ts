@@ -105,6 +105,9 @@ export class SocketInventarioService {
   onConnect(): Observable<any> {
     return this.socket.fromEvent('connect');
   }
+  isConnected(): boolean {
+    return this.socketConnected;
+  }
 
   onDisconnect(): Observable<any> {
     return this.socket.fromEvent('disconnect');
@@ -150,7 +153,7 @@ listenStockProductoChange(): Observable<any> {
 }
 
 
-  getTandasByProductoId(idProducto: string): void {
+getTandasByProductoId(idProducto: string): void {
     if (this.socketConnected) {
       this.socket.emit('getTandasByIdProducto', { idProducto });
     } else {

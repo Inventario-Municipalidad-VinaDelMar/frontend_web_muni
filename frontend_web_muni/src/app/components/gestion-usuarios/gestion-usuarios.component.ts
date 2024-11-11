@@ -18,6 +18,19 @@ export class GestionUsuariosComponent {
   mostrarDialogoAgregar: boolean = false; // Controla la visibilidad del diálogo de agregar usuario
   mostrarDialogoDetalles: boolean = false; // Controla la visibilidad del diálogo de detalles de usuario
   nuevoUsuario: Partial<Usuario> = { rut: '', email: '', nombre: '', apellidoPaterno: '', apellidoMaterno: '', roles: [] }; // Nuevo usuario
+  usuarioEditable: Usuario = {
+    id: '',
+    rut: '',
+    nombre: '',
+    apellidoPaterno: '',
+    apellidoMaterno: '',
+    email: '',
+    roles: []
+  };
+  
+  
+
+  mostrarDialogoEditar: boolean = false;
 
   constructor() {
     this.obtenerUsuarios();
@@ -86,5 +99,32 @@ export class GestionUsuariosComponent {
   cerrarDialogoDetalles() {
     this.mostrarDialogoDetalles = false;
     this.usuarioSeleccionado = null;
+  }
+
+
+  abrirDialogoEditar(usuario: Usuario) {
+    this.usuarioEditable = { ...usuario }; // Clonar el usuario para editarlo sin modificar el original
+    this.mostrarDialogoEditar = true;
+  }
+  
+  cerrarDialogoEditar() {
+    this.mostrarDialogoEditar = false;
+  }
+  
+  guardarCambiosUsuario() {
+    if (this.usuarioEditable) { // Verifica que no sea null
+      const index = this.usuarios.findIndex((u) => u.id === this.usuarioEditable!.id);
+      if (index !== -1) {
+        this.usuarios[index] = { ...this.usuarioEditable };
+        console.log('Usuario editado:', this.usuarios[index]);
+      }
+      this.cerrarDialogoEditar();
+    }
+  }
+  
+  
+  eliminarUsuario(id: string) {
+    this.usuarios = this.usuarios.filter((usuario) => usuario.id !== id);
+    console.log('Usuario eliminado:', id);
   }
 }

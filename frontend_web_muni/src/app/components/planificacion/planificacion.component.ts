@@ -21,13 +21,19 @@ import { DialogModule } from 'primeng/dialog';
 import { MultiSelectModule } from 'primeng/multiselect';
 import { ConfirmationService, MessageService, PrimeNGConfig } from 'primeng/api';
 import { DividerModule } from 'primeng/divider';
+import { Tanda } from '../../models/tanda.model';
+
 
 
 interface Producto {
   id: string;
   nombre: string;
-  urlImagen:string;
-  cantidadPlanificada:number;
+  barcode: null;
+  descripcion: string;
+  urlImagen: string;
+  stock?:number;
+  tandas?: Tanda[];
+  cantidadPlanificada?:number;
 }
 
 
@@ -129,19 +135,90 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
   private resetData() {
     this.productos = [];
   }
+
+  
   
   private loadProductos() {
     this.socketInventarioService.getAllProductos();
-    
+  
     this.productSubscription.add(
-        this.socketInventarioService.loadAllProductos().subscribe((productos: Producto[]) => {
-            this.productos = productos;
-            this.productosFiltrado = [...this.productos]; // Inicializa productosFiltrado aquí
-        }, (error: any) => {
-            console.error('Error al cargar productos:', error);
-        })
+      this.socketInventarioService.loadAllProductos().subscribe(
+        (productos: Producto[]) => {
+          // Inicializa los productos y asegura que `tandas` esté como un array vacío en cada producto
+          this.productos = productos.map(producto => ({
+            ...producto,
+            tandas: producto.tandas || [] // Inicializa `tandas` como un array vacío si no está definida
+          }));
+  
+          // Contador para verificar cuándo todas las tandas se han cargado
+          let tandasCargadas = 0;
+  
+          // Para cada producto, cargar sus tandas y mostrarlas en consola
+          this.productos.forEach(producto => {
+            // Emitir evento para obtener tandas del producto
+            this.socketInventarioService.getTandasByProductoId(producto.id);
+  
+            // Suscribirse al evento para recibir las tandas de cada producto
+            this.socketInventarioService.onLoadTandasByProductoId(producto.id).subscribe(
+              (tandas: Tanda[]) => {
+                producto.tandas = tandas;
+                console.log(`Producto: ${producto.nombre}, Tandas:`, producto.tandas);
+  
+                // Incrementar el contador cada vez que se carguen las tandas de un producto
+                tandasCargadas++;
+  
+                // Verificar si todas las tandas han sido cargadas
+                if (tandasCargadas === this.productos.length) {
+                  // Ordenar productos por la fecha de vencimiento más próxima de sus tandas
+                  this.productosFiltrado = this.productos.sort((a, b) => {
+                    const fechaVencimientoA = (a.tandas && a.tandas.length > 0) 
+                      ? Math.min(...a.tandas
+                          .filter(t => t.fechaVencimiento) // Filtrar tandas con fecha válida
+                          .map(t => new Date(t.fechaVencimiento).getTime())
+                        )
+                      : Infinity;
+                    const fechaVencimientoB = (b.tandas && b.tandas.length > 0) 
+                      ? Math.min(...b.tandas
+                          .filter(t => t.fechaVencimiento) // Filtrar tandas con fecha válida
+                          .map(t => new Date(t.fechaVencimiento).getTime())
+                        )
+                      : Infinity;
+                    
+                    return fechaVencimientoA - fechaVencimientoB;
+                  });
+  
+                  // Mostrar el resultado ordenado en consola
+                  console.log("Productos ordenados por vencimiento más próximo:", this.productosFiltrado);
+                }
+              },
+              (error: any) => {
+                console.error(`Error al cargar tandas del producto ${producto.nombre}:`, error);
+              }
+            );
+          });
+        },
+        (error: any) => {
+          console.error('Error al cargar productos:', error);
+        }
+      )
     );
-}
+  }
+  
+  
+  // En el componente TypeScript
+  getExpiryClass(producto: Producto): string {
+    const today = new Date().getTime();
+    const nearestExpiry = this.getNearestExpiry(producto);
+    
+    if (nearestExpiry === Infinity) return 'null';
+
+    const daysUntilExpiry = Math.ceil((nearestExpiry - today) / (1000 * 60 * 60 * 24));
+
+    if (daysUntilExpiry < 0) return 'vencido';
+    if (daysUntilExpiry <= 2) return 'porvencer1';
+    if (daysUntilExpiry <= 7) return 'porvencer2';
+    return 'seguro';
+  }
 
 
   private asignarProductosPorDia(planificacion: any[]) {
@@ -176,15 +253,14 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
         // Recorremos los detalles de la planificación
         plan.detalles.forEach((detalle: any) => {
           console.log( typeof(detalle.producto.nombre)==="string")
-            // Crear el producto con la información necesaria
-            // typeof(detalle.producto.nombre)==="string"?detalle.producto.nombre:(detalle.producto.nombre as any).nombre
-            // const {} = detalle;
             const producto: Producto = {
-                id: detalle.productoId, // Cambiar a productoId
-                // nombre:  typeof(detalle.producto)==="string"?detalle.producto:(detalle.producto as any).nombre, // Asumiendo que el detalle tiene un campo 'producto' 
-                nombre: detalle.producto, // Asumiendo que el detalle tiene un campo 'producto'
-                urlImagen: detalle.urlImagen, // Incluyendo la URL de la imagen
-                cantidadPlanificada: detalle.cantidadPlanificada // Incluyendo la cantidad planificada
+              id: detalle.productoId, // Cambiar a productoId
+              nombre: detalle.producto, // Asumiendo que el detalle tiene un campo 'producto'
+              urlImagen: detalle.urlImagen, // Incluyendo la URL de la imagen
+              cantidadPlanificada: detalle.cantidadPlanificada // Incluyendo la cantidad planificada
+              ,
+              barcode: null,
+              descripcion: ''
             };
             // Añadir el producto al Set del día correspondiente
             this.productosPorDia[dia].add(producto);
@@ -206,6 +282,9 @@ filterProductos() {
     );
   }
 }
+
+  
+
 
   
   
@@ -315,7 +394,8 @@ filterProductos() {
   }
   
   drag(event: DragEvent) {
-    event.dataTransfer?.setData('text', (event.target as HTMLElement).id);
+    const id = (event.target as HTMLElement).id;
+    event.dataTransfer?.setData('text', id);
   }
   
   // Cambiar el método dropToMainList para evitar eliminar de productosFiltrado
@@ -344,35 +424,37 @@ dropToMainList(event: DragEvent) {
 // Cambiar el método drop para evitar duplicados en productosPorDia
 drop(event: DragEvent, dia: string) {
   event.preventDefault();
-  const data = event.dataTransfer?.getData('text');
-  const productoElement = document.getElementById(data ?? '');
+  const productoId = event.dataTransfer?.getData('text');
+  const producto = this.productosFiltrado.find(p => p.id === productoId);
 
-  if (productoElement) {
-    const producto = this.productos.find(t => t.id === data);
-    
-    if (producto && !this.productosPorDia[dia].has(producto)) { // Verifica si ya está asignada
-      // Agregar la tanda al día correspondiente
-      this.productosPorDia[dia].add(producto);
-      
-      // Cambiar las clases
-      productoElement.classList.add('tanda-en-dia');
-      productoElement.classList.add(`tanda-en-${dia}`);  // Clase específica para el día
-      productoElement.classList.remove('tanda-en-lista');
-    }
+  if (producto && !this.productosPorDia[dia].has(producto)) {
+    // Agregar el producto al día específico
+    this.productosPorDia[dia].add(producto);
+
+    // Remover el producto de la lista principal
+    this.productosFiltrado = this.productosFiltrado.filter(p => p.id !== productoId);
   }
 }
 
 
 // Para quitar de un día, usamos delete para el Set
 quitarDeDia(producto: Producto, dia: string) {
-    // Remover la tanda del día correspondiente
-    this.productosPorDia[dia].delete(producto);
-  
-    // Agregar la tanda de nuevo a la lista filtrada
-    this.productosFiltrado.push(producto);
+  // Eliminar el producto del día específico
+  this.productosPorDia[dia].delete(producto);
+
+  // Reagregar el producto a la lista principal en la posición correcta de orden
+  const nearestExpiry = this.getNearestExpiry(producto);
+  let index = this.productosFiltrado.findIndex(p => this.getNearestExpiry(p) > nearestExpiry);
+  if (index === -1) index = this.productosFiltrado.length;
+  this.productosFiltrado.splice(index, 0, producto);
 }
 
-
+private getNearestExpiry(producto: Producto): number {
+  return producto.tandas?.reduce((nearest, tanda) => {
+    const fechaVencimiento = new Date(tanda.fechaVencimiento).getTime();
+    return fechaVencimiento < nearest ? fechaVencimiento : nearest;
+  }, Infinity) || Infinity;
+}
 
 
 

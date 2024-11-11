@@ -8,4 +8,5 @@ export interface Producto {
     urlImagen: string;
     stock?:number;
     tandas?: Tanda[];
+    cantidadPlanificada?:number;
 }

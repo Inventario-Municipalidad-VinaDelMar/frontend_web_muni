@@ -12,8 +12,6 @@ import { CardModule } from 'primeng/card';
 import { PanelModule } from 'primeng/panel';
 import { ScrollPanelModule } from 'primeng/scrollpanel';
 import { DashboardComponent } from "../dashboard/dashboard.component";
-import localeEs from '@angular/common/locales/es';
-import { LOCALE_ID } from '@angular/core';
 
 
 @Component({
@@ -134,15 +132,43 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   loadPlanificacion(fecha: string): void {
-    this.planificacionSocketService.getPlanificacionIndividual(fecha);
-
+    console.log("Fecha recibida:", fecha);
+  
+    // Descomposición manual de la fecha para evitar problemas de zona horaria
+    const [year, month, day] = fecha.split('-').map(Number);
+    let date = new Date(year, month - 1, day); // Restamos 1 al mes porque los meses en JavaScript van de 0 a 11
+    const dayOfWeek = date.getDay();
+    console.log("Día de la semana (0 = Domingo, 6 = Sábado):", dayOfWeek);
+  
+    // Si es sábado (6), avanza 2 días para obtener el lunes
+    // Si es domingo (0), avanza 1 día para obtener el lunes
+    if (dayOfWeek === 6) {
+      date.setDate(date.getDate() + 2);
+      console.log("Es sábado, ajustando la fecha al lunes:", date);
+    } else if (dayOfWeek === 0) {
+      date.setDate(date.getDate() + 1);
+      console.log("Es domingo, ajustando la fecha al lunes:", date);
+    } else {
+      console.log("Es día de semana, no se requiere ajuste.");
+    }
+  
+    // Convertir la fecha al formato "yyyy-MM-dd" para el socket
+    const adjustedDate = date.toISOString().split('T')[0];
+    console.log("Fecha ajustada para enviar al socket:", adjustedDate);
+  
+    // Ahora llama al servicio del socket con la fecha ajustada
+    this.planificacionSocketService.getPlanificacionIndividual(adjustedDate);
+    console.log("Llamada al socket realizada con la fecha:", adjustedDate);
+  
     const planificacionSubscription = this.planificacionSocketService.onLoadPlanificacionData()
       .subscribe(planificacion => {
         this.planningData = planificacion; // Almacena los datos recibidos
+        console.log("Datos recibidos del socket:", planificacion);
       });
-
+  
     this.subscriptions.push(planificacionSubscription);
   }
+  
 
   onSelectDate(day: any): void {
     if (this.planningTimeout) {
@@ -157,6 +183,7 @@ export class HomeComponent implements OnInit, OnDestroy {
       this.loadPlanificacion(this.selectedDate);
     }, 0);
   }
+  
   
 
   calculateWeekDates(): void {

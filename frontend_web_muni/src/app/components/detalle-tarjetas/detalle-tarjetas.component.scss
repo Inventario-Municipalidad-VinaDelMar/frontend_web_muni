@@ -286,13 +286,13 @@ h2 {
 }
 
 .status-cargando {
-  color: #ffffff;
-  background-color: #ff9800;
+  background-color: #fff3cd; /* Amarillo claro */
+  color: #856404;
 }
 
 .status-en-envio {
-  color: #ffffff;
-  background-color: #4caf50;
+  background-color: #d4edda; /* Verde claro */
+  color: #155724;
 }
 
 .status-pendiente {
@@ -301,8 +301,8 @@ h2 {
 }
 
 .status-finalizado {
-  color: #ffffff;
-  background-color: #2196f3;
+  background-color: #cce4ff;
+  color: #007bff;
 }
 
 /* Comparación de carga */
