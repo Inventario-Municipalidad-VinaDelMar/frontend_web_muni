@@ -24,41 +24,45 @@
           <div class="status" [ngClass]="getStatusClass(envio.status)">
             {{ envio.status }}
           </div>
-          
-          
-
+    
           <!-- Círculo superior derecho con el icono del camión -->
           <div class="status-container">
             <div class="circle-icon">
               <img src="assets/img/camion.png" alt="Camión de envío" />
             </div>
           </div>
-
+    
           <!-- Contenido de la tarjeta -->
           <div class="card-header">
             <div class="info-header">
               <p><strong>Autorizado por:</strong> {{ envio.autorizante }}</p>
               <p><strong>Fecha de creación:</strong> {{ getFormattedDate(envio.fecha) }}</p>
               <p><strong>Hora de inicio:</strong> {{ formatHour(envio.horaInicioEnvio) }}</p>
-              <p *ngIf="envio.horaFinalizacion"><strong>Hora de término:</strong> {{ envio.horaFinalizacion | date: 'HH:mm' }}</p>
+              <p><strong>Hora de término:</strong> {{ envio.horaFinalizacion ? (envio.horaFinalizacion | date: 'HH:mm') : 'No disponible' }}</p>
+
             </div>
           </div>
-
-          <!-- Lista de productos -->
+    
+          <!-- Lista de productos o mensaje de "No hay productos cargados" -->
           <div class="products-container">
-            <div *ngFor="let producto of envio.productos" class="product-card">
-              <img [src]="producto.urlImagen" alt="{{ producto.producto }}" />
-            </div>
+            <ng-container *ngIf="envio.productos.length > 0; else noProducts">
+              <div *ngFor="let producto of envio.productos" class="product-card">
+                <img [src]="producto.urlImagen" alt="{{ producto.producto }}" />
+              </div>
+            </ng-container>
+            <ng-template #noProducts>
+              <p class="no-products-message">No hay productos cargados.</p>
+            </ng-template>
           </div>
         </div>
       </div>
-
+    
       <!-- Mensaje si no hay envíos -->
       <div *ngIf="enviosList.length === 0" class="no-envios-message">
         <img src="assets/img/Designer.jpeg" alt="No hay envíos">
         <p>No hay envíos recibidos para esta fecha.</p>
       </div>
-      
     </div>
+    
   </div>
 </div>

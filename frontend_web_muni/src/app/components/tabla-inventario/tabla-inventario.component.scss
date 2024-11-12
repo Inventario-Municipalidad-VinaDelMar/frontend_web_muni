@@ -406,3 +406,12 @@
 .margin-right-10 {
   margin-right: 40%;
 }
+.no-products-message {
+  font-size: 1.5em; /* Tamaño de fuente */
+  font-weight: bold; /* Texto en negrita */
+  text-align: center; /* Centrar el texto */
+  width: 100%; /* Ancho completo del contenedor */
+  color: #333; /* Cambia el color si es necesario */
+  padding: 10px 0; /* Espacio adicional alrededor del texto */
+  margin:20px;
+}

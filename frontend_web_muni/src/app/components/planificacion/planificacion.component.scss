@@ -375,25 +375,3 @@ input {
 .color-box.null {
   background-color: #e0e0e0; /* Gris */
 }
-/* Personalización de los botones del diálogo */
-.custom-confirm-dialog-footer .p-button-yes {
-  background-color: #007bff; /* Azul primario */
-  color: white;
-  border: none;
-  margin-left: 10px; /* Espacio entre los botones */
-}
-
-.custom-confirm-dialog-footer .p-button-yes:hover {
-  background-color: #0056b3; /* Azul oscuro al pasar el mouse */
-}
-
-.custom-confirm-dialog-footer .p-button-no {
-  background-color: #e0e0e0; /* Gris claro */
-  color: #333;
-  border: none;
-  margin-right: 10px; /* Espacio entre los botones */
-}
-
-.custom-confirm-dialog-footer .p-button-no:hover {
-  background-color: #b0b0b0; /* Gris más oscuro al pasar el mouse */
-}

@@ -82,12 +82,12 @@
         <div class="incidentes-container">
           <div *ngFor="let incidente of envioData2?.incidentes" class="incidente-card">
             <div class="incidente-header">
-              <p><strong>Fecha:</strong> {{ incidente.fecha | date: 'dd/MM/yyyy' }}</p>
-              <p><strong>Hora:</strong> {{ formatHora(incidente.hora) }}</p>
+              <p class="incidente-fecha"><strong>Fecha:</strong> {{ incidente.fecha | date: 'dd/MM/yyyy' }}</p>
+              <p class="incidente-hora"><strong>Hora:</strong> {{ formatHora(incidente.hora) }}</p>
             </div>
             <div class="incidente-content">
-              <p><strong>Descripción:</strong> {{ incidente.descripcion }}</p>
-              <p><strong>Tipo:</strong> {{ incidente.type }}</p>
+              <p class="incidente-descripcion"><strong>Descripción:</strong> {{ incidente.descripcion }}</p>
+              <p class="incidente-tipo"><strong>Tipo:</strong> {{ incidente.type }}</p>
               <ng-container *ngIf="incidente.evidenciaFotograficaUrl">
                 <p><strong>Evidencia Fotográfica:</strong></p>
                 <img 
@@ -97,7 +97,7 @@
                   (click)="openModal(incidente.evidenciaFotograficaUrl)"
                 />
               </ng-container>
-              <div *ngIf="incidente.productosAfectados && incidente.productosAfectados.length > 0">
+              <div *ngIf="incidente.productosAfectados && incidente.productosAfectados.length > 0" class="productos-afectados">
                 <p><strong>Productos Afectados:</strong></p>
                 <ul>
                   <li *ngFor="let producto of incidente.productosAfectados">
@@ -154,4 +154,8 @@
   <p>Cargando datos del envío...</p>
 </div>
 
+
+<div *ngIf="modalImageUrl" class="modal" (click)="closeModal()">
+  <img [src]="modalImageUrl" alt="Imagen en grande" class="modal-image" />
+</div>
 

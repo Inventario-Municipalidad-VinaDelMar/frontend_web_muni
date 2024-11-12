@@ -95,15 +95,12 @@ h2 {
   overflow-y: auto; /* Permite desplazamiento interno si el contenido excede el tamaño */
 }
 
-
-/* Incidentes (Columna izquierda y central, Fila inferior) */
-/* Sección de Incidentes */
 .incidentes-section {
   grid-column: 1 / 3;
   grid-row: 2 / 3;
   padding: 20px;
   text-align: center;
-  background-color: #f3f4f6;
+  background-color: #f9fbfd;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
@@ -112,118 +109,93 @@ h2 {
 .incidentes-container {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 20px;
   justify-content: center;
   align-items: flex-start;
 }
 
-/* Tarjetas individuales de incidentes */
+/* Tarjeta de incidente */
 .incidente-card {
-  border-radius: 10px;
   width: 280px;
-  height: 420px;
+  background-color: #ffffff;
+  border-radius: 12px;
   padding: 16px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 0 6px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
-  position: relative;
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
+  gap: 10px;
 }
 
+.incidente-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2);
+}
 
 /* Encabezado de cada tarjeta de incidente */
 .incidente-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 8px;
   font-weight: bold;
-  color: #020079;
+  color: #343a40;
   font-size: 0.95rem;
+  border-bottom: 1px solid #e9ecef;
+  padding-bottom: 10px;
 }
 
-/* Contenido informativo de cada tarjeta */
+/* Contenido de la tarjeta de incidente */
 .incidente-content {
-  flex-grow: 1;
-  margin-top: 8px;
-  color: #444;
+  color: #555;
+  font-size: 0.9rem;
 }
 
 .incidente-content p {
-  font-size: 0.85rem;
   margin: 4px 0;
 }
 
 .incidente-content strong {
-  color: #020079;
-  font-weight: 600;
+  color: #007bff;
 }
-
 /* Imagen de evidencia fotográfica */
 .evidencia-img {
-  cursor:pointer;
+  cursor: pointer;
   width: 100%;
   height: auto;
-  max-height: 100px;
-  margin-top: 8px;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.15);
+  max-height: 150px;
+  margin-top: 10px;
+  border-radius: 8px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
   object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.evidencia-img:hover {
+  transform: scale(1.05);
 }
 
 /* Productos Afectados */
-.incidente-content ul {
+.productos-afectados ul {
   padding: 0;
-  margin: 8px 0;
   list-style: none;
+  margin: 8px 0 0 0;
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  max-height: 100px; /* Ajusta este valor según el espacio que quieras asignar */
-  overflow-y: auto;
 }
-
-.incidente-content li {
+.productos-afectados li {
   display: flex;
   align-items: center;
   font-size: 0.85rem;
-  color: #555;
+  color: #333;
 }
 
-.incidente-content li img {
-  
+.producto-img {
   width: 24px;
   height: 24px;
+  border-radius: 4px;
   margin-right: 6px;
-  border-radius: 4px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.15);
 }
-
-/* Insignia para el tipo de incidente */
-.incidente-type-badge {
-  background-color: #020079;
-  color: #ffffff;
-  padding: 4px 8px;
-  font-size: 0.75rem;
-  font-weight: bold;
-  border-radius: 4px;
-  display: inline-block;
-  position: absolute;
-  top: 12px;
-  right: 12px;
-}
-
-/* Detalle adicional */
-.incidente-detail {
-  font-size: 0.9rem;
-  color: #666;
-  background-color: #f0f1f5;
-  padding: 6px 8px;
-  border-radius: 8px;
-  margin-top: 10px;
-}
-
-
 /* Entregas (Columna derecha, Todas las filas) */
 .entregas-section {
   grid-column: 3 / 4;
@@ -339,14 +311,7 @@ h2 {
 }
 
 
-/* Imagen de productos y evidencia fotográfica */
-.producto-img, .evidencia-img {
-  width: 30px;
-  height: auto;
-  border-radius: 6px;
-  margin-right: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-}
+
 
 /* Contenedores de desplazamiento */
 .movimientos-content, .entregas-content, .incidentes-content {
@@ -357,16 +322,7 @@ h2 {
   box-shadow: inset 0 0 6px rgba(0, 0, 0, 0.1);
 }
 
-/* Estilo para mensajes sin datos */
-.no-data-message {
-  color: #555;
-  font-size: 1rem;
-  text-align: center;
-  padding: 16px;
-  background-color: #f8f9fa;
-  border-radius: 12px;
-  margin-top: 16px;
-}
+/* Estilo para mensajes sin datos *
 
 /* Ajustes para listas de productos */
 .entrega-card ul, .incidente-card ul {
@@ -411,4 +367,35 @@ h2 {
 .faltante {
   color: green;
   font-weight: bold;
+}
+/* Estilos para el modal */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  cursor: zoom-out;
+}
+
+.modal-image {
+  width: 100%;
+  max-width: 80vw;
+  max-height: 80vh;
+  height: auto;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  object-fit: contain;
+}
+
+.no-data-message {
+  font-size: 1rem;
+  color: #6c757d;
+  text-align: center;
+  margin-top: 20px;
 }

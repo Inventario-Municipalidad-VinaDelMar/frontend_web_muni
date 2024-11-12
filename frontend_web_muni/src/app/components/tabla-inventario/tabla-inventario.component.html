@@ -68,77 +68,93 @@
         </tr>
       </thead>
       <tbody>
-        <ng-container *ngFor="let producto of productosPaginados;">
-          <tr>
-            <td>
-              <div style="display: flex; flex-direction: column; align-items: center;">
-                <img [src]="producto.urlImagen" alt="Imagen de {{ producto.nombre }}" width="50" height="50" style="margin-bottom: 5px; border-radius: 5px;">
-                <span>{{ producto.nombre }}</span>
-              </div>
-            </td>
-            
-            
-            <td>{{ calcularCantidadTotal(producto) }}</td>
-            <td>{{ calcularCantidadPorVencer(producto) }}</td>
-            <td>{{ calcularFechaProxima(producto) }}</td>
-            <td>
-              <button class="boton-expandir margin-right-10" (click)="toggleExpansion(producto.id)">
-                {{ expandedRows[producto.id] ? 'Minimizar' : 'Expandir' }}
-              </button>
-              <button type="button" class="btn btn-transparent-border btn-sm" (click)="abrirDialogoEditarProducto(producto)">
-                <i class="bi bi-pencil"></i> 
-              </button>
-            </td>
-            
-          </tr>
-          <tr *ngIf="expandedRows[producto.id]" class="expanded-row">
-            <td colspan="5">
-              <table class="expanded-content">
-                <thead>
-                  <tr>
-                    <th>Cantidad Actual</th>
-                    <th>Fecha de Vencimiento</th>
-                    <th>Fecha de Ingreso</th>
-                    <th>Ubicación</th>
-                    <th>Bodega</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  <tr *ngFor="let tanda of producto.tandas?.slice(0, 10)" [ngClass]="calcularEstadoVencimiento(tanda)">
-                    <td>{{ tanda.cantidadActual }}</td>
-                    <td>{{ tanda.fechaVencimiento | date:'dd-MM-yyyy' }}</td>
-                    <td>{{ tanda.fechaLlegada | date:'dd-MM-yyyy' }}</td>
-                    <td>{{ tanda.ubicacion }}</td>
-                    <td>{{ tanda.bodega }}</td>
-                    <td>
-                      <button type="button" class="btn btn-transparent-border btn-sm" (click)="editarTanda(tanda)">
-                        <i class="bi bi-pencil"></i> 
-                      </button>
-                      <button type="button" class="btn btn-transparent-border btn-sm" (click)="confirmarEliminarTanda(tanda)">
-                        <i class="bi bi-trash"></i>
-                      </button>
+        <ng-container *ngIf="productosPaginados.length > 0; else noProductos">
+          <ng-container *ngFor="let producto of productosPaginados">
+            <tr>
+              <td>
+                <div style="display: flex; flex-direction: column; align-items: center;">
+                  <img [src]="producto.urlImagen" alt="Imagen de {{ producto.nombre }}" width="50" height="50" style="margin-bottom: 5px; border-radius: 5px;">
+                  <span>{{ producto.nombre }}</span>
+                </div>
+              </td>
+              <td>{{ calcularCantidadTotal(producto) }}</td>
+              <td>{{ calcularCantidadPorVencer(producto) }}</td>
+              <td>{{ calcularFechaProxima(producto) }}</td>
+              <td class="actions-cell">
+                <button class="boton-expandir" (click)="toggleExpansion(producto.id)">
+                  {{ expandedRows[producto.id] ? 'Minimizar' : 'Expandir' }}
+                </button>
+                <button type="button" class="btn btn-transparent-border btn-sm" (click)="abrirDialogoEditarProducto(producto)">
+                  <i class="bi bi-pencil"></i>
+                </button>
+              </td>
+              
+            </tr>
+            <tr *ngIf="expandedRows[producto.id]" class="expanded-row">
+              <td colspan="5">
+                <table class="expanded-content">
+                  <thead>
+                    <tr>
+                      <th>Cantidad Actual</th>
+                      <th>Fecha de Vencimiento</th>
+                      <th>Fecha de Ingreso</th>
+                      <th>Ubicación</th>
+                      <th>Bodega</th>
+                      <th>Acciones</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let tanda of producto.tandas?.slice(0, 10)" [ngClass]="calcularEstadoVencimiento(tanda)">
+                      <td>{{ tanda.cantidadActual }}</td>
+                      <td>{{ tanda.fechaVencimiento | date:'dd-MM-yyyy' }}</td>
+                      <td>{{ tanda.fechaLlegada | date:'dd-MM-yyyy' }}</td>
+                      <td>{{ tanda.ubicacion }}</td>
+                      <td>{{ tanda.bodega }}</td>
+                      <td>
+                        <button type="button" class="btn btn-transparent-border btn-sm" (click)="editarTanda(tanda)">
+                          <i class="bi bi-pencil"></i> 
+                        </button>
+                        <button type="button" class="btn btn-transparent-border btn-sm" (click)="confirmarEliminarTanda(tanda)">
+                          <i class="bi bi-trash"></i>
+                        </button>
+                        
+                      </td>
                       
-                    </td>
-                    
-                    
-                    
-                  </tr>
-                </tbody>
-              </table>
-            </td>
-          </tr>
+                      
+                      
+                    </tr>
+                  </tbody>
+                </table>
+              </td>
+            </tr>
+          </ng-container>
         </ng-container>
       </tbody>
       <tfoot>
         <tr>
-          <td colspan="5">
-            Total Productos: {{ productos.length }}, total tandas: {{ getTotalTandas() }}
+          <td colspan="5" class="text-center">
+            <ng-container *ngIf="estadoFiltroActual || terminoBusqueda; else mostrarTotalesGenerales">
+              Total Productos Filtrados: {{ productosFiltrados.length }}, Total Tandas Filtradas: {{ getTotalTandasFiltradas() }}
+            </ng-container>
+            <ng-template #mostrarTotalesGenerales>
+              Total Productos: {{ productos.length }}, Total Tandas: {{ getTotalTandas() }}
+            </ng-template>
           </td>
         </tr>
       </tfoot>
       
     </table>
+  
+    <!-- Mensaje cuando no hay productos para el filtrado -->
+    <ng-template #noProductos>
+      <tr>
+        <td colspan="5" class="text-center no-products-message" style="min-width: 500px; padding: 100px 0;">
+          No hay productos para el filtrado seleccionado.
+        </td>
+        
+        
+      </tr>
+    </ng-template>
   
     <!-- Componente de paginación -->
     <p-paginator 
@@ -147,6 +163,7 @@
       (onPageChange)="cambiarPagina($event)">
     </p-paginator>
   </div>
+  
 
   <div *ngIf="!hasError" class="export-button-container my-3 d-flex justify-content-center gap-3">
     <!-- Botón para exportar a Excel -->
@@ -234,29 +251,7 @@
         <i class="bi bi-clipboard-data display-4 text-primary"></i>
       </div>
   
-      <div class="row mb-3">
-        <div class="col-12">
-          <label for="cantidadIngresada" class="form-label fw-bold">Cantidad Ingresada</label>
-          <input id="cantidadIngresada" type="number" class="form-control" [(ngModel)]="nuevaTanda.cantidadIngresada" placeholder="Ingrese cantidad ingresada" />
-          <div *ngIf="errores.cantidadIngresada" class="text-danger small">{{ errores.cantidadIngresada }}</div>
-        </div>
-      </div>
-  
-      <div class="row mb-3">
-        <div class="col-12">
-          <label for="cantidadActual" class="form-label fw-bold">Cantidad Actual</label>
-          <input id="cantidadActual" type="number" class="form-control" [(ngModel)]="nuevaTanda.cantidadActual" placeholder="Ingrese cantidad actual" />
-          <div *ngIf="errores.cantidadActual" class="text-danger small">{{ errores.cantidadActual }}</div>
-        </div>
-      </div>
-  
-      <div class="row mb-3">
-        <div class="col-12">
-          <label for="fechaLlegada" class="form-label fw-bold">Fecha de Llegada</label>
-          <input id="fechaLlegada" type="date" class="form-control" [(ngModel)]="nuevaTanda.fechaLlegada" />
-          <div *ngIf="errores.fechaLlegada" class="text-danger small">{{ errores.fechaLlegada }}</div>
-        </div>
-      </div>
+    
   
       <div class="row mb-3">
         <div class="col-12">
@@ -295,20 +290,13 @@
           <div *ngIf="errores.ubicacion" class="text-danger small">{{ errores.ubicacion }}</div>
         </div>
       </div>
-  
-      <div class="row mb-3">
-        <div class="col-12 form-check">
-          <input type="checkbox" class="form-check-input" id="esMerma" [(ngModel)]="nuevaTanda.esMerma" />
-          <label for="esMerma" class="form-check-label fw-bold">Es Merma</label>
-        </div>
-      </div>
     </div>
   
     <p-footer class="d-flex justify-content-center gap-3 mt-4">
       <button type="button" class="btn btn-success d-flex align-items-center gap-2" (click)="esEdicion ? guardarCambiosTanda() : addTanda()">
         <i class="bi bi-check-circle"></i> {{ dialogLabel }}
       </button>
-      <button type="button" class="btn btn-cancel-blue d-flex align-items-center gap-2" (click)="cerrarDialogoConfirmacionEliminar()">
+      <button type="button" class="btn btn-cancel-blue d-flex align-items-center gap-2" (click)="cerrarDialogoTanda()">
         <i class="bi bi-x-circle"></i> Cancelar
       </button>
       

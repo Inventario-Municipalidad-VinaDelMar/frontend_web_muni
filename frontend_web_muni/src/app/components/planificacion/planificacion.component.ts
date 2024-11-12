@@ -56,7 +56,8 @@ interface Producto {
     CardModule,
     ChipModule,
     MessageModule,
-    DividerModule
+    DividerModule,
+    
     
 
   ]
@@ -346,18 +347,22 @@ filterProductos() {
       message: '¿Estás seguro de que deseas guardar la planificación?',
       header: 'Confirmar',
       icon: 'pi pi-exclamation-triangle',
+      acceptLabel: 'Sí', // Etiqueta para el botón de aceptación
+      rejectLabel: 'No', // Etiqueta para el botón de rechazo
+      acceptButtonStyleClass: 'p-button-yes', // Clase CSS para el botón de aceptación
+      rejectButtonStyleClass: 'p-button-no', // Clase CSS para el botón de rechazo
       accept: () => {
         this.guardarProductos();
-        setTimeout(() => {
-        }, 1000); // 1000 milisegundos = 1 segundo
-        
-        
+        setTimeout(() => {}, 1000);
       },
       reject: () => {
-        this.messageService.add({ severity: 'info', summary: 'Cancelado', detail: 'No se guardó la planificación' });
+        this.messageService.add({
+          severity: 'info',
+          summary: 'Cancelado',
+          detail: 'No se guardó la planificación'
+        });
       }
     });
-    
   }
 
   
@@ -499,10 +504,15 @@ private getNearestExpiry(producto: Producto): number {
     this.planificacionSocketService.getPlanificacion(lunesFormatted, viernesFormatted);
   }
   updateWeek() {
-    const startOfWeek = this.getStartOfWeek(this.selectedDate); // Obtener el inicio de la semana
-    this.fechasSemana['lunes'] = this.formatDate(startOfWeek);
-    this.fechasSemana['viernes'] = this.formatDate(new Date(startOfWeek.getTime() + 4 * 24 * 60 * 60 * 1000)); // Viernes
-
+    const startOfWeek = this.getStartOfWeek(this.selectedDate); // Obtener el lunes de la semana de selectedDate
+  
+    // Asignar las fechas de lunes a viernes
+    for (let i = 0; i < 5; i++) {
+      const date = new Date(startOfWeek);
+      date.setDate(startOfWeek.getDate() + i);
+      this.fechasSemana[this.diaDeLaSemana(i)] = this.formatDate(date);
+    }
+  
     // Cargar la planificación para la nueva semana seleccionada
     this.logWeekDates();
   }

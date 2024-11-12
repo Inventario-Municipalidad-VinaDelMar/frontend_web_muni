@@ -244,6 +244,7 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
       return (fechaVencimiento.getTime() - hoy.getTime()) / (1000 * 3600 * 24) <= 7;
     }).length;
   }
+  
 
   toggleExpansion(productId: string): void {
     this.expandedRows[productId] = !this.expandedRows[productId];
@@ -402,6 +403,8 @@ actualizarProductosPaginadosFiltrados() {
   const fin = inicio + this.productosPorPagina;
   this.productosPaginados = this.productosFiltrados.slice(inicio, fin);
 }
+
+
 
 exportarInventarioExcel() {
   // Prepara los datos para el Excel
@@ -727,6 +730,13 @@ cerrarDialogoEditarProducto() {
 }
 
 // Maneja la carga de archivos de imagen (opcional, si quieres permitir cambios de imagen)
+getTotalTandasFiltradas(): number {
+  return this.productosFiltrados.reduce((total, producto) => {
+    // Asegurarte de contar solo las tandas con cantidad mayor a 0 si es necesario
+    const tandasFiltradas = (producto.tandas || []).filter(tanda => tanda.cantidadActual > 0);
+    return total + tandasFiltradas.length;
+  }, 0);
+}
 
 
 }
