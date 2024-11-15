@@ -168,4 +168,27 @@ getTandasByProductoId(idProducto: string): void {
   getInventoryUpdates(): Observable<Tanda | null> {
     return this.inventoryUpdates.asObservable();
   }
+
+  getUbicacionesByBodega(idBodega: string): void {
+    if (this.socketConnected) {
+      this.socket.emit('getUbicacionesByBodega', { idBodega });
+    } else {
+      console.warn('No se puede obtener ubicaciones: el socket no está conectado');
+    }
+  }
+  
+  // Método para recibir las ubicaciones según el id de la bodega
+  loadUbicacionesByBodega(idBodega: string): Observable<any> {
+    return this.socket.fromEvent(`${idBodega}-ubicaciones`);
+  }
+  
+
+  onUbicacionCreada(): Observable<any> {
+    return this.socket.fromEvent('ubicacionCreada');
+  }
+
+  // Método para escuchar la eliminación de ubicaciones
+  onUbicacionEliminada(): Observable<any> {
+    return this.socket.fromEvent('ubicacionEliminada');
+  }
 }

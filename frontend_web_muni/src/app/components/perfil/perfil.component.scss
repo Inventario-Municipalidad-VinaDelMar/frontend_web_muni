@@ -229,3 +229,20 @@
 .btn-cancel:hover {
   background-color: #5a6268;
 }
+/* Estilo para el botón del ojo */
+.eye-button {
+  background: none;
+  border: none;
+  padding: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;  /* Ajustar el tamaño del ícono */
+  height: 25px;    /* Ajustar la altura */
+  width: 25px;     /* Ajustar el ancho */
+}
+
+.eye-button i {
+  font-size: 16px;  /* Reducir el tamaño del ícono del ojo */
+}

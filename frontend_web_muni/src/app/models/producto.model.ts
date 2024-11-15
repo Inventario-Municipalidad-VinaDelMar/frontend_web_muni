@@ -1,6 +1,7 @@
 import { Tanda } from "./tanda.model";
 
 export interface Producto {
+    isDeleted: any;
     id: string;
     nombre: string;
     barcode: null;

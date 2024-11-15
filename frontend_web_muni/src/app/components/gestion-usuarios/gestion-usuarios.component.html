@@ -43,6 +43,10 @@
   </tbody>
 </table>
 
+<p-confirmDialog></p-confirmDialog>
+
+
+
 <!-- Diálogo para editar usuario -->
 <div class="custom-dialog" *ngIf="mostrarDialogoEditar">
   <div class="custom-dialog-content">
@@ -50,36 +54,65 @@
     <div class="p-fluid">
       <div class="field">
         <label for="rut">RUT</label>
-        <input id="rut" [(ngModel)]="usuarioEditable.rut" type="text" />
+        <input id="rut" [(ngModel)]="usuarioEditable.rut" name="rut" type="text" required pattern="^\d{7,8}-[0-9kK]$" #rut="ngModel" />
+        <small *ngIf="rut.invalid && rut.touched" class="text-danger">
+          <span *ngIf="rut.errors?.['required']">El RUT es obligatorio.</span>
+          <span *ngIf="rut.errors?.['pattern']">El RUT debe tener un formato válido.</span>
+        </small>
       </div>
       <div class="field">
         <label for="nombre">Nombre</label>
-        <input id="nombre" [(ngModel)]="usuarioEditable.nombre" type="text" />
+        <input id="nombre" [(ngModel)]="usuarioEditable.nombre" name="nombre" type="text" required minlength="3" #nombre="ngModel" />
+        <small *ngIf="nombre.invalid && nombre.touched" class="text-danger">
+          <span *ngIf="nombre.errors?.['required']">El nombre es obligatorio.</span>
+          <span *ngIf="nombre.errors?.['minlength']">El nombre debe tener al menos 3 caracteres.</span>
+        </small>
       </div>
       <div class="field">
         <label for="apellidoPaterno">Apellido Paterno</label>
-        <input id="apellidoPaterno" [(ngModel)]="usuarioEditable.apellidoPaterno" type="text" />
+        <input id="apellidoPaterno" [(ngModel)]="usuarioEditable.apellidoPaterno" name="apellidoPaterno" type="text" required minlength="3" #apellidoPaterno="ngModel" />
+        <small *ngIf="apellidoPaterno.invalid && apellidoPaterno.touched" class="text-danger">
+          <span *ngIf="apellidoPaterno.errors?.['required']">El apellido paterno es obligatorio.</span>
+          <span *ngIf="apellidoPaterno.errors?.['minlength']">Debe tener al menos 3 caracteres.</span>
+        </small>
       </div>
       <div class="field">
         <label for="apellidoMaterno">Apellido Materno</label>
-        <input id="apellidoMaterno" [(ngModel)]="usuarioEditable.apellidoMaterno" type="text" />
+        <input id="apellidoMaterno" [(ngModel)]="usuarioEditable.apellidoMaterno" name="apellidoMaterno" type="text" minlength="3" #apellidoMaterno="ngModel" />
+        <small *ngIf="apellidoMaterno.invalid && apellidoMaterno.touched" class="text-danger">
+          <span *ngIf="apellidoMaterno.errors?.['minlength']">Debe tener al menos 3 caracteres.</span>
+        </small>
       </div>
       <div class="field">
         <label for="email">Email</label>
-        <input id="email" [(ngModel)]="usuarioEditable.email" type="email" />
+        <input id="email" [(ngModel)]="usuarioEditable.email" name="email" type="email" required #email="ngModel" />
+        <small *ngIf="email.invalid && email.touched" class="text-danger">
+          <span *ngIf="email.errors?.['required']">El email es obligatorio.</span>
+          <span *ngIf="email.errors?.['email']">Debe ingresar un email válido.</span>
+          <span *ngIf="email.errors?.['emailDuplicado']">Este email ya está en uso por otro usuario.</span>
+        </small>
+
+        <p>* Considerar que no se puede enviar la edición si hay otro usuario con el email que se está editando</p>
       </div>
+      
       <div class="field">
         <label for="roles">Roles</label>
-        <input id="roles" [(ngModel)]="usuarioEditable.roles" type="text" />
+        <p-multiSelect [(ngModel)]="usuarioEditable.roles" name="roles" [options]="rolesOptions" defaultLabel="Selecciona roles" required #roles="ngModel" class="w-100">
+        </p-multiSelect>
+        <small *ngIf="roles.invalid && roles.touched" class="text-danger">
+          Debe seleccionar al menos un rol.
+        </small>
       </div>
       <div class="dialog-footer d-flex justify-content-end gap-2">
         <button class="btn btn-primary" (click)="guardarCambiosUsuario()">Guardar</button>
         <button class="btn btn-secondary" (click)="cerrarDialogoEditar()">Cancelar</button>
       </div>
-      
     </div>
+    
   </div>
+  
 </div>
+
 
     <ng-template #noUsuarios>
       <p class="no-usuarios">No hay usuarios registrados.</p>
@@ -104,40 +137,106 @@
   </div>
 
   <!-- Diálogo para agregar usuario -->
-  <div class="custom-dialog" *ngIf="mostrarDialogoAgregar">
-    <div class="custom-dialog-content">
-      <h3>Agregar Usuario</h3>
-      <div class="p-fluid">
-        <div class="field">
-          <label for="rut">RUT</label>
-          <input id="rut" [(ngModel)]="nuevoUsuario.rut" type="text" placeholder="Ej: 12345678-9" />
+  <p-dialog [(visible)]="mostrarDialogoAgregar" header="Agregar Usuario" [modal]="true" [closable]="false" [style]="{ width: '40vw', maxWidth: '500px' }">
+    <form [formGroup]="usuarioForm" (ngSubmit)="onSubmit()" class="p-fluid">
+      <div class="p-grid p-align-stretch">
+        
+        <div class="p-field p-col-12">
+          <label for="rut" class="dialog-label">RUT</label>
+          <input id="rut" pInputText formControlName="rut" class="dialog-input" placeholder="Ej: 12345678-9" />
+          <small *ngIf="usuarioForm.get('rut')?.invalid && usuarioForm.get('rut')?.touched" class="text-danger">
+            {{ getRutErrorMessage() }}
+          </small>
         </div>
-        <div class="field">
-          <label for="nombre">Nombre</label>
-          <input id="nombre" [(ngModel)]="nuevoUsuario.nombre" type="text" />
+  
+        <div class="p-field p-col-12">
+          <label for="nombre" class="dialog-label">Nombre</label>
+          <input id="nombre" pInputText formControlName="nombre" class="dialog-input" />
+          <small *ngIf="usuarioForm.get('nombre')?.invalid && usuarioForm.get('nombre')?.touched" class="text-danger">
+            {{ getNombreErrorMessage() }}
+          </small>
         </div>
-        <div class="field">
-          <label for="apellidoPaterno">Apellido Paterno</label>
-          <input id="apellidoPaterno" [(ngModel)]="nuevoUsuario.apellidoPaterno" type="text" />
+  
+        <div class="p-field p-col-12">
+          <label for="apellidoPaterno" class="dialog-label">Apellido Paterno</label>
+          <input id="apellidoPaterno" pInputText formControlName="apellidoPaterno" class="dialog-input" />
+          <small *ngIf="usuarioForm.get('apellidoPaterno')?.invalid && usuarioForm.get('apellidoPaterno')?.touched" class="text-danger">
+            {{ getApellidoPaternoErrorMessage() }}
+          </small>
         </div>
-        <div class="field">
-          <label for="apellidoMaterno">Apellido Materno</label>
-          <input id="apellidoMaterno" [(ngModel)]="nuevoUsuario.apellidoMaterno" type="text" />
-        </div>
-        <div class="field">
-          <label for="email">Email</label>
-          <input id="email" [(ngModel)]="nuevoUsuario.email" type="email" />
-        </div>
-        <div class="field">
-          <label for="roles">Roles</label>
-          <input id="roles" [(ngModel)]="nuevoUsuario.roles" type="text" placeholder="Ejemplo: administrador, usuario" />
-        </div>
-        <div class="dialog-footer d-flex justify-content-end gap-2">
-          <button class="btn btn-primary" (click)="guardarUsuario()">Guardar</button>
-          <button class="btn btn-secondary" (click)="cerrarDialogoAgregar()">Cancelar</button>
+  
+        <div class="p-field p-col-12">
+          <label for="apellidoMaterno" class="dialog-label">Apellido Materno</label>
+          <input id="apellidoMaterno" pInputText formControlName="apellidoMaterno" class="dialog-input" />
+          <small *ngIf="usuarioForm.get('apellidoMaterno')?.invalid && usuarioForm.get('apellidoMaterno')?.touched" class="text-danger">
+            {{ getApellidoMaternoErrorMessage() }}
+          </small>
         </div>
         
+  
+        <div class="p-field p-col-12">
+          <label for="email" class="dialog-label">Email</label>
+          <input 
+            id="email" 
+            pInputText 
+            formControlName="email" 
+            class="dialog-input" 
+            (focus)="usuarioForm.get('email')?.markAsTouched()" 
+            (blur)="usuarioForm.get('email')?.markAsDirty()" 
+          />
+          <small 
+            *ngIf="(usuarioForm.get('email')?.touched || usuarioForm.get('email')?.dirty) && getEmailErrorMessage()"
+            class="text-danger"
+          >
+            {{ getEmailErrorMessage() }}
+          </small>
+        </div>
+        
+  
+        <div class="p-field p-col-12">
+          <label for="password" class="dialog-label">Contraseña</label>
+          <p-password 
+            id="password" 
+            formControlName="password" 
+            class="dialog-input" 
+            promptLabel="La contraseña debe tener al menos 6 caracteres, una mayúscula, una minúscula y un número" 
+            feedback="true" 
+            [toggleMask]="true">
+          </p-password>
+          <small *ngIf="usuarioForm.get('password')?.invalid && usuarioForm.get('password')?.touched" class="text-danger">
+            La contraseña debe tener al menos 6 caracteres, una mayúscula, una minúscula y un número.
+          </small>
+        </div>
+  
+        <div class="p-field p-col-12">
+          <label for="roles" class="dialog-label">Roles</label>
+          <p-multiSelect
+            id="roles"
+            formControlName="roles"
+            [options]="rolesOptions"
+            display="chip"
+            defaultLabel="Seleccione roles"
+            appendTo="body"
+            class="dialog-input w-full"
+          ></p-multiSelect>
+          <small *ngIf="usuarioForm.get('roles')?.invalid && usuarioForm.get('roles')?.touched" class="text-danger">
+            Debe seleccionar al menos un rol.
+          </small>
+        </div>
       </div>
-    </div>
-  </div>
+      
+      <p-footer>
+        <div class="button-container">
+          <button pButton type="submit" class="p-button p-button-primary dialog-button-save" [disabled]="usuarioForm.invalid">Añadir</button>
+          <button pButton type="button" class="p-button p-button-secondary dialog-button-cancel" (click)="cerrarDialogoAgregar()">Cancelar</button>
+        </div>
+      </p-footer>
+    </form>
+   
+  </p-dialog>
+  
+  
+  
+  
+  
 </div>

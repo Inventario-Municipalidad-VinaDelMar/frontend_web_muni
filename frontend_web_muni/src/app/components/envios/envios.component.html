@@ -21,6 +21,7 @@
     <div class="cards-wrapper">
       <div *ngIf="enviosList.length > 0" class="card-container">
         <div *ngFor="let envio of enviosList" class="card" (click)="goToDetalle(envio.id)">
+          
           <div class="status" [ngClass]="getStatusClass(envio.status)">
             {{ envio.status }}
           </div>
@@ -38,8 +39,10 @@
               <p><strong>Autorizado por:</strong> {{ envio.autorizante }}</p>
               <p><strong>Fecha de creación:</strong> {{ getFormattedDate(envio.fecha) }}</p>
               <p><strong>Hora de inicio:</strong> {{ formatHour(envio.horaInicioEnvio) }}</p>
-              <p><strong>Hora de término:</strong> {{ envio.horaFinalizacion ? (envio.horaFinalizacion | date: 'HH:mm') : 'No disponible' }}</p>
-
+              <p><strong>Hora de última actualización:</strong> {{ formatHour(envio.ultimaActualizacion) }}</p>
+              <p><strong>Hora de término:</strong> {{ envio.horaFinalizacion ? formatHour(envio.horaFinalizacion) : 'No disponible' }}</p>
+              <p><strong>Status:</strong> {{ envio.status }}</p>
+              <p><strong>Solicitante:</strong> {{ envio.solicitante }}</p>
             </div>
           </div>
     
@@ -54,8 +57,12 @@
               <p class="no-products-message">No hay productos cargados.</p>
             </ng-template>
           </div>
+          <div *ngIf="envio.incidentes && envio.incidentes.length > 0" class="warning-icon">!</div>
+        
         </div>
+        
       </div>
+      
     
       <!-- Mensaje si no hay envíos -->
       <div *ngIf="enviosList.length === 0" class="no-envios-message">
@@ -63,6 +70,5 @@
         <p>No hay envíos recibidos para esta fecha.</p>
       </div>
     </div>
-    
   </div>
 </div>

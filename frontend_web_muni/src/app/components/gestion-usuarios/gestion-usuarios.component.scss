@@ -251,3 +251,74 @@
 .icon-button i {
   font-size: inherit; /* Ajusta el tamaño del icono según el botón */
 }
+
+
+/* Estilo para etiquetas */
+.dialog-label {
+  font-weight: bold;
+  color: #3a3a3a;
+  margin-bottom: 4px;
+}
+
+/* Estilo para inputs */
+.dialog-input {
+  width: 100%;
+  border-radius: 4px;
+  padding: 0.6em;
+  font-size: 1em;
+}
+
+/* Mensajes de error */
+.dialog-error {
+  font-size: 0.85em;
+  color: #d9534f; /* Color rojo suave */
+  margin-top: 2px;
+}
+
+
+
+
+/* Espacio adicional entre los campos */
+.dialog-form .p-field {
+  margin-bottom: 1.2em;
+}
+
+/* Ancho máximo del diálogo */
+.p-dialog .p-dialog-content .p-field input,
+.p-dialog .p-dialog-content .p-field .p-multiSelect {
+  padding: 0.6em;
+  font-size: 1em;
+}
+
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px; /* Espacio entre los botones */
+  margin-top: 1em;
+}
+
+.dialog-button-save,
+.dialog-button-cancel {
+  width: 100px; /* Asegura que ambos botones tengan el mismo ancho */
+  height: 40px; /* Define una altura consistente */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1em;
+  border-radius: 4px;
+  padding: 0; /* Asegura que no haya padding extra */
+}
+
+.dialog-button-save {
+  background-color: #007bff;
+  color: #ffffff;
+  border: none;
+}
+
+.dialog-button-cancel {
+  background-color: #6c757d;
+  color: #ffffff;
+  border: none;
+}

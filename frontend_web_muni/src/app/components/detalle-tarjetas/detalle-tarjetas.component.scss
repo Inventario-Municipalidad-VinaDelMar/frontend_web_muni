@@ -399,3 +399,31 @@ h2 {
   text-align: center;
   margin-top: 20px;
 }
+
+.movimiento-user {
+  font-weight: bold;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.movimiento-user i {
+  color: #007bff;
+}
+
+.movimiento-info {
+  border-top: 1px solid #ddd;
+  padding-top: 10px;
+  margin-top: 10px;
+  line-height: 1.6;
+}
+
+.movimiento-info p {
+  margin: 5px 0;
+}
+
+.no-data-message {
+  color: #777;
+  font-style: italic;
+}

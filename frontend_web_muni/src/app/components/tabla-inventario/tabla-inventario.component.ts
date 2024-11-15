@@ -10,6 +10,8 @@ import * as XLSX from 'xlsx';
 import { DialogModule } from 'primeng/dialog';
 import { ConfirmationService } from 'primeng/api'; 
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
+import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
+import { TokenService } from '../../services/auth-token.service';
 
 @Component({
   selector: 'app-tabla-inventario',
@@ -22,6 +24,7 @@ import { ConfirmDialogModule } from 'primeng/confirmdialog';
     CommonModule,
     PaginatorModule,
     DialogModule,
+    HttpClientModule,
 
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA]
@@ -59,12 +62,27 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
 
 
 
-  tandaSeleccionada: Tanda | null = null; 
+  tandaSeleccionada= {
+    id:"",
+    cantidadIngresada:0,
+    fechaLlegada: '',
+    fechaVencimiento: '',
+    productoId: '',
+    bodega: '',
+    ubicacion: ''
+  };
   esEdicion: boolean = false;
   dialogLabel: string = 'Añadir Tanda'; 
-  bodegaOpciones: string[] = [];
+  bodegaOpciones: { id: string; nombre: string }[] = [];
+
   ubicacionOpciones: string[] = [];
+  ubicacionListado: { id: string; descripcion: string }[] = [];
+
   productoOpciones: { id: string; nombre: string }[] = [];
+
+  mostrarDialogoConfirmacion = false;
+
+  
 
 
   nuevoProducto = {
@@ -73,22 +91,9 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
     urlImagen: ''
   };
 
-  nuevaTanda: Tanda = {
-    id: '',                // Identificador único de la tanda (debes asignarle un valor en algún momento)
-    productoId: '',        // ID del producto al que pertenece la tanda
-    cantidadIngresada: 0,  // Cantidad ingresada en la tanda
-    cantidadActual: 0,     // Cantidad actual disponible en la tanda
-    fechaLlegada: '',      // Fecha de llegada de la tanda
-    fechaVencimiento: '',  // Fecha de vencimiento de la tanda
-    producto: '',          // Nombre del producto (puedes asignarlo al seleccionar el producto en el select)
-    bodega: '',            // Bodega en la que se almacena la tanda
-    ubicacion: '',         // Ubicación de la tanda dentro de la bodega
-    esMerma: false         // Indica si es merma o no
-  };
-
-  errores = {
-    cantidadIngresada: '',
-    cantidadActual: '',
+  nuevaTanda = {
+    id:"",
+    cantidadIngresada:0,
     fechaLlegada: '',
     fechaVencimiento: '',
     productoId: '',
@@ -97,49 +102,67 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
   };
   
 
-  selectedFile: File | null = null;
+  errores = {
+    cantidadIngresada: "",
+    cantidadActual: 0,
+    fechaLlegada: '',
+    fechaVencimiento: '',
+    productoId: '',
+    bodega: '',
+    ubicacion: ''
+  };
+  
+
+  imagenSeleccionada: File | null = null;
+  bodegaLista: { id: string; nombre: string; direccion: string; nombreEncargado: string; isDeleted: boolean }[] = [];
 
 
   constructor(
     private socketService: SocketInventarioService,
     private messageService: MessageService,
+    private http: HttpClient,
     
   ) {this.generarOpciones();}
 
   ngOnInit() {
     const startTime = new Date().getTime();
-    
+    this.cargarBodegas();
+  
     // Suscribirse a eventos de conexión/desconexión del socket
     this.socketService.onConnect().subscribe(() => console.log('Socket conectado'));
     this.socketService.onDisconnect().subscribe(() => console.log('Socket desconectado'));
-    
+  
     setTimeout(() => {
       if (this.isLoading) {
         this.hasError = true;
         this.isLoading = false;
       }
     }, 10000);
-    
+  
     // Cargar productos inicialmente
     setTimeout(() => {
       this.socketService.getAllProductos();
       this.subscriptions.add(
         this.socketService.loadAllProductos().subscribe((productos: Producto[]) => {
           if ((new Date().getTime() - startTime) <= 10000) {
-            this.productos = productos;
-            this.productos2 = productos;
+            // Filtrar productos para excluir los eliminados
+            this.productos = productos.filter(producto => !producto.isDeleted);
+            this.productos2 = [...this.productos];
             this.isLoading = false;
             this.hasError = false;
+  
+            // Log de los productos cargados
+            console.log("Productos cargados (excluyendo eliminados):", this.productos);
   
             // Inicializa el contador para verificar cuántos productos han cargado sus tandas
             let productosConTandasCargadas = 0;
   
             // Cargar tandas para cada producto
-            productos.forEach(producto => {
+            this.productos.forEach(producto => {
               this.loadTandasForProducto(producto.id, () => {
                 productosConTandasCargadas++;
                 // Verifica si todos los productos han cargado sus tandas
-                if (productosConTandasCargadas === productos.length) {
+                if (productosConTandasCargadas === this.productos.length) {
                   // Actualiza los productos paginados para mostrar la primera página
                   this.actualizarProductosPaginados();
   
@@ -156,12 +179,13 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
         })
       );
     }, 1000);
-    
+  
     // Suscribirse a actualizaciones en tiempo real
     this.subscriptions.add(this.socketService.listenNewTandaCreated().subscribe(tanda => this.updateProductoTanda(tanda)));
     this.subscriptions.add(this.socketService.listenNewTandaUpdate().subscribe(tanda => this.updateProductoTanda(tanda)));
     this.subscriptions.add(this.socketService.listenStockProductoChange().subscribe(change => this.updateStockProducto(change)));
   }
+  
   
   
   
@@ -188,18 +212,17 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
   private updateProductoTanda(tanda: Tanda) {
     this.productos = this.productos.map(prod => {
       if (prod.id === tanda.productoId) {
-        // Actualizar y ordenar las tandas por fecha de vencimiento
         const tandas = (prod.tandas || []).filter(t => t.id !== tanda.id).concat(tanda);
         tandas.sort((a, b) => new Date(a.fechaVencimiento).getTime() - new Date(b.fechaVencimiento).getTime());
-        
         return { ...prod, tandas };
       }
       return prod;
     });
     this.productos2 = [...this.productos];
     this.actualizarAlertas();
+    this.actualizarProductosPaginadosFiltrados();  // Llama para refrescar los productos paginados y filtrados
   }
-
+  
   
 
   actualizarProductosPaginados() {
@@ -224,6 +247,7 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
     });
     this.productos2 = [...this.productos];
     this.actualizarAlertas();
+    this.actualizarProductosPaginadosFiltrados();  // Llama para refrescar los productos paginados y filtrados
   }
   
 
@@ -462,51 +486,42 @@ onCancel() {
   this.mostrarDialogo2 = false; // Cierra el diálogo sin exportar
 }
 
-addProduct() {
-    try {
-      // Crear un nuevo objeto Producto basado en los datos del formulario
-      const nuevoProducto: Producto = {
-        id: (Math.random() * 1000000).toFixed(0), // Genera un ID temporal único para el producto
-        nombre: this.nuevoProducto.nombre,
-        barcode: null,
-        descripcion: this.nuevoProducto.descripcion,
-        urlImagen: this.nuevoProducto.urlImagen,
-        stock: 0,
-        tandas: [],
-        cantidadPlanificada: 0
-      };
-
-      // Agregar el producto a los arrays de productos
-      this.productos.push(nuevoProducto);
-      this.actualizarProductosPaginados();
-
-      // Mostrar mensaje de éxito
-      this.messageService.add({
-        severity: 'success',
-        summary: 'Producto Creado',
-        detail: 'El producto se ha añadido correctamente',
-        life: 3000 // El mensaje desaparecerá después de 3 segundos
-      });
-
-      // Limpiar el formulario y cerrar el diálogo
-      this.mostrarDialogo = false;
-      this.nuevoProducto = { nombre: '', descripcion: '', urlImagen: '' };
-      this.selectedFile = null;
-    } catch (error) {
-      // Mostrar mensaje de error si algo falla
-      this.messageService.add({
-        severity: 'error',
-        summary: 'Error',
-        detail: 'No se pudo añadir el producto. Intente de nuevo.',
-        life: 3000
-      });
-    }
+addProduct(): void {
+  if (!this.nuevoProducto.nombre || !this.nuevoProducto.descripcion || !this.imagenSeleccionada) {
+    alert("Todos los campos son obligatorios.");
+    return;
   }
 
+  const formData = new FormData();
+  formData.append('nombre', this.nuevoProducto.nombre);
+  formData.append('descripcion', this.nuevoProducto.descripcion);
+  formData.append('productImage', this.imagenSeleccionada, this.imagenSeleccionada.name);
+
+  const url = 'http://34.176.26.41/api/inventario/productos';
+  this.http.post(url, formData).subscribe(
+    (response: any) => {
+      console.log("Producto añadido:", response);
+      alert("Producto añadido exitosamente.");
+      this.mostrarDialogo = false;
+
+      // Añadir el nuevo producto a la lista de productos y actualizar la paginación
+      this.productos.push(response);
+      this.actualizarProductosPaginadosFiltrados();
+    },
+    error => {
+      console.error("Error al añadir el producto:", error);
+      alert("Error al añadir el producto.");
+    }
+  );
+}
 
 
-onFileSelected(event: any) {
-  this.selectedFile = event.target.files[0];
+
+onFileSelected(event: Event): void {
+  const input = event.target as HTMLInputElement;
+  if (input.files && input.files[0]) {
+    this.imagenSeleccionada = input.files[0];
+  }
 }
 
 
@@ -520,10 +535,15 @@ abrirDialogoTanda() {
 
 editarTanda(tanda: Tanda) {
   this.esEdicion = true;
-  this.dialogLabel = 'Guardar Cambios'; // Cambia el label del botón al modo edición
-  this.nuevaTanda = { ...tanda }; // Cargar los datos de la tanda en el formulario
+  this.dialogLabel = 'Guardar Cambios';
   this.mostrarDialogo3 = true;
+
+  this.tandaSeleccionada = tanda; // Guarda la tanda seleccionada
+  // Rellena los campos del formulario con los datos actuales de la tanda
+  this.nuevaTanda.cantidadIngresada = tanda.cantidadIngresada;
+  this.nuevaTanda.fechaVencimiento = tanda.fechaVencimiento;
 }
+
 
 
 cerrarDialogoTanda() {
@@ -532,46 +552,50 @@ cerrarDialogoTanda() {
   this.dialogLabel = 'Añadir Tanda'; // Restablece el label para el siguiente uso
   this.limpiarFormularioTanda();
 }
+
+
 addTanda() {
-  // Primero ejecuta las validaciones en el formulario
   if (this.validarFormulario()) {
-    // Si el formulario es válido, procede a crear la nueva tanda
-    const nuevaTanda: Tanda = {
-      id: (Math.random() * 1000000).toFixed(0), // Genera un ID aleatorio temporal para la tanda
-      productoId: this.nuevaTanda.productoId,
+    const token = localStorage.getItem('authToken');
+
+    const body = {
       cantidadIngresada: this.nuevaTanda.cantidadIngresada,
-      cantidadActual: this.nuevaTanda.cantidadActual,
-      fechaLlegada: this.nuevaTanda.fechaLlegada,
       fechaVencimiento: this.nuevaTanda.fechaVencimiento,
-      producto: this.obtenerNombreProducto(this.nuevaTanda.productoId), // Nombre del producto asociado
-      bodega: this.nuevaTanda.bodega,
-      ubicacion: this.nuevaTanda.ubicacion,
-      esMerma: this.nuevaTanda.esMerma
+      idProducto: this.nuevaTanda.productoId,
+      idBodega: this.nuevaTanda.bodega, // Ahora es el id de la bodega
+      idUbicacion: this.nuevaTanda.ubicacion,
     };
 
-    // Aquí puedes agregar la lógica para añadir esta tanda a un producto específico si lo deseas.
-    // Ejemplo: this.productos.find(p => p.id === nuevaTanda.productoId)?.tandas?.push(nuevaTanda);
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
 
-    // Mostrar mensaje de éxito
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Tanda Creada',
-      detail: 'La tanda se ha añadido correctamente',
-      life: 3000
-    });
-
-    // Cierra el diálogo y reinicia el formulario
-    this.cerrarDialogoTanda();
-  } else {
-    // Si la validación falla, muestra un mensaje de error general
-    this.messageService.add({
-      severity: 'error',
-      summary: 'Error en el Formulario',
-      detail: 'Por favor, corrige los errores en el formulario antes de continuar',
-      life: 3000
-    });
+    fetch('http://34.176.26.41/api/inventario/tandas', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify(body)
+    })
+    .then(response => {
+      if (response.ok) {
+        console.log("Tanda añadida exitosamente:", this.nuevaTanda);
+        this.mostrarDialogo3 = false;
+      } else {
+        console.error("Error al añadir la tanda:", response.statusText);
+      }
+    })
+    .catch(error => console.error("Error en la solicitud:", error));
   }
 }
+
+
+validarCantidadIngresada() {
+  if (this.nuevaTanda.cantidadIngresada < 0) {
+    this.nuevaTanda.cantidadIngresada = 0; // Si es negativo, lo establece en 0
+  }
+}
+
+
 
 // Método auxiliar para obtener el nombre del producto a partir de su ID
 obtenerNombreProducto(productoId: string): string {
@@ -580,68 +604,107 @@ obtenerNombreProducto(productoId: string): string {
 }
 
 limpiarFormularioTanda() {
-  this.nuevaTanda = {
-    id: '',                // Identificador único de la tanda (debes asignarle un valor en algún momento)
-    productoId: '',        // ID del producto al que pertenece la tanda
-    cantidadIngresada: 0,  // Cantidad ingresada en la tanda
-    cantidadActual: 0,     // Cantidad actual disponible en la tanda
-    fechaLlegada: '',      // Fecha de llegada de la tanda
-    fechaVencimiento: '',  // Fecha de vencimiento de la tanda
-    producto: '',          // Nombre del producto (puedes asignarlo al seleccionar el producto en el select)
-    bodega: '',            // Bodega en la que se almacena la tanda
-    ubicacion: '',         // Ubicación de la tanda dentro de la bodega
-    esMerma: false 
-  };
 }
 
 
 guardarCambiosTanda() {
   if (this.tandaSeleccionada) {
-    // Actualizar los valores de la tanda seleccionada
-    this.tandaSeleccionada.cantidadIngresada = this.nuevaTanda.cantidadIngresada;
-    this.tandaSeleccionada.cantidadActual = this.nuevaTanda.cantidadActual;
-    this.tandaSeleccionada.fechaLlegada = this.nuevaTanda.fechaLlegada;
-    this.tandaSeleccionada.fechaVencimiento = this.nuevaTanda.fechaVencimiento;
-    this.tandaSeleccionada.bodega = this.nuevaTanda.bodega;
-    this.tandaSeleccionada.ubicacion = this.nuevaTanda.ubicacion;
-    this.tandaSeleccionada.esMerma = this.nuevaTanda.esMerma;
+    const token = localStorage.getItem('authToken');
+    const idTanda = this.tandaSeleccionada.id; // Usa el id de la tanda seleccionada
 
-    this.messageService.add({
-      severity: 'success',
-      summary: 'Tanda Actualizada',
-      detail: 'La tanda se ha actualizado correctamente',
-      life: 3000
-    });
+    // Define los datos a actualizar
+    const body = {
+      cantidadIngresada: this.nuevaTanda.cantidadIngresada,
+      fechaVencimiento: this.nuevaTanda.fechaVencimiento,
+    };
 
-    this.cerrarDialogoTanda();
+    // Configura los encabezados de la solicitud
+    const headers = {
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${token}`
+    };
+
+    // Realiza la solicitud PATCH
+    fetch(`http://34.176.26.41/api/inventario/tandas/${idTanda}/update`, {
+      method: 'PATCH',
+      headers: headers,
+      body: JSON.stringify(body)
+    })
+    .then(response => {
+      if (response.ok) {
+        this.messageService.add({
+          severity: 'success',
+          summary: 'Tanda Actualizada',
+          detail: 'La tanda se ha actualizado correctamente',
+          life: 3000
+        });
+        this.cerrarDialogoTanda(); // Cierra el diálogo de edición
+      } else {
+        console.error("Error al actualizar la tanda:", response.statusText);
+      }
+    })
+    .catch(error => console.error("Error en la solicitud:", error));
   }
 }
 
+
+eliminarProducto(): void {
+  this.mostrarDialogoConfirmacion = true;
+}
+
+confirmarEliminacion(): void {
+  const url = `http://34.176.26.41/api/inventario/productos/${this.productoEditable.id}/delete`;
+  console.log("prisdjka_ "+this.productoEditable.id )
+  this.http.delete(url).subscribe(
+    response => {
+      console.log("Producto eliminado:", response);
+      alert("Producto eliminado exitosamente.");
+      
+      // Remueve el producto de la lista de productos local
+      this.productos = this.productos.filter(p => p.id !== this.productoEditable.id);
+      this.actualizarProductosPaginadosFiltrados();
+      
+      // Cierra el diálogo de edición y de confirmación
+      this.cerrarDialogoEditarProducto();
+      this.mostrarDialogoConfirmacion = false;
+    },
+    error => {
+      console.error("Error al eliminar el producto:", error);
+      alert("Error al eliminar el producto.");
+      this.mostrarDialogoConfirmacion = false;
+    }
+  );
+}
+
+
 generarOpciones() {
-  const bodegaSet = new Set<string>();
-  const ubicacionSet = new Set<string>();
+  // Asegúrate de que `productoOpciones` esté vacío antes de llenarlo
+  this.productoOpciones = [];
 
+  // Recorrer la lista de productos y generar las opciones
   this.productos.forEach(producto => {
-    this.productoOpciones.push({ id: producto.id, nombre: producto.nombre });
-
-    producto.tandas?.forEach(tanda => {
-      if (tanda.bodega) bodegaSet.add(tanda.bodega);
-      if (tanda.ubicacion) ubicacionSet.add(tanda.ubicacion);
-    });
+    // Asegúrate de que el producto tenga un id y un nombre antes de añadirlo a las opciones
+    if (producto.id && producto.nombre) {
+      this.productoOpciones.push({ id: producto.id, nombre: producto.nombre });
+    }
   });
 
-  this.bodegaOpciones = Array.from(bodegaSet);
-  this.ubicacionOpciones = Array.from(ubicacionSet);
+  // Opcional: Mostrar en la consola para verificar
+  console.log("Opciones de productos generadas:", this.productoOpciones);
 }
+
 
 validarFormulario(): boolean {
   let esValido = true;
-  const hoy = new Date().toISOString().split('T')[0]; // Fecha actual en formato 'yyyy-mm-dd'
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0); // Elimina la hora para comparar solo la fecha
+  const mañana = new Date(hoy);
+  mañana.setDate(hoy.getDate() + 1); // Calcula el día siguiente
 
-  // Resetear mensajes de error
+  // Reiniciar mensajes de error
   this.errores = {
-    cantidadIngresada: '',
-    cantidadActual: '',
+    cantidadIngresada: "",
+    cantidadActual: 0,
     fechaLlegada: '',
     fechaVencimiento: '',
     productoId: '',
@@ -649,56 +712,63 @@ validarFormulario(): boolean {
     ubicacion: ''
   };
 
-  // Validaciones específicas
-  if (!this.nuevaTanda.cantidadIngresada || this.nuevaTanda.cantidadIngresada <= 0) {
+  // Validación de la cantidad ingresada
+  if (!this.nuevaTanda.cantidadIngresada || this.nuevaTanda.cantidadIngresada < 0) {
     this.errores.cantidadIngresada = 'La cantidad ingresada debe ser mayor que 0';
     esValido = false;
   }
 
-  if (!this.nuevaTanda.cantidadActual || this.nuevaTanda.cantidadActual < 0) {
-    this.errores.cantidadActual = 'La cantidad actual no puede ser negativa';
-    esValido = false;
-  }
-
-  if (!this.nuevaTanda.fechaLlegada) {
-    this.errores.fechaLlegada = 'La fecha de llegada es obligatoria';
-    esValido = false;
-  }
-
+  // Validación de la fecha de vencimiento
+  const fechaVencimiento = new Date(this.nuevaTanda.fechaVencimiento);
   if (!this.nuevaTanda.fechaVencimiento) {
     this.errores.fechaVencimiento = 'La fecha de vencimiento es obligatoria';
     esValido = false;
-  } else if (this.nuevaTanda.fechaVencimiento < hoy) {
-    this.errores.fechaVencimiento = 'La fecha de vencimiento no puede ser anterior a hoy';
+  } else if (fechaVencimiento < hoy) {
+    this.errores.fechaVencimiento = 'La fecha de vencimiento debe ser al menos un día después de hoy';
     esValido = false;
   }
 
+  // Validación del producto
   if (!this.nuevaTanda.productoId) {
     this.errores.productoId = 'Seleccione un producto';
     esValido = false;
   }
 
+  // Validación de la bodega
   if (!this.nuevaTanda.bodega) {
     this.errores.bodega = 'Seleccione una bodega';
     esValido = false;
   }
 
+  // Validación de la ubicación
   if (!this.nuevaTanda.ubicacion) {
     this.errores.ubicacion = 'Seleccione una ubicación';
     esValido = false;
   }
 
+  // Mostrar errores en la consola si hay alguno
+  console.log('Errores en el formulario:', this.errores);
   return esValido;
 }
 
 
+
 confirmarEliminarTanda(tanda: Tanda) {
-  this.tandaSeleccionada = tanda;
+  this.tandaSeleccionada  = {
+    id:tanda.id,
+    cantidadIngresada:tanda.cantidadIngresada,
+    fechaLlegada: tanda.fechaLlegada,
+    fechaVencimiento: tanda.fechaVencimiento,
+    productoId: tanda.productoId,
+    bodega:tanda.bodega,
+    ubicacion:tanda.ubicacion
+  }
+  
   this.mostrarDialogoConfirmacionEliminar = true;
 }
 eliminarTanda() {
   if (this.tandaSeleccionada) {
-    console.log("Se va a eliminar: " + this.tandaSeleccionada.id);
+    console.log("Se va a eliminar: " + this.tandaSeleccionada);
     // Aquí podrías realizar la lógica de eliminación, por ejemplo, llamando a un servicio
     // Después de eliminar, cierra el diálogo
     this.cerrarDialogoConfirmacionEliminar();
@@ -707,7 +777,15 @@ eliminarTanda() {
 
 cerrarDialogoConfirmacionEliminar() {
   this.mostrarDialogoConfirmacionEliminar = false;
-  this.tandaSeleccionada = null;
+  this.tandaSeleccionada  = {
+    id:'',
+    cantidadIngresada:0,
+    fechaLlegada: '',
+    fechaVencimiento: '',
+    productoId: '',
+    bodega: '',
+    ubicacion: ''
+  };;
 }
 
 
@@ -717,11 +795,33 @@ abrirDialogoEditarProducto(producto: any) {
 }
 
 // Guarda los cambios realizados al producto
-guardarCambiosProducto() {
-  // Aquí puedes realizar la lógica para guardar los cambios en el producto,
-  // como enviar los datos a la API o actualizar el estado local
-  console.log('Guardando cambios del producto:', this.productoEditable);
-  this.cerrarDialogoEditarProducto();
+guardarCambiosProducto(): void {
+  if (!this.productoEditable.nombre || !this.productoEditable.id) {
+    alert("El nombre y el ID del producto son obligatorios.");
+    return;
+  }
+
+  const formData = new FormData();
+  formData.append('nombre', this.productoEditable.nombre);
+  formData.append('descripcion', this.productoEditable.descripcion || '');
+
+  if (this.imagenSeleccionada) {
+    formData.append('newProductImage', this.imagenSeleccionada, this.imagenSeleccionada.name);
+  }
+
+  const url = `http://34.176.26.41/api/inventario/productos/${this.productoEditable.id}/update`;
+  this.http.patch(url, formData).subscribe(
+    response => {
+      console.log("Producto actualizado:", response);
+      alert("Producto actualizado exitosamente.");
+      this.cerrarDialogoEditarProducto();
+      this.actualizarProductosPaginadosFiltrados();
+    },
+    error => {
+      console.error("Error al actualizar el producto:", error);
+      alert("Error al actualizar el producto.");
+    }
+  );
 }
 
 // Cierra el diálogo sin guardar cambios
@@ -737,6 +837,45 @@ getTotalTandasFiltradas(): number {
     return total + tandasFiltradas.length;
   }, 0);
 }
+onBodegaChange(event: Event): void {
+  const nombreBodegaSeleccionada = (event.target as HTMLSelectElement).value;
+  const bodegaSeleccionada = this.bodegaLista.find(bodega => bodega.nombre === nombreBodegaSeleccionada);
 
+  if (bodegaSeleccionada) {
+    const idBodega = bodegaSeleccionada.id;
+    this.nuevaTanda.bodega = idBodega; // Guarda el id de la bodega seleccionada en nuevaTanda.bodega
+
+    // Llama al servicio para obtener las ubicaciones por bodega
+    this.socketService.getUbicacionesByBodega(idBodega);
+
+    // Actualiza ubicacionListado con las ubicaciones obtenidas
+    this.socketService.loadUbicacionesByBodega(idBodega).subscribe(ubicaciones => {
+      this.ubicacionListado = ubicaciones.map((ubicacion: any) => ({
+        id: ubicacion.id,
+        descripcion: ubicacion.descripcion
+      }));
+    });
+  } else {
+    this.ubicacionListado = []; // Limpia la lista de ubicaciones si no hay bodega seleccionada
+    this.nuevaTanda.bodega = ""; // Opcional: Limpia el id de la bodega si no hay selección
+  }
+}
+
+
+
+
+
+// Método para cargar las bodegas disponibles desde el servicio de socket
+cargarBodegas(): void {
+  this.socketService.getAllBodegas(); // Emite el evento para solicitar bodegas
+
+  this.socketService.loadAllBodegas().subscribe((bodegas: any[]) => {
+    console.log("Bodegas cargadas:", bodegas);
+    
+    // Asegúrate de que bodegas sean objetos con { id, nombre, etc. }
+    this.bodegaOpciones = bodegas.map(bodega => ({ id: bodega.id, nombre: bodega.nombre }));
+    this.bodegaLista = bodegas;
+  });
+}
 
 }

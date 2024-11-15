@@ -1,5 +1,5 @@
 import { CommonModule } from '@angular/common';
-import { Component, OnInit, OnDestroy, ViewChild } from '@angular/core';
+import { Component, OnInit, OnDestroy, ViewChild, ChangeDetectorRef } from '@angular/core';
 import { FormGroup, FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { EnviarService } from '../../services/enviar.service';
@@ -22,6 +22,7 @@ import { MultiSelectModule } from 'primeng/multiselect';
 import { ConfirmationService, MessageService, PrimeNGConfig } from 'primeng/api';
 import { DividerModule } from 'primeng/divider';
 import { Tanda } from '../../models/tanda.model';
+
 
 
 
@@ -97,7 +98,8 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
     private enviarService: EnviarService,
     private tokenService: TokenService,
     private confirmationService: ConfirmationService,
-    private messageService: MessageService
+    private messageService: MessageService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit() {
@@ -111,22 +113,24 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
       today: 'Hoy',
       clear: 'Limpiar'
     });
-
+  
     this.planificacionSubscription.add(
-      this.planificacionSocketService.onLoadPlanificacion().subscribe((data: any) => {
-        this.asignarProductosPorDia(data)
-      }, (error: any) => {
-        console.error('Error al cargar planificación:', error);
-      })
+      this.planificacionSocketService.onLoadPlanificacion().subscribe(
+        (data: any) => this.asignarProductosPorDia(data),
+        (error: any) => console.error('Error al cargar planificación:', error)
+      )
     );
+  
     this.resetData(); // Limpia los datos
     this.updateWeekDates(); 
     this.logWeekDates();
     this.loadProductos(); // Carga los productos
     this.productosFiltrado = [...this.productos];
-    
-    
+  
+    // Suscripciones para recibir cambios en tiempo real
+    this.subscribeToRealTimeUpdates();
   }
+  
 
   ngOnDestroy() {
     this.productSubscription.unsubscribe(); // Limpia las suscripciones
@@ -350,7 +354,7 @@ filterProductos() {
       acceptLabel: 'Sí', // Etiqueta para el botón de aceptación
       rejectLabel: 'No', // Etiqueta para el botón de rechazo
       acceptButtonStyleClass: 'p-button-yes', // Clase CSS para el botón de aceptación
-      rejectButtonStyleClass: 'p-button-no', // Clase CSS para el botón de rechazo
+      rejectButtonStyleClass: 'p-button-danger p-button-outlined p-button-rounded', // Botón rojo solo con borde y bordes redondeados
       accept: () => {
         this.guardarProductos();
         setTimeout(() => {}, 1000);
@@ -549,4 +553,50 @@ private getNearestExpiry(producto: Producto): number {
       default: return '';
     }
   }
+
+  private subscribeToRealTimeUpdates() {
+    // Suscribirse al evento de creación de una nueva tanda
+    this.productSubscription.add(
+      this.socketInventarioService.listenNewTandaCreated().subscribe(tanda => this.updateProductoTanda(tanda))
+    );
+  
+    // Suscribirse al evento de actualización de una tanda existente
+    this.productSubscription.add(
+      this.socketInventarioService.listenNewTandaUpdate().subscribe(tanda => this.updateProductoTanda(tanda))
+    );
+  
+    // Suscribirse al evento de cambio de stock del producto
+    this.productSubscription.add(
+      this.socketInventarioService.listenStockProductoChange().subscribe(change => this.updateStockProducto(change))
+    );
+  }
+
+  private updateProductoTanda(tanda: Tanda) {
+    this.productos = this.productos.map(prod => {
+      if (prod.id === tanda.productoId) {
+        const tandas = (prod.tandas || []).filter(t => t.id !== tanda.id).concat(tanda);
+        tandas.sort((a, b) => new Date(a.fechaVencimiento).getTime() - new Date(b.fechaVencimiento).getTime());
+        return { ...prod, tandas };
+      }
+      return prod;
+    });
+  
+    // Actualizar la lista de productos filtrados
+    this.productosFiltrado = [...this.productos];
+    this.cdr.detectChanges();
+  }
+  
+  private updateStockProducto(change: any) {
+    this.productos = this.productos.map(prod => {
+      if (prod.id === change.productoId) {
+        return { ...prod, stock: change.nuevoStock };
+      }
+      return prod;
+    });
+  
+    // Actualizar la lista de productos filtrados
+    this.productosFiltrado = [...this.productos];
+    this.cdr.detectChanges();
+  }
+  
 }

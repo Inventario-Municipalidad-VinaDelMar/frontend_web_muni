@@ -49,6 +49,7 @@
 <div class="main-container">
   <!-- Columna de contenido principal (60%) -->
   <div class="content-section">
+    
     <div class="product-list">
       <h3>Productos en {{ bodegaSeleccionada?.nombre }}</h3>
       
@@ -61,8 +62,10 @@
         
         <!-- Mostrar productos si están disponibles -->
         <ng-container *ngFor="let producto of productos">
+          
           <p-card *ngIf="filtrarTandasPorBodega(producto.id)?.length" class="product-card">
             <ng-template pTemplate="header">{{ producto.nombre }}</ng-template>
+            
             <ng-template pTemplate="content">
               <div class="product-card-content">
                 <div class="product-info">
@@ -90,30 +93,37 @@
 
   <div class="additional-section">
     <p-panel header="Ubicaciones" styleClass="custom-panel" [style]="{ width: '100%', height: '100%' }">
+      
       <div class="panel-content">
+        
         <p class="panel-subheader">Ubicaciones en {{ bodegaSeleccionada?.nombre }}</p>
+
+        <button class="btn btn-primary btn-sm mt-3 d-flex align-items-center" 
+        (click)="mostrarDialogoCrearUbicacion = true" 
+        title="Agregar Ubicaciones">
+  <i class="pi pi-plus-circle me-2"></i> Agregar Ubicaciones
+</button>
+
         <div class="ubicaciones-list">
           <ul>
             <li *ngFor="let ubicacion of getUbicacionesArray()" class="ubicacion-item">
-              <span (click)="seleccionarUbicacion(ubicacion)">{{ ubicacion }}</span>
+              <span (click)="seleccionarUbicacion(ubicacion.descripcion)">{{ ubicacion.descripcion }}</span>
               <div class="action-icons">
-                <button class="btn btn-link" (click)="abrirDialogoEditarUbicacion(ubicacion)">
+                <button class="btn btn-link" (click)="abrirDialogoEditarUbicacion(ubicacion.id, ubicacion.descripcion)">
                   <i class="pi pi-pencil" title="Editar"></i>
                 </button>
-                <button class="btn btn-link text-danger" (click)="abrirDialogoEliminarUbicacion(ubicacion)">
+                <button class="btn btn-link text-danger" (click)="abrirDialogoEliminarUbicacion(ubicacion.id)">
                   <i class="pi pi-trash" title="Eliminar"></i>
                 </button>
               </div>
             </li>
-            
           </ul>
+          
         </div>
-        <button class="btn btn-primary mt-3 d-flex align-items-center btn-add" (click)="mostrarDialogoCrearUbicacion = true" title="Agregar Ubicaciones">
-          <i class="pi pi-plus-circle me-2"></i> Agregar Ubicaciones
-      </button>
-      
+        
       </div>
     </p-panel>
+    
 
     <!-- Listado de tandas en la ubicación seleccionada con paneles expandibles que inician colapsados -->
     <p-panel header="Tandas en {{ ubicacionSeleccionada }}" *ngIf="productosEnUbicacion.length > 0" styleClass="custom-panel">
@@ -147,25 +157,26 @@
     </p-dialog>
   
     <!-- Dialog Editar Ubicación -->
-    <p-dialog [(visible)]="mostrarDialogoEditarUbicacion" [draggable]="false"[modal]="true" header="Editar Ubicación">
+    <p-dialog [(visible)]="mostrarDialogoEditarUbicacion" [draggable]="false" [modal]="true" header="Editar Ubicación">
       <div>
         <label>Nombre de la Ubicación</label>
         <input type="text" class="form-control" [(ngModel)]="ubicacionEditable" placeholder="Modificar el nombre de la ubicación" />
       </div>
       <p-footer>
-        <button type="button" class="btn btn-success" (click)="guardarCambiosUbicacion()">Guardar</button>
+        <button type="button" class="btn btn-success" (click)="guardarCambiosUbicacion(ubicacionEditableId)">Guardar</button>
         <button type="button" class="btn btn-secondary" (click)="mostrarDialogoEditarUbicacion = false">Cancelar</button>
       </p-footer>
     </p-dialog>
+    
   
     <!-- Dialog Confirmación Eliminar Ubicación -->
-    <p-dialog [(visible)]="mostrarDialogoEliminarUbicacion"[draggable]="false" [modal]="true" header="Eliminar Ubicación">
-      <p>¿Estás seguro de que deseas eliminar esta ubicación?</p>
-      <p-footer>
-        <button type="button" class="btn btn-danger" (click)="eliminarUbicacion()">Eliminar</button>
-        <button type="button" class="btn btn-secondary" (click)="mostrarDialogoEliminarUbicacion = false">Cancelar</button>
-      </p-footer>
-    </p-dialog>
+    <p-dialog [(visible)]="mostrarDialogoEliminarUbicacion" [draggable]="false" [modal]="true" header="Eliminar Ubicación">
+  <p>¿Estás seguro de que deseas eliminar esta ubicación?</p>
+  <p-footer>
+    <button type="button" class="btn btn-danger" (click)="eliminarUbicacion()">Eliminar</button>
+    <button type="button" class="btn btn-secondary" (click)="mostrarDialogoEliminarUbicacion = false">Cancelar</button>
+  </p-footer>
+</p-dialog>
   </div>
   
 </div>
@@ -227,3 +238,4 @@
     <button type="button" class="btn btn-secondary" (click)="mostrarDialogoEliminarBodega = false">Cancelar</button>
   </p-footer>
 </p-dialog>
+

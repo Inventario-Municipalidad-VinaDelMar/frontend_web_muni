@@ -5,6 +5,7 @@ import { Subscription } from 'rxjs';
 import { Tanda } from '../../models/tanda.model';
 import { NgxChartsModule } from '@swimlane/ngx-charts';
 import { Color, ScaleType } from '@swimlane/ngx-charts';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 
 
 
@@ -52,7 +53,7 @@ export class DashboardComponent implements AfterViewInit {
 
   
   
-  
+  datosInfoCharts: any = {};
   chartData: { name: string; value: number }[] = [];
 
 
@@ -91,7 +92,8 @@ deliveries: Delivery[] = [
 ];
   
 
-  constructor() {
+  constructor(private http: HttpClient) {
+    
     Chart.register(...registerables);
   }
   calcularProductosEntregados(): number {
@@ -106,7 +108,8 @@ deliveries: Delivery[] = [
     }, 0);
   }
 
-  
+  cargarDatos(): void {
+  }
   
 
   async ngAfterViewInit() {
@@ -126,6 +129,10 @@ deliveries: Delivery[] = [
   handleTimeViewChange(event: Event) {
     this.viewMode = (event.target as HTMLSelectElement).value as 'daily' | 'weekly' | 'monthly';
     this.createChart(); // Actualiza el gráfico basado en el nuevo modo de vista
+  }
+
+  ngOnInit(): void {
+    console.log('info:', this.datosInfoCharts);
   }
 
   getFilteredData() {
@@ -369,5 +376,8 @@ createComedorChart(comedor: string) {
       };
       return colorMap[name] || '#000'; // Retorna un color por defecto si no se encuentra en el mapa
     }
-  
+
+    
+    
+    
 }

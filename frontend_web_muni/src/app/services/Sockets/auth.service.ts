@@ -1,7 +1,6 @@
-// auth.service.ts
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, Subscription } from 'rxjs';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { BehaviorSubject, Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { TokenService } from '../auth-token.service';
 
@@ -13,12 +12,44 @@ export class AuthService {
   private userKey = 'user';
   private defaultImageUrl = '/assets/img/user.jpeg';
 
+  // BehaviorSubject para manejar el usuario en tiempo real
+  private userSubject = new BehaviorSubject<any>(this.getUserFromStorage());
+
   constructor(private http: HttpClient, private tokenService: TokenService) {}
+
+  // Método privado para obtener el usuario desde localStorage
+  private getUserFromStorage() {
+    const user = localStorage.getItem(this.userKey);
+    return user ? JSON.parse(user) : null;
+  }
+
+  // Observable del usuario para que otros componentes puedan suscribirse
+  getUserObservable(): Observable<any> {
+    return this.userSubject.asObservable();
+  }
+
+  // Establece el usuario en localStorage y en el BehaviorSubject
+  setUser(user: any): void {
+    if (!user) {
+      console.error('No se puede establecer el usuario porque es null o undefined');
+      return;
+    }
+
+    if (!user.imageUrl) {
+      user.imageUrl = this.defaultImageUrl; // Asigna una imagen predeterminada si falta
+    }
+    localStorage.setItem(this.userKey, JSON.stringify(user)); // Guarda el usuario en localStorage
+    this.userSubject.next(user); // Actualiza el BehaviorSubject
+  }
+
+  // Obtiene el usuario actual (sincrónico)
+  getUser(): any {
+    return this.userSubject.value;
+  }
 
   // Método para refrescar el token
   refreshToken(): Observable<any> {
     const idToken = this.tokenService.getToken(); // Obtener el token actual
-    
     console.log('Token actual antes de renovar:', idToken); // Log para verificar el token actual antes de enviarlo
   
     return this.http.post<any>(`${this.apiUrl}/token/renew`, { idToken }).pipe(
@@ -28,38 +59,9 @@ export class AuthService {
       })
     );
   }
-  
 
   setAuthToken(token: string): void {
     this.tokenService.setToken(token);
-  }
-// auth.service.ts
-setUser(user: any): void {
-  if (!user) {
-    console.error('No se puede establecer el usuario porque es null o undefined');
-    return;
-  }
-  
-  if (!user.imageUrl) {
-    user.imageUrl = this.defaultImageUrl; // Asigna una imagen predeterminada si falta
-  }
-  localStorage.setItem(this.userKey, JSON.stringify(user)); // Guarda el usuario completo en localStorage
-}
-
-
-  
-
-  // Obtiene el usuario de localStorage y establece la imagen predeterminada si falta
-  getUser(): any {
-    const user = localStorage.getItem(this.userKey);
-    if (user) {
-      const parsedUser = JSON.parse(user);
-      if (!parsedUser.imageUrl) {
-        parsedUser.imageUrl = this.defaultImageUrl; // Asigna user.png si no tiene imagen
-      }
-      return parsedUser;
-    }
-    return null;
   }
 
   isAuthenticated(): boolean {
@@ -67,22 +69,51 @@ setUser(user: any): void {
     return !!token; // Retorna true si el token existe y es válido, false si no
   }
 
-  /// auth.service.ts
-login(email: string, password: string): Observable<any> {
-  return this.http.post<any>(`${this.apiUrl}/login`, { email, password }).pipe(
-    tap(response => {
-      console.log('Respuesta de login:', response); // Para verificar la respuesta completa en consola
-      if (response && response.token) { // Asegúrate de usar el campo correcto aquí
-        this.tokenService.setToken(response.token); // Guarda el token usando `response.token`
-        this.setUser(response); // Guarda el usuario completo
-      } else {
-        console.error('No se recibió un token en la respuesta de login');
-      }
-    })
-  );
-}
+  // Método de login con actualización del BehaviorSubject
+  login(email: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.apiUrl}/login`, { email, password }).pipe(
+      tap(response => {
+        console.log('Respuesta de login:', response); // Para verificar la respuesta completa en consola
+        if (response && response.token) {
+          this.tokenService.setToken(response.token); // Guarda el token usando `response.token`
+          this.setUser(response); // Actualiza el usuario en el BehaviorSubject
+        } else {
+          console.error('No se recibió un token en la respuesta de login');
+        }
+      })
+    );
+  }
 
+  // Método de registro con actualización del BehaviorSubject
+  register(user: any): Observable<any> {
+    const token = this.tokenService.getToken(); // Obtener el token actual
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
 
-  
-  
+    return this.http.post<any>(`${this.apiUrl}/register`, user, { headers }).pipe(
+      tap(response => {
+        console.log('Registro exitoso:', response);
+        this.setUser(response); // Actualiza el usuario en el BehaviorSubject
+      })
+    );
+  }
+
+  // Obtiene la lista de usuarios (necesita autenticación)
+  obtenerUsuarios(): Observable<any> {
+    const token = this.tokenService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.get<any>(`${this.apiUrl}/usuarios`, { headers });
+  }
+
+  // Elimina un usuario por ID (necesita autenticación)
+  eliminarUsuario(id: string): Observable<any> {
+    const token = this.tokenService.getToken();
+    const headers = new HttpHeaders({
+      'Authorization': `Bearer ${token}`
+    });
+    return this.http.delete<any>(`${this.apiUrl}/${id}/delete`, { headers });
+  }
 }

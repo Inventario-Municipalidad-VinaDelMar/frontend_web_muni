@@ -1,43 +1,27 @@
 export interface DetalleEnvio {
   id: string;
   fecha: string;
-  horaInicioEnvio: string; // Cambia esto de `horaInicio` a `horaInicioEnvio`
+  horaCreacion: string;
+  horaInicioEnvio: string | null;
   horaFinalizacion: string | null;
+  ultimaActualizacion: string;
   status: string;
-  administrador: Persona;
-  solicitante: Persona;
+  autorizante: string;
+  solicitante: string;
   movimientos: Movimiento[];
   entregas: Entrega[];
   cargaInicial: Producto[];
   cargaActual: Producto[];
-  incidente: Incidente[];
+  incidentes: Incidente[];
+  administrador?: Persona; // Agregando administrador como opcional
 }
-export interface Delivery {
-  date: string;
-  products: { name: string; quantity: number }[];
-  comedor: string;
-}
-
-
-export interface Incidente {
-  id: string;
-  descripcion: string;
-  fecha: string;
-  // Otros campos de incidente
-}
-
 
 export interface Persona {
-  id: string;
-  rut: string;
-  email: string;
   nombre: string;
   apellidoPaterno: string;
   apellidoMaterno: string;
-  imageUrl: string | null;
-  isActive: boolean;
-  roles: string[];
 }
+
 
 export interface Movimiento {
   id: string;
@@ -46,17 +30,19 @@ export interface Movimiento {
   productoId: string;
   fecha: string;
   hora: string;
+  user: string;
 }
 
 export interface Entrega {
   id: string;
-  comedorSolidario: string;
-  comedorSolidarioId: string;
-  copiloto: Persona;
   fecha: string;
   hora: string;
-  urlActaLegal: string | null;
-  productosEntregados: ProductoEntregado[];
+  url_acta_legal: string | null;
+  comedorSolidario: string;
+  comedorDireccion: string;
+  realizador: string;
+  realizadorId: string;
+  productosEntregados: number; // Cantidad de productos entregados en esta entrega
 }
 
 export interface Producto {
@@ -66,9 +52,39 @@ export interface Producto {
   urlImagen: string;
 }
 
+export interface Incidente {
+  id: string;
+  fecha: string;
+  hora: string;
+  descripcion: string;
+  type: string;
+  evidenciaFotograficaUrl?: string;
+  productosAfectados?: ProductoAfectado[];
+}
+
+export interface ProductoAfectado {
+  cantidad: number;
+  producto: string;
+  productoId: string;
+  urlImagen?: string;
+}
+
+export interface Entrega {
+  id: string;
+  fecha: string;
+  hora: string;
+  url_acta_legal: string | null;
+  comedorSolidario: string;
+  comedorDireccion: string;
+  realizador: string;
+  realizadorId: string;
+  productosEntregados: number; // Ajuste para interpretar como cantidad total en lugar de lista
+}
+
+
 export interface ProductoEntregado {
   cantidad: number;
   producto: string;
   productoId: string;
-  urlImagen: string;
+  urlImagen?: string;
 }

@@ -251,7 +251,16 @@
         <i class="bi bi-clipboard-data display-4 text-primary"></i>
       </div>
   
-    
+      <!-- Campo cantidadIngresada solo cuando es añadir tanda -->
+      <div *ngIf="!esEdicion" class="row mb-3">
+        <div class="col-12">
+          <label for="cantidadIngresada" class="form-label fw-bold">Cantidad Ingresada</label>
+          <input id="cantidadIngresada" type="number" class="form-control" [(ngModel)]="nuevaTanda.cantidadIngresada" 
+                 min="0" (input)="validarCantidadIngresada()" />
+          <div *ngIf="errores.cantidadIngresada" class="text-danger small">{{ errores.cantidadIngresada }}</div>
+        </div>
+      </div>
+      
   
       <div class="row mb-3">
         <div class="col-12">
@@ -274,22 +283,28 @@
       <div class="row mb-3">
         <div class="col-12">
           <label for="bodega" class="form-label fw-bold">Bodega</label>
-          <select id="bodega" class="form-control" [(ngModel)]="nuevaTanda.bodega">
-            <option *ngFor="let bodega of bodegaOpciones" [value]="bodega">{{ bodega }}</option>
+          <!-- Selección del nombre de la bodega, pero se almacena el id en nuevaTanda.bodega -->
+          <select id="bodega" class="form-control" [(ngModel)]="nuevaTanda.bodega" (change)="onBodegaChange($event)">
+            <option *ngFor="let bodega of bodegaOpciones" [value]="bodega.nombre">{{ bodega.nombre }}</option>
           </select>
           <div *ngIf="errores.bodega" class="text-danger small">{{ errores.bodega }}</div>
         </div>
       </div>
-  
+      
+      
+      
       <div class="row mb-3">
         <div class="col-12">
           <label for="ubicacion" class="form-label fw-bold">Ubicación</label>
           <select id="ubicacion" class="form-control" [(ngModel)]="nuevaTanda.ubicacion">
-            <option *ngFor="let ubicacion of ubicacionOpciones" [value]="ubicacion">{{ ubicacion }}</option>
+            <option *ngFor="let ubicacion of ubicacionListado" [value]="ubicacion.id">{{ ubicacion.descripcion }}</option>
           </select>
           <div *ngIf="errores.ubicacion" class="text-danger small">{{ errores.ubicacion }}</div>
         </div>
       </div>
+      
+      
+
     </div>
   
     <p-footer class="d-flex justify-content-center gap-3 mt-4">
@@ -299,10 +314,9 @@
       <button type="button" class="btn btn-cancel-blue d-flex align-items-center gap-2" (click)="cerrarDialogoTanda()">
         <i class="bi bi-x-circle"></i> Cancelar
       </button>
-      
-      
     </p-footer>
   </p-dialog>
+  
   
   <p-dialog [(visible)]="mostrarDialogoConfirmacionEliminar" 
           [modal]="true" 
@@ -312,13 +326,13 @@
           [style]="{ width: '400px', maxWidth: '90vw' }">
   
   <div class="container text-center">
-    <p>¿Estás seguro de que deseas eliminar la tanda con ID: {{ tandaSeleccionada?.id }}?</p>
+    <p>¿Estás seguro de que deseas eliminar la tanda con ID: {{ tandaSeleccionada }}?</p>
   </div>
 
   <p-footer class="d-flex justify-content-center gap-3 mt-4">
-    <button type="button" class="btn btn-danger" (click)="eliminarTanda()">
+    <!--<button type="button" class="btn btn-danger" (click)="eliminarTanda()">
       <i class="bi bi-trash"></i> Eliminar
-    </button>
+    </button>-->
     <button type="button" class="btn btn-secondary" (click)="cerrarDialogoConfirmacionEliminar()">
       <i class="bi bi-x-circle"></i> Cancelar
     </button>
@@ -326,6 +340,11 @@
 </p-dialog>
 
 <p-dialog [(visible)]="mostrarDialogoEditarProducto" [modal]="true" [draggable]="false" header="Editar Producto" class="text-center">
+  <div class="d-flex justify-content-end mb-3">
+    <button type="button" class="btn btn-danger d-flex align-items-center gap-2" (click)="eliminarProducto()">
+      <i class="bi bi-trash"></i> Eliminar Producto
+    </button>
+  </div>
   <div class="container-fluid">
     <div class="mb-3">
       <i class="bi bi-box-seam display-4 text-primary"></i>
@@ -348,23 +367,43 @@
     <div class="row mb-3">
       <div class="col-12">
         <label for="urlImagenProducto" class="form-label fw-bold">Imagen del Producto</label>
+        <!-- Muestra la imagen actual usando la URL existente -->
+        <div class="mb-2">
+          <img *ngIf="productoEditable.urlImagen" [src]="productoEditable.urlImagen" alt="Imagen actual del producto" class="img-fluid" style="max-width: 200px;" />
+        </div>
+        <!-- Opción para cargar una nueva imagen -->
         <input type="file" class="form-control" id="urlImagenProducto" (change)="onFileSelected($event)" />
       </div>
     </div>
+    
+    
   </div>
 
   <p-footer class="d-flex justify-content-center gap-3 mt-4">
     <button type="button" class="btn btn-success d-flex align-items-center gap-2" (click)="guardarCambiosProducto()">
       <i class="bi bi-check-circle"></i> Guardar
     </button>
-    <button type="button" class="btn btn-secondary d-flex align-items-center gap-2" (click)="cerrarDialogoEditarProducto()">
+    <button type="button" class="btn btn-primary d-flex align-items-center gap-2" (click)="cerrarDialogoEditarProducto()">
       <i class="bi bi-x-circle"></i> Cancelar
     </button>
+
+    
   </p-footer>
 </p-dialog>
 
 
-
+<p-dialog [(visible)]="mostrarDialogoConfirmacion" [modal]="true" [draggable]="false" header="Confirmar Eliminación" class="text-center">
+  <p>¿Estás seguro de que deseas eliminar el producto "{{ productoEditable.nombre }}"?</p>
+  
+  <p-footer class="d-flex justify-content-center gap-3 mt-4">
+    <button type="button" class="btn btn-danger" (click)="confirmarEliminacion()">
+      Sí, eliminar
+    </button>
+    <button type="button" class="btn btn-primary" (click)="mostrarDialogoConfirmacion = false">
+      Cancelar
+    </button>
+  </p-footer>
+</p-dialog>
 
 
 

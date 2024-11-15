@@ -57,10 +57,10 @@
 
 /* Tarjeta de envíos */
 .card {
-  flex: 0 0 250px;
-  max-width: 300px;
-  min-width: 200px;
-  min-height: 300px; /* Fija la altura mínima */
+  flex: 0 0 300px; /* Ancho base de la tarjeta */
+  max-width: 320px; /* Ancho máximo de la tarjeta */
+  min-width: 280px; /* Ancho mínimo de la tarjeta */
+  min-height: 250px; /* Altura mínima de la tarjeta */
   background-color: white;
   border-radius: 10px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
@@ -73,7 +73,27 @@
   opacity: 0;
   animation: fadeIn 0.5s ease-in-out forwards;
   animation-delay: 0.1s;
+  padding: 10px; /* Reduce el padding para optimizar espacio */
 }
+
+.card-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 15px; /* Espacio entre tarjetas */
+  justify-content: center;
+}
+
+/* Encabezado de la tarjeta */
+.card-header {
+  min-height: 120px; /* Ajusta según la altura que necesites */
+  padding: 8px; /* Reduce padding para optimizar espacio */
+  margin-top: 60px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+
 .card:nth-child(2) {
   animation-delay: 0.2s;
 }
@@ -302,4 +322,23 @@
 .hora-termino {
   color: #999;
   font-weight: normal;
+}
+/* Estilo para el ícono de advertencia */
+/* Estilo para el ícono de advertencia en la parte inferior */
+.warning-icon {
+  position: absolute;
+  bottom: 10px; /* Ajusta la distancia desde la parte inferior */
+  right: 10px; /* Ajusta la distancia desde la derecha */
+  width: 24px;
+  height: 24px;
+  background-color: #f44336; /* Color rojo */
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  z-index: 2;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra para darle profundidad */
 }

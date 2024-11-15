@@ -683,4 +683,16 @@ h2 {
     text-align: center;
     margin-top: 10px;
   }
+  .btn-extra-small {
+    font-size: 0.7rem;      /* Reduce el tamaño del texto */
+    padding: 2px 6px;       /* Reduce el tamaño del botón */
+    height: auto;           /* Ajusta la altura */
+    width: auto;            /* Ajusta el ancho */
+    display: flex;          /* Mantén la alineación */
+    align-items: center;
+  }
+  
+  .btn-extra-small .pi { 
+    font-size: 0.8rem;      /* Ajusta el tamaño del ícono */
+  }
   

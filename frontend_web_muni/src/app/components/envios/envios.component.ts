@@ -50,21 +50,23 @@ export class EnviosComponent implements OnInit, OnDestroy {
   constructor(
     private enviosSocketService: EnviosSocketService,
     private router: Router,
-    private adapter: DateAdapter<any>
+    private adapter: DateAdapter<any>,
+    private cdr: ChangeDetectorRef 
   ) {}
 
   ngOnInit() {
-    this.adapter.setLocale('es-ES'); // Configura la localización en español
-    this.adapter.getFirstDayOfWeek = () => 1;
     this.selectedDate = new Date();
     this.selectedDate.setHours(0, 0, 0, 0);
-    this.buscarEnvios(); // Cargar envíos para la fecha actual
+    this.buscarEnvios();
 
-    // Suscribirse a los envíos en tiempo real
+    // Suscribirse a cambios en tiempo real de los envíos
     this.subscription.add(
       this.enviosSocketService.listenToProductosByFecha().subscribe({
-        next: (data: Envio[]) => this.procesarEnvios(data),
-        error: (error: any) => console.error('Error al escuchar productos:', error), // Definición explícita del tipo `error: any`
+        next: (data: Envio[]) => {
+          this.procesarEnvios(data);
+          this.cdr.detectChanges(); // Forzar la detección de cambios
+        },
+        error: (error: any) => console.error('Error al escuchar cambios de envíos:', error),
       })
     );
   }
@@ -105,14 +107,26 @@ export class EnviosComponent implements OnInit, OnDestroy {
         if (!this.envioIds.has(envio.id)) {
           this.enviosList.push(envio);
           this.envioIds.add(envio.id);
+        } else {
+          // Actualizar detalles si el envío ya existe
+          const index = this.enviosList.findIndex((e) => e.id === envio.id);
+          if (index !== -1) {
+            this.enviosList[index] = envio;
+          }
         }
       });
     } else {
       if (!this.envioIds.has(data.id)) {
         this.enviosList.push(data);
         this.envioIds.add(data.id);
+      } else {
+        const index = this.enviosList.findIndex((e) => e.id === data.id);
+        if (index !== -1) {
+          this.enviosList[index] = data;
+        }
       }
     }
+    this.cdr.detectChanges(); // Forzar la detección de cambios para cada actualización
   }
 
   formatDate(date: Date): string {

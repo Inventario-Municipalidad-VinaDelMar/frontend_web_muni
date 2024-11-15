@@ -11,27 +11,37 @@
         <p-accordion *ngIf="envioData.movimientos && envioData.movimientos.length > 0; else noMovimientos">
           <p-accordionTab *ngFor="let movimiento of envioData.movimientos" [header]="movimiento.producto">
             <div class="movimiento-details">
-              <p><strong>Producto:</strong> {{ movimiento.producto }}</p>
-              <p><strong>Cantidad Retirada:</strong> {{ movimiento.cantidadRetirada }}</p>
-              <p><strong>Fecha:</strong> {{ movimiento.fecha | date: 'dd/MM/yyyy' }}</p>
-              <p><strong>Hora:</strong> {{ formatHora(movimiento.hora) }}</p>
+              <p class="movimiento-user">
+                <i class="bi bi-person-fill"></i> Realizado por: {{ movimiento.user }} 
+              </p>
+              <div class="movimiento-info">
+                <p><strong>Producto:</strong> {{ movimiento.producto }}</p>
+                <p><strong>Cantidad Retirada:</strong> {{ movimiento.cantidadRetirada }}</p>
+                <p><strong>Fecha:</strong> {{ movimiento.fecha | date: 'dd/MM/yyyy' }}</p>
+                <p><strong>Hora:</strong> {{ formatHoraConMilisegundos(movimiento.hora) }}</p>
+              </div>
             </div>
           </p-accordionTab>
         </p-accordion>
         <ng-template #noMovimientos>
-          <p>No hay movimientos registrados.</p>
+          <p class="no-data-message">No hay movimientos registrados.</p>
         </ng-template>
       </div>
     </aside>
+    
 
     <!-- Detalle del Envío -->
     <main class="detalle-section">
       <div class="section-header">Detalle del Envío</div>
-      <div class="detalle-envio-content">
-        <p *ngIf="envioData.id"><strong>ID:</strong> {{ envioData.id }}</p>
-        <p *ngIf="envioData.fecha"><strong>Fecha:</strong> {{ envioData.fecha | date: 'dd/MM/yyyy' }}</p>
-        <p><strong>Hora de Inicio:</strong> {{ formatHora(envioData.horaInicioEnvio) || 'No disponible' }}</p>
-        <p><strong>Hora de Finalización:</strong> {{ formatHora(envioData.horaFinalizacion) || 'Pendiente' }}</p>
+      <div class="detalle-envio-content" *ngIf="envioData">
+        <p><strong>ID:</strong> {{ envioData.id }}</p>
+        <p><strong>Fecha:</strong> {{ envioData.fecha | date: 'dd/MM/yyyy' }}</p>
+        
+        <p><strong>Hora de Creación:</strong> {{ formatFechaCompleta(envioData.horaCreacion) }}</p>
+        <p><strong>Última Actualización:</strong> {{ formatFechaCompleta(envioData.ultimaActualizacion) }}</p>
+        <p><strong>Hora de Inicio:</strong> {{ formatFechaCompleta(envioData.horaInicioEnvio) || 'No disponible' }}</p>
+        <p><strong>Hora de Finalización:</strong> {{ formatFechaCompleta(envioData.horaFinalizacion) || 'Pendiente' }}</p>
+      
         <p>
           <strong>Status:</strong>
           <span class="status-text" 
@@ -44,10 +54,17 @@
             {{ envioData.status || 'Sin estado' }}
           </span>
         </p>
-        <p *ngIf="envioData.administrador">
-          <strong>Administrador:</strong> {{ envioData.administrador.nombre || '' }} {{ envioData.administrador.apellidoPaterno || '' }} {{ envioData.administrador.apellidoMaterno || '' }}
+      
+        <p *ngIf="envioData.autorizante">
+          <strong>Autorizante:</strong> {{ envioData.autorizante }}
+        </p>
+      
+        <p *ngIf="envioData.solicitante">
+          <strong>Solicitante:</strong> {{ envioData.solicitante }}
         </p>
       </div>
+      
+      
 
       <!-- Comparación de carga inicial vs carga actual -->
       <div class="carga-comparacion" *ngIf="envioData?.cargaInicial && envioData?.cargaActual">
@@ -66,8 +83,8 @@
                 <img *ngIf="producto.urlImagen" [src]="producto.urlImagen" alt="{{ producto.producto }}" class="producto-img" />
                 {{ producto.producto }}
               </td>
-              <td>{{ producto.cantidadInicial || 'N/A' }}</td>
-              <td>{{ producto.cantidadActual || 'N/A' }}</td>
+              <td>{{ producto.cantidadInicial || '0' }}</td>
+              <td>{{ producto.cantidadActual || '0' }}</td>
               
             </tr>
           </tbody>
@@ -78,12 +95,12 @@
     <!-- Incidentes -->
     <section class="incidentes-section">
       <h3 class="section-header">Incidentes</h3>
-      <div *ngIf="envioData2?.incidentes && envioData2.incidentes.length > 0; else noIncidentes">
+      <div *ngIf="envioData?.incidentes && envioData.incidentes.length > 0; else noIncidentes">
         <div class="incidentes-container">
-          <div *ngFor="let incidente of envioData2?.incidentes" class="incidente-card">
+          <div *ngFor="let incidente of envioData.incidentes" class="incidente-card">
             <div class="incidente-header">
               <p class="incidente-fecha"><strong>Fecha:</strong> {{ incidente.fecha | date: 'dd/MM/yyyy' }}</p>
-              <p class="incidente-hora"><strong>Hora:</strong> {{ formatHora(incidente.hora) }}</p>
+              <p class="incidente-hora"><strong>Hora:</strong> {{ formatFechaCompleta(incidente.hora) }}</p>
             </div>
             <div class="incidente-content">
               <p class="incidente-descripcion"><strong>Descripción:</strong> {{ incidente.descripcion }}</p>
@@ -114,36 +131,40 @@
         <p class="no-data-message">No hay incidentes registrados.</p>
       </ng-template>
     </section>
+    
 
     <!-- Entregas -->
     <aside class="entregas-section">
       <h3 class="section-header">Entregas</h3>
       <p-accordion *ngIf="envioData.entregas && envioData.entregas.length > 0; else noEntregas">
         <p-accordionTab *ngFor="let entrega of envioData.entregas" 
-                        [header]="'Entrega del ' + (entrega.fecha | date: 'dd/MM/yyyy') + ' a las ' + formatHora(entrega.hora)">
+                        [header]="'Entrega del ' + (entrega.fecha | date: 'dd/MM/yyyy') + ' a las ' + formatHoraConMilisegundos(entrega.hora)">
           <div class="entrega-details">
             <p><strong>Comedor Solidario:</strong> {{ entrega.comedorSolidario }}</p>
-            <p><strong>Realizador:</strong> {{ entrega.copiloto.nombre }} {{ entrega.copiloto.apellidoPaterno }}</p>
-            <div *ngIf="entrega.productosEntregados && entrega.productosEntregados.length > 0">
-              <p><strong>Productos Entregados:</strong></p>
-              <ul class="productos-list">
-                <li *ngFor="let producto of entrega.productosEntregados">
-                  <img *ngIf="producto.urlImagen" [src]="producto.urlImagen" alt="{{ producto.producto }}" width="30">
-                  {{ producto.cantidad }} x {{ producto.producto }}
-                </li>
-              </ul>
+            <p><strong>Dirección:</strong> {{ entrega.comedorDireccion }}</p>
+            <p><strong>Realizador:</strong> {{ entrega.realizador }}</p>
+    
+            <!-- Mostrar la cantidad total de productos entregados -->
+            <div *ngIf="entrega.productosEntregados > 0">
+              <p><strong>Total de Productos Entregados:</strong> {{ entrega.productosEntregados }}</p>
             </div>
-            <div *ngIf="entrega.urlActaLegal">
+    
+            <!-- Acta Legal -->
+            <div *ngIf="entrega.url_acta_legal">
               <p><strong>Acta Legal:</strong></p>
-              <a [href]="entrega.urlActaLegal" target="_blank">Ver Acta Legal</a>
+              <a [href]="entrega.url_acta_legal" target="_blank">Ver Acta Legal</a>
             </div>
           </div>
         </p-accordionTab>
       </p-accordion>
+      
+      <!-- Mensaje si no hay entregas -->
       <ng-template #noEntregas>
         <p class="no-data-message">No hay entregas registradas.</p>
       </ng-template>
     </aside>
+    
+    
   </div>
 </div>
 

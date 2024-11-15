@@ -1,128 +1,161 @@
-.login-container {
+/* Contenedor principal */
+.main-wrapper {
+  display: flex;
+  height: 100%;
+}
+
+/* Contenedor vacío con imagen */
+.empty-space {
+  flex: 0.8; /* Ajusta el ancho del espacio vacío */
   display: flex;
   justify-content: center;
   align-items: center;
-  height: 100vh; /* Asegura que ocupe toda la altura de la ventana */
 }
 
+/* Imagen de bienvenida */
+.welcome-image {
+  max-width: 80%;
+  height: auto;
+  border-radius: 10px;
+}
+
+/* Animación de respiración */
+.breathing-animation {
+  animation: breathing 3s ease-in-out infinite; /* Duración de 3 segundos, animación continua */
+}
+
+@keyframes breathing {
+  0% {
+    transform: scale(1); /* Tamaño original */
+  }
+  50% {
+    transform: scale(1.05); /* Expansión al 105% */
+  }
+  100% {
+    transform: scale(1); /* Vuelve al tamaño original */
+  }
+}
+
+
+/* Contenedor de login */
+.login-container {
+  flex: 0.6; /* Ajusta el ancho del formulario de login */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+/* Tarjeta de login */
 .login-card {
-  display: flex; /* Utiliza Flexbox para el contenido */
-  flex-direction: column; /* Coloca los elementos en columna */
-  justify-content: center; /* Centra verticalmente */
-  align-items: center; /* Centra horizontalmente */
-  padding: 2rem; /* Espaciado interno */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem;
   background-color: #ffffff;
-  border-radius: 1.5rem; /* Bordes redondeados */
-  width: 400px; /* Ancho del contenedor */
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Sombra para el contenedor */
+  border-radius: 1.5rem;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
+
+/* Inputs personalizados */
 .custom-input {
-  width: 100%; /* Para que ocupe todo el ancho del contenedor */
-  padding: 1rem; /* Aumenta el tamaño del padding para hacerlos más grandes */
-  font-size: 1.1rem; /* Aumenta el tamaño del texto */
-  background-color: #f0f8ff; /* Cambia el color de fondo */
-  border: 1px solid #cccccc; /* Cambia el color del borde */
-  border-radius: 8px; /* Bordes más redondeados */
-  color: #333; /* Color del texto */
-  transition: background-color 0.3s, border-color 0.3s; /* Transiciones suaves */
-}
-.relative {
-  position: relative; /* Para que el botón se posicione relativo al input */
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  background-color: #f0f8ff;
+  border: 1px solid #cccccc;
+  border-radius: 8px;
+  color: #333;
+  transition: background-color 0.3s, border-color 0.3s;
 }
 
+/* Icono de contraseña */
 .toggle-password {
-  position: absolute; /* Posiciona el botón */
-  right: 10px; /* Espaciado desde la derecha */
-  top: 50%; /* Centrado verticalmente */
-  transform: translateY(-50%); /* Ajuste de centrado */
-  background: none; /* Sin fondo */
-  border: none; /* Sin borde */
-  cursor: pointer; /* Cambia el cursor al pasar el mouse */
-  color: #6a5acd; /* Color del icono */
-  font-size: 1rem; /* Tamaño del icono */
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: #120087;
+  font-size: 1rem;
 }
 
-
+/* Encabezado de login */
 .login-header {
-  text-align: center; /* Centra el texto del encabezado */
+  text-align: center;
   margin-bottom: 1.5rem;
 }
 
 h3 {
   font-weight: 600;
-  font-size: 1.5rem; /* Tamaño del texto */
-  color: #333; /* Color del texto */
+  font-size: 1.5rem;
+  color: #333;
 }
 
-p {
-  color: #666; /* Color del texto */
-}
-
-.signup-link {
-  color: #6a5acd; /* Color del enlace */
-  text-decoration: none; /* Sin subrayado */
-}
-
-.signup-link:hover {
-  text-decoration: underline; /* Subrayar al pasar el mouse */
-}
-
+/* Mensaje de error */
 .error-message {
-  color: red; /* Color de mensaje de error */
-  margin-bottom: 1rem; /* Espaciado inferior */
-  text-align: center; /* Centra el mensaje de error */
+  color: red;
+  margin-bottom: 1rem;
+  text-align: center;
 }
 
+/* Formulario de login */
 .login-form {
   display: flex;
-  flex-direction: column; /* Coloca los elementos en columna */
-  gap: 1.5rem; /* Espacio entre los elementos */
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
-
+/* Botón de login */
 .button-container {
   display: flex;
-  justify-content: center; /* Centra el botón */
-  margin-top: 1rem; /* Espaciado superior */
+  justify-content: center;
+  margin-top: 1rem;
 }
 
+.custom-button {
+  background-color: #1950b8;
+  color: white;
+  border: none;
+  border-radius: 1.5rem;
+  padding: 12px;
+  font-size: 1rem;
+  cursor: pointer;
+  width: 100%;
+  transition: background-color 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.custom-button:hover {
+  background-color: rgb(12, 0, 106);
+}
+
+/* Divider */
 .divider {
   display: flex;
   align-items: center;
   justify-content: center;
-  margin: 1.5rem 0; /* Espaciado superior e inferior */
+  margin: 1.5rem 0;
 }
 
 .divider-line {
   height: 1px;
-  background-color: #ccc; /* Color de la línea */
-  flex-grow: 1; /* Hace que la línea ocupe el espacio restante */
+  background-color: #ccc;
+  flex-grow: 1;
 }
 
 .divider-text {
-  margin: 0 1rem; /* Espacio entre la línea y el texto */
-  color: #666; /* Color del texto */
-}
-.custom-button {
-  background-color: #1950b8; /* Color de fondo personalizado */
-  color: white; /* Color del texto */
-  border: none; /* Sin borde */
-  border-radius: 1.5rem; /* Bordes redondeados */
-  padding: 12px; /* Espaciado interno */
-  font-size: 1rem; /* Tamaño del texto */
-  cursor: pointer; /* Cambia el cursor al pasar sobre el botón */
-  width: 100%; /* Ancho completo */
-  transition: background-color 0.3s; /* Transición suave */
-  display: flex; /* Flexbox para alinear icono y texto */
-  align-items: center; /* Centra verticalmente el contenido */
-  justify-content: center; /* Centra horizontalmente el contenido */
+  margin: 0 1rem;
+  color: #666;
 }
 
-.custom-button:hover {
-  background-color: #5a4db8; /* Color al pasar el mouse */
+/* Mensaje de redes sociales */
+.social-buttons p {
+  color: #666;
+  font-size: 0.9rem;
 }
-
-.custom-button i {
-  margin-right: 8px; /* Espacio entre el icono y el texto */
-}
-

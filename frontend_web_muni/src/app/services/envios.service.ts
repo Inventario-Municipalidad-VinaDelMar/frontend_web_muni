@@ -14,6 +14,8 @@ export class EnviosSocketService {
   private isInitialized = false; // Flag para asegurar que solo se inicialice una vez
   private enviosSubject = new BehaviorSubject<Envio[]>([]);
   envios$ = this.enviosSubject.asObservable();
+  private detalleEnvioSubjects: { [key: string]: BehaviorSubject<DetalleEnvio | null> } = {};
+
 
   constructor(private tokenService: TokenService) {
     this.initializeSocket();
@@ -57,7 +59,7 @@ export class EnviosSocketService {
     this.isInitialized = true;
   }
 
-   loadEnviosByFecha(fecha: string): Observable<Envio[]> {
+  loadEnviosByFecha(fecha: string): Observable<Envio[]> {
     const token = this.tokenService.getToken();
     if (!token) {
       console.error('Token no disponible. No se puede enviar el mensaje.');
@@ -77,11 +79,12 @@ export class EnviosSocketService {
       console.error('Socket no inicializado.');
     }
 
-    // Escucha el evento 'loadEnviosByFecha' y devuelve un Observable de los datos
+    // Escucha el evento 'loadEnviosByFecha' y actualiza enviosSubject con los datos
     return new Observable<Envio[]>((observer) => {
       if (this.socket) {
         this.socket.on('loadEnviosByFecha', (data: Envio[]) => {
           console.log('Productos recibidos para la fecha:', data);
+          this.enviosSubject.next(data); // Actualiza enviosSubject con los nuevos datos
           observer.next(data);
         });
       }
@@ -95,18 +98,50 @@ export class EnviosSocketService {
     });
   }
 
+  // Método para escuchar actualizaciones en tiempo real de un envío específico
+  // EnviosSocketService
+listenToEnvioUpdates(idEnvio: string): Observable<DetalleEnvio> {
+  return new Observable<DetalleEnvio>((observer) => {
+      const eventoActualizacion = `${idEnvio}-loadEnvioById`;
+
+      if (this.socket) {
+          console.log(`Registrando listener para el evento ${eventoActualizacion}`); // Verificar que se registra
+          this.socket.on(eventoActualizacion, (data: DetalleEnvio) => {
+              console.log(`Actualización en tiempo real recibida para ${eventoActualizacion}:`, data);
+              observer.next(data);
+          });
+      }
+
+      return () => {
+          if (this.socket) {
+              this.socket.off(eventoActualizacion);
+              console.log(`Listener "${eventoActualizacion}" eliminado.`);
+          }
+      };
+  });
+}
+
+
+  
+
   // Método para escuchar el evento de productos por fecha usando BehaviorSubject
 listenToProductosByFecha(): Observable<Envio[]> {
   return this.envios$; // Devuelve el observable de enviosSubject para que otros componentes puedan suscribirse
 }
 
 
+
   // Método adicional para obtener envío por ID
-  getEnvioById(idEnvio: string): Observable<DetalleEnvio> {
+  // EnviosSocketService
+  getEnvioById(idEnvio: string): Observable<DetalleEnvio | null> {
+    if (!this.detalleEnvioSubjects[idEnvio]) {
+      this.detalleEnvioSubjects[idEnvio] = new BehaviorSubject<DetalleEnvio | null>(null);
+    }
+
     const token = this.tokenService.getToken();
     if (!token) {
       console.error('Token no disponible. No se puede enviar el mensaje.');
-      return new Observable<DetalleEnvio>();
+      return this.detalleEnvioSubjects[idEnvio].asObservable();
     }
 
     const mensaje = {
@@ -115,31 +150,22 @@ listenToProductosByFecha(): Observable<Envio[]> {
     };
 
     if (this.socket) {
+      console.log(`Emitido mensaje getEnvioById con idEnvio: ${idEnvio}`);
       this.socket.emit('getEnvioById', mensaje);
+
+      const eventoRespuesta = `${idEnvio}-loadEnvioById`;
+      this.socket.off(eventoRespuesta); // Elimina listeners duplicados
+      this.socket.on(eventoRespuesta, (data: DetalleEnvio) => {
+        console.log(`Datos recibidos para ${eventoRespuesta}:`, data);
+        this.detalleEnvioSubjects[idEnvio].next(data); // Emite los nuevos datos sin completar
+      });
     } else {
       console.error('Socket no inicializado.');
     }
 
-    return new Observable<DetalleEnvio>((observer) => {
-      const eventoRespuesta = `${idEnvio}-loadEnvioById`;
-
-      if (this.socket) {
-        this.socket.off(eventoRespuesta); // Asegura que no haya listeners duplicados
-        this.socket.on(eventoRespuesta, (data: DetalleEnvio) => {
-          console.log(`Datos recibidos para ${eventoRespuesta}:`, data);
-          observer.next(data);
-          observer.complete();
-        });
-      }
-
-      return () => {
-        if (this.socket) {
-          this.socket.off(eventoRespuesta);
-          console.log(`Listener "${eventoRespuesta}" eliminado.`);
-        }
-      };
-    });
+    return this.detalleEnvioSubjects[idEnvio].asObservable();
   }
+
 
   disconnect() {
     if (this.socket) {

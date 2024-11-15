@@ -50,10 +50,29 @@
         <label for="email">Email</label>
         <input id="email" type="email" [(ngModel)]="usuarioEditable.email" class="form-control"/>
       </div>
+      
+      <!-- Nueva sección para cambiar la contraseña -->
+      <div class="field">
+        <label for="confirmarContrasena">Nueva Contraseña</label>
+        <div class="p-inputgroup">
+          <input [type]="mostrarContrasena ? 'text' : 'password'" id="nuevaContrasena" [(ngModel)]="usuarioEditable.password" class="form-control"/>
+          <!-- Usamos un botón estándar de HTML -->
+          <button type="button" (click)="toggleMostrarContrasena()" class="eye-button">
+            <i class="pi pi-eye"></i> <!-- Icono de ojo -->
+          </button>
+        </div>
+      </div>
+
+
+
+      <p-toast></p-toast>
+
+
     </div>
     <p-footer>
       <button pButton label="Guardar" icon="pi pi-check" class="p-button-success btn-save" (click)="guardarCambiosPerfil()"></button>
       <button pButton label="Cancelar" icon="pi pi-times" class="p-button-secondary btn-cancel" (click)="cerrarDialogoEditarPerfil()"></button>
     </p-footer>
   </p-dialog>
+  
 </div>
