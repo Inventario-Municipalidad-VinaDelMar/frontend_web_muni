@@ -340,8 +340,6 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
       });
     });
   
-    // Imprimir contadores en consola para verificar si están correctos
-    console.log(`Vencidos: ${this.contadorVencidos}, Por Vencer (1-2 días): ${this.contadorPorVencerEtapa1}, Por Vencer (3-7 días): ${this.contadorPorVencerEtapa2}, Seguros: ${this.contadorSeguro}`);
   }
   filtrarPorEstado(estado: string): void {
     this.estadoFiltroActual = estado;

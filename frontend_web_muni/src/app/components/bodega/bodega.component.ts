@@ -325,7 +325,6 @@ export class BodegaComponent implements OnInit {
         .loadUbicacionesByBodega(this.bodegaSeleccionada.id)
         .subscribe({
           next: (ubicaciones) => {
-            console.log('Datos de ubicaciones recibidos:', ubicaciones);
   
             // Asigna las ubicaciones directamente a todasLasUbicaciones
             this.todasLasUbicaciones = ubicaciones;

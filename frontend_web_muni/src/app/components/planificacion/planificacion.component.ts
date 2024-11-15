@@ -167,7 +167,6 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
             this.socketInventarioService.onLoadTandasByProductoId(producto.id).subscribe(
               (tandas: Tanda[]) => {
                 producto.tandas = tandas;
-                console.log(`Producto: ${producto.nombre}, Tandas:`, producto.tandas);
   
                 // Incrementar el contador cada vez que se carguen las tandas de un producto
                 tandasCargadas++;
@@ -192,8 +191,6 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
                     return fechaVencimientoA - fechaVencimientoB;
                   });
   
-                  // Mostrar el resultado ordenado en consola
-                  console.log("Productos ordenados por vencimiento más próximo:", this.productosFiltrado);
                 }
               },
               (error: any) => {
