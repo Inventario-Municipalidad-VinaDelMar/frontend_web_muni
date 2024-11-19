@@ -47,7 +47,20 @@
   width: 150px;
   height: 150px;
   object-fit: cover;
+  
+  /* Animación */
+  animation: scale-animation 10s infinite;
 }
+
+@keyframes scale-animation {
+  0% {
+    transform: scale(1); /* Tamaño original */
+  }
+  50% {
+    transform: scale(1.1); /* Se agranda un 20% */
+  }
+}
+
 
 .side-bar.collapsed img {
   opacity: 0;

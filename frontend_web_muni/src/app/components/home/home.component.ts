@@ -27,7 +27,14 @@ export class HomeComponent implements OnInit, OnDestroy {
   userImageUrl: string = '';
 
 
-  daysOfWeek: { day: string, date: string, isToday: boolean, active: boolean }[] = [];
+  daysOfWeek: { 
+    day: string; 
+    date: string; 
+    isToday: boolean; 
+    active: boolean; 
+    planificacion: any | null; // Agregamos planificacion
+  }[] = [];
+  
 
 
   productos: Producto[] = [];
@@ -132,42 +139,25 @@ export class HomeComponent implements OnInit, OnDestroy {
   }
 
   loadPlanificacion(fecha: string): void {
-    console.log("Fecha recibida:", fecha);
-  
-    // Descomposición manual de la fecha para evitar problemas de zona horaria
-    const [year, month, day] = fecha.split('-').map(Number);
-    let date = new Date(year, month - 1, day); // Restamos 1 al mes porque los meses en JavaScript van de 0 a 11
-    const dayOfWeek = date.getDay();
-    console.log("Día de la semana (0 = Domingo, 6 = Sábado):", dayOfWeek);
-  
-    // Si es sábado (6), avanza 2 días para obtener el lunes
-    // Si es domingo (0), avanza 1 día para obtener el lunes
-    if (dayOfWeek === 6) {
-      date.setDate(date.getDate() + 2);
-      console.log("Es sábado, ajustando la fecha al lunes:", date);
-    } else if (dayOfWeek === 0) {
-      date.setDate(date.getDate() + 1);
-      console.log("Es domingo, ajustando la fecha al lunes:", date);
-    } else {
-      console.log("Es día de semana, no se requiere ajuste.");
-    }
-  
-    // Convertir la fecha al formato "yyyy-MM-dd" para el socket
-    const adjustedDate = date.toISOString().split('T')[0];
-    console.log("Fecha ajustada para enviar al socket:", adjustedDate);
-  
-    // Ahora llama al servicio del socket con la fecha ajustada
-    this.planificacionSocketService.getPlanificacionIndividual(adjustedDate);
-    console.log("Llamada al socket realizada con la fecha:", adjustedDate);
+    this.planificacionSocketService.getPlanificacionIndividual(fecha);
   
     const planificacionSubscription = this.planificacionSocketService.onLoadPlanificacionData()
       .subscribe(planificacion => {
-        this.planningData = planificacion; // Almacena los datos recibidos
-        console.log("Datos recibidos del socket:", planificacion);
+        const dayIndex = this.daysOfWeek.findIndex(day => day.date === fecha);
+  
+        if (dayIndex !== -1) {
+          this.daysOfWeek[dayIndex].planificacion = planificacion || { detalles: [] };
+        }
+  
+        // Actualiza la planificación del día seleccionado
+        if (this.selectedDate === fecha) {
+          this.planningData = planificacion || { detalles: [] };
+        }
       });
   
     this.subscriptions.push(planificacionSubscription);
   }
+  
   
 
   onSelectDate(day: any): void {
@@ -190,21 +180,25 @@ export class HomeComponent implements OnInit, OnDestroy {
     const today = new Date();
     const dayOfWeek = today.getDay();
     const monday = new Date(today);
-    monday.setDate(today.getDate() - (dayOfWeek - 1));
+    monday.setDate(today.getDate() - (dayOfWeek - 1)); // Ajusta al lunes
+  
     const days = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes'];
-    
+  
+    // Crea los días con una estructura predeterminada
     this.daysOfWeek = days.map((day, index) => {
       const date = new Date(monday);
       date.setDate(monday.getDate() + index);
-      
+  
       return {
-        day,
-        date: formatDate(date, 'yyyy-MM-dd', 'en-US'), // Almacena la fecha en formato ISO
+        day, // Nombre del día
+        date: formatDate(date, 'yyyy-MM-dd', 'en-US'), // Fecha en formato ISO
         isToday: today.toDateString() === date.toDateString(),
-        active: today.toDateString() === date.toDateString()
+        active: today.toDateString() === date.toDateString(),
+        planificacion: null // Predeterminado sin planificación
       };
     });
   }
+  
   redirectToPlanificacion(): void {
     this.router.navigate(['/planificacion']);
   }

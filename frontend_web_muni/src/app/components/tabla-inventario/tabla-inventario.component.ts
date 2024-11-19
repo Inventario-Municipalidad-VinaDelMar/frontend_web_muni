@@ -31,7 +31,8 @@ import { TokenService } from '../../services/auth-token.service';
 })
 export class TablaInventarioComponent implements OnInit, OnDestroy {
 
-  estadoFiltroActual: string | null = null;
+  estadoFiltroActual: string | null = null; // Sin filtros al inicio
+
   productos: Producto[] = [];
   productos2: Producto[] = [];
   expandedRows: { [key: string]: boolean } = {};
@@ -111,7 +112,9 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
     bodega: '',
     ubicacion: ''
   };
-  
+  mostrarDialogoMermas: boolean = false; // Controla la visibilidad del diálogo
+  mermas: any[] = []; // Almacena los datos de mermas
+  isLoadingMermas: boolean = false; // Indica si los datos se están cargando
 
   imagenSeleccionada: File | null = null;
   bodegaLista: { id: string; nombre: string; direccion: string; nombreEncargado: string; isDeleted: boolean }[] = [];
@@ -125,13 +128,14 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
   ) {this.generarOpciones();}
 
   ngOnInit() {
-    const startTime = new Date().getTime();
-    this.cargarBodegas();
-  
+    this.isLoading = true; // Activa el indicador de carga
+    this.cargarBodegas(); // Carga las bodegas inicialmente
+    
     // Suscribirse a eventos de conexión/desconexión del socket
     this.socketService.onConnect().subscribe(() => console.log('Socket conectado'));
     this.socketService.onDisconnect().subscribe(() => console.log('Socket desconectado'));
-  
+    
+    // Timeout para manejar errores si la carga toma demasiado tiempo
     setTimeout(() => {
       if (this.isLoading) {
         this.hasError = true;
@@ -139,51 +143,59 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
       }
     }, 10000);
   
-    // Cargar productos inicialmente
-    setTimeout(() => {
-      this.socketService.getAllProductos();
-      this.subscriptions.add(
-        this.socketService.loadAllProductos().subscribe((productos: Producto[]) => {
+    // Cargar productos y sus tandas asociadas
+    this.cargarProductosConTandas();
+  
+    // Suscripciones a actualizaciones en tiempo real
+    this.subscriptions.add(this.socketService.listenNewTandaCreated().subscribe(tanda => this.updateProductoTanda(tanda)));
+    this.subscriptions.add(this.socketService.listenNewTandaUpdate().subscribe(tanda => this.updateProductoTanda(tanda)));
+    this.subscriptions.add(this.socketService.listenStockProductoChange().subscribe(change => this.updateStockProducto(change)));
+  }
+  
+  // Método para cargar productos y sus tandas asociadas
+  private cargarProductosConTandas() {
+    const startTime = new Date().getTime();
+  
+    // Solicitar productos al servidor
+    this.socketService.getAllProductos();
+    this.subscriptions.add(
+      this.socketService.loadAllProductos().subscribe(
+        (productos: Producto[]) => {
           if ((new Date().getTime() - startTime) <= 10000) {
-            // Filtrar productos para excluir los eliminados
+            // Filtra productos que no estén eliminados
             this.productos = productos.filter(producto => !producto.isDeleted);
             this.productos2 = [...this.productos];
-            this.isLoading = false;
-            this.hasError = false;
+            this.productosFiltrados = [...this.productos]; // Inicializa la lista de productos filtrados
   
             // Log de los productos cargados
             console.log("Productos cargados (excluyendo eliminados):", this.productos);
   
-            // Inicializa el contador para verificar cuántos productos han cargado sus tandas
-            let productosConTandasCargadas = 0;
+            // Contador para asegurarse de que todas las tandas se carguen
+            let tandasCargadas = 0;
   
-            // Cargar tandas para cada producto
+            // Cargar las tandas para cada producto
             this.productos.forEach(producto => {
               this.loadTandasForProducto(producto.id, () => {
-                productosConTandasCargadas++;
-                // Verifica si todos los productos han cargado sus tandas
-                if (productosConTandasCargadas === this.productos.length) {
-                  // Actualiza los productos paginados para mostrar la primera página
-                  this.actualizarProductosPaginados();
-  
-                  // Generar las opciones para productoId, bodega, y ubicacion después de cargar todos los productos
+                tandasCargadas++;
+                if (tandasCargadas === this.productos.length) {
+                  // Todas las tandas han sido cargadas
+                  this.isLoading = false;
+                  this.productosFiltrados = [...this.productos]; // Asegúrate de actualizar los productos filtrados
+                  this.actualizarProductosPaginados(); // Actualiza la lista paginada
                   this.generarOpciones();
                 }
               });
             });
           }
-        }, () => {
+        },
+        error => {
+          console.error("Error al cargar productos:", error);
           this.hasError = true;
           this.isLoading = false;
-          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'El servicio no está disponible. Intente más tarde.' });
-        })
-      );
-    }, 1000);
-  
-    // Suscribirse a actualizaciones en tiempo real
-    this.subscriptions.add(this.socketService.listenNewTandaCreated().subscribe(tanda => this.updateProductoTanda(tanda)));
-    this.subscriptions.add(this.socketService.listenNewTandaUpdate().subscribe(tanda => this.updateProductoTanda(tanda)));
-    this.subscriptions.add(this.socketService.listenStockProductoChange().subscribe(change => this.updateStockProducto(change)));
+          this.messageService.add({ severity: 'error', summary: 'Error', detail: 'No se pudieron cargar los productos.' });
+        }
+      )
+    );
   }
   
   
@@ -192,20 +204,33 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
 
   private loadTandasForProducto(idProducto: string, callback?: () => void) {
     this.socketService.getTandasByProductoId(idProducto);
-    const tandaSubscription = this.socketService.onLoadTandasByProductoId(idProducto).subscribe((tandas: Tanda[]) => {
-      // Ordenar tandas por fecha de vencimiento más próxima antes de asignarlas
-      tandas.sort((a, b) => new Date(a.fechaVencimiento).getTime() - new Date(b.fechaVencimiento).getTime());
   
-      this.productos = this.productos.map(prod => prod.id === idProducto ? { ...prod, tandas: tandas } : prod);
-      this.productos2 = [...this.productos];
-      tandaSubscription.unsubscribe();
-      this.actualizarAlertas(); // Actualiza los contadores de alertas
-      
-      // Llamar al callback una vez que las tandas hayan sido cargadas
-      if (callback) {
-        callback();
-      }
-    });
+    const tandaSubscription = this.socketService
+      .onLoadTandasByProductoId(idProducto)
+      .subscribe(
+        (tandas: Tanda[]) => {
+          // Ordena las tandas por fecha de vencimiento más próxima
+          tandas.sort((a, b) => new Date(a.fechaVencimiento).getTime() - new Date(b.fechaVencimiento).getTime());
+  
+          // Asigna las tandas al producto correspondiente
+          this.productos = this.productos.map(prod =>
+            prod.id === idProducto ? { ...prod, tandas: tandas } : prod
+          );
+  
+          // Actualiza la lista secundaria
+          this.productos2 = [...this.productos];
+  
+          // Desuscribirse una vez que la carga esté completa
+          tandaSubscription.unsubscribe();
+  
+          // Ejecutar el callback
+          if (callback) callback();
+        },
+        error => {
+          console.error(`Error al cargar tandas para el producto ${idProducto}:`, error);
+        }
+      );
+  
     this.subscriptions.add(tandaSubscription);
   }
   
@@ -228,14 +253,13 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
   actualizarProductosPaginados() {
     const inicio = this.paginaActual * this.productosPorPagina;
     const fin = inicio + this.productosPorPagina;
-    this.productosPaginados = this.productos.slice(inicio, fin);
+    this.productosPaginados = this.productosFiltrados.slice(inicio, fin);
   }
 
   cambiarPagina(event: any) {
     this.paginaActual = event.page;
     this.actualizarProductosPaginados();
   }
-  
   
   // Función para actualizar el stock de un producto específico
   private updateStockProducto(change: any) {
@@ -264,10 +288,17 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
   calcularCantidadPorVencer(producto: Producto): number {
     const hoy = new Date();
     return (producto.tandas || []).filter(tanda => {
+      // Validar que tanda.fechaVencimiento sea válida
+      if (!tanda.fechaVencimiento) return false; // Excluir si no tiene fecha de vencimiento
+  
       const fechaVencimiento = new Date(tanda.fechaVencimiento);
+      if (isNaN(fechaVencimiento.getTime())) return false; // Excluir si no es una fecha válida
+  
+      // Calcular la diferencia en días y verificar si es menor o igual a 7 días
       return (fechaVencimiento.getTime() - hoy.getTime()) / (1000 * 3600 * 24) <= 7;
     }).length;
   }
+  
   
 
   toggleExpansion(productId: string): void {
@@ -277,22 +308,34 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
   // Obtener la fecha de vencimiento más próxima
   calcularFechaProxima(producto: Producto): string {
     if (!producto.tandas || producto.tandas.length === 0) {
-      return 'N/A';
+      return 'N/A'; // Si no hay tandas, muestra "N/A"
     }
-    const fechas = producto.tandas.map(tanda => new Date(tanda.fechaVencimiento));
-    const fechaProxima = fechas.reduce((min, fecha) => fecha < min ? fecha : min);
+  
+    // Filtrar tandas con fecha válida
+    const fechas = producto.tandas
+      .filter(tanda => tanda.fechaVencimiento && tanda.fechaVencimiento !== '01/01/1970') // Excluye fechas inválidas
+      .map(tanda => new Date(tanda.fechaVencimiento));
+  
+    if (fechas.length === 0) {
+      return 'N/A'; // Si no hay fechas válidas, muestra "N/A"
+    }
+  
+    const fechaProxima = fechas.reduce((min, fecha) => (fecha < min ? fecha : min));
     return fechaProxima.toISOString().split('T')[0];
   }
+  
 
   // Calcular el estado de vencimiento para contabilización
   calcularEstadoVencimiento(tanda: Tanda): string {
-    const hoy = new Date();
-    if (!tanda.fechaVencimiento) {
+    if (!tanda.fechaVencimiento || tanda.fechaVencimiento === 'N/A' || tanda.fechaVencimiento === '01/01/1970') {
       return 'sinVencimiento';
     }
+  
+    const hoy = new Date();
     const fechaVencimiento = new Date(tanda.fechaVencimiento);
     const diffTime = fechaVencimiento.getTime() - hoy.getTime();
     const diffDays = Math.ceil(diffTime / (1000 * 3600 * 24));
+  
     if (diffDays < 0) {
       return 'vencido';
     } else if (diffDays <= 2) {
@@ -303,6 +346,7 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
       return 'seguro';
     }
   }
+  
 
   getTotalTandas(): number {
     return this.productos.reduce((total, producto) => total + (producto.tandas ? producto.tandas.length : 0), 0);
@@ -371,60 +415,57 @@ export class TablaInventarioComponent implements OnInit, OnDestroy {
   }
 
   filtrarProductos() {
-  const termino = this.terminoBusqueda.toLowerCase();
-
-  this.productosFiltrados = this.productos.filter(producto => {
-    // Verificar si el término está en el nombre del producto
-    const coincideProducto = producto.nombre.toLowerCase().includes(termino);
-
-    // Verificar si el término está en alguna tanda del producto
-    const coincideTanda = producto.tandas?.some(tanda => 
-      tanda.ubicacion?.toLowerCase().includes(termino) || 
-      tanda.bodega?.toLowerCase().includes(termino) || 
-      tanda.fechaVencimiento?.toLowerCase().includes(termino)
-    );
-
-    // Retornar verdadero si el término coincide con el producto o alguna tanda
-    return coincideProducto || coincideTanda;
-  });
-
-  // Actualizar la paginación con los productos filtrados
-  this.actualizarProductosPaginadosFiltrados();
-}
-
-actualizarProductosPaginadosFiltrados() {
-  let listaFiltrada = this.productos;
-
-  // Filtrar por término de búsqueda
-  if (this.terminoBusqueda) {
     const termino = this.terminoBusqueda.toLowerCase();
-    listaFiltrada = listaFiltrada.filter(producto =>
-      producto.nombre.toLowerCase().includes(termino) ||
-      producto.tandas?.some(tanda => 
-        tanda.ubicacion?.toLowerCase().includes(termino) || 
-        tanda.bodega?.toLowerCase().includes(termino) || 
-        tanda.fechaVencimiento?.toLowerCase().includes(termino)
-      )
-    );
+  
+    // Filtra productos con base en el término de búsqueda
+    this.productosFiltrados = this.productos.filter(producto => {
+      const coincideProducto = producto.nombre.toLowerCase().includes(termino);
+      const coincideTanda = producto.tandas?.some(tanda =>
+        tanda.ubicacion?.toLowerCase().includes(termino) ||
+        tanda.bodega?.toLowerCase().includes(termino) ||
+        (tanda.fechaVencimiento && tanda.fechaVencimiento.toLowerCase().includes(termino))
+      );
+      return coincideProducto || coincideTanda;
+    });
+  
+    // Reinicia a la primera página
+    this.paginaActual = 0;
+  
+    // Actualiza la lista paginada
+    this.actualizarProductosPaginados();
   }
 
-  // Filtrar por estado de vencimiento
-  if (this.estadoFiltroActual) {
-    listaFiltrada = listaFiltrada.filter(producto =>
-      producto.tandas?.some(tanda => 
-        this.calcularEstadoVencimiento(tanda) === this.estadoFiltroActual
-      )
-    );
+  actualizarProductosPaginadosFiltrados() {
+    let listaFiltrada = this.productos;
+  
+    // Aplica el filtro por término de búsqueda
+    if (this.terminoBusqueda) {
+      const termino = this.terminoBusqueda.toLowerCase();
+      listaFiltrada = listaFiltrada.filter(producto =>
+        producto.nombre.toLowerCase().includes(termino) ||
+        producto.tandas?.some(tanda =>
+          tanda.ubicacion?.toLowerCase().includes(termino) ||
+          tanda.bodega?.toLowerCase().includes(termino) ||
+          (tanda.fechaVencimiento && tanda.fechaVencimiento.toLowerCase().includes(termino))
+        )
+      );
+    }
+  
+    // Aplica el filtro por estado de vencimiento si existe
+    if (this.estadoFiltroActual) {
+      listaFiltrada = listaFiltrada.filter(producto =>
+        producto.tandas?.some(tanda => this.calcularEstadoVencimiento(tanda) === this.estadoFiltroActual)
+      );
+    }
+  
+    // Si no hay término de búsqueda ni filtros, muestra todos los productos
+    this.productosFiltrados = listaFiltrada;
+  
+    // Actualiza los productos paginados
+    this.paginaActual = 0; // Reinicia a la primera página
+    this.actualizarProductosPaginados();
   }
-
-  // Actualizar productosFiltrados con la lista filtrada
-  this.productosFiltrados = listaFiltrada;
-
-  // Paginación de los productos filtrados
-  const inicio = this.paginaActual * this.productosPorPagina;
-  const fin = inicio + this.productosPorPagina;
-  this.productosPaginados = this.productosFiltrados.slice(inicio, fin);
-}
+  
 
 
 
@@ -875,5 +916,30 @@ cargarBodegas(): void {
     this.bodegaLista = bodegas;
   });
 }
+
+  // Método para abrir el diálogo y cargar los datos
+  abrirDialogoMermas() {
+    this.mostrarDialogoMermas = true; // Muestra el diálogo
+    this.isLoadingMermas = true; // Activa el indicador de carga
+  
+    const fechaInicio = '2024-01-01'; // Define tu rango de fechas
+    const fechaFin = '2024-12-31';
+    const url = `http://34.176.26.41/api/inventario/infoCharts?fechaInicio=${fechaInicio}&fechaFin=${fechaFin}`;
+  
+    // Realiza la solicitud GET
+    this.http.get<any>(url).subscribe(
+      (data) => {
+        console.log('Datos recibidos de mermas:', data); // Log para inspeccionar la respuesta
+        this.mermas = data.mermas || []; // Almacena solo las mermas obtenidas
+        this.isLoadingMermas = false; // Finaliza la carga
+      },
+      (error) => {
+        console.error('Error al cargar mermas:', error); // Log de error
+        this.mermas = []; // Limpia cualquier dato previo en caso de error
+        this.isLoadingMermas = false; // Finaliza la carga
+      }
+    );
+  }
+  
 
 }

@@ -6,7 +6,7 @@ import { CommonModule } from '@angular/common';
 import { TokenService } from './services/auth-token.service';
 import { PlanificacionSocketService } from './services/Sockets/planificacion.socket.service';
 import { SocketInventarioService } from './services/Sockets/socket-inventario.service';
-import { EnviosSocketService } from './services/envios.service'; // Asegúrate de importar EnviosSocketService
+import { EnviosSocketService } from './services/Sockets/envios.service'; // Asegúrate de importar EnviosSocketService
 import { Subscription } from 'rxjs';
 
 @Component({

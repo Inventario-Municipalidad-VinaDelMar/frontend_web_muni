@@ -91,25 +91,23 @@
 
   
   /* Contenedor de los días de la semana */
+  /* Ajustar tamaño del contenedor principal de planificación */
   .dias-semana-container {
     display: flex;
-    flex-wrap: wrap; /* Permitir que los días se ajusten a múltiples líneas */
-    justify-content: space-between; /* Espacio igual entre cada día */
-    align-items: flex-start; /* Alinear verticalmente al inicio */
-    padding: 0 20px; /* Ajustar el padding para que no sobresalga */
-    margin-bottom: 20px;
+    flex-wrap: wrap; /* Permitir que las tarjetas salten de línea si es necesario */
+    justify-content: space-between; /* Espaciar uniformemente las tarjetas */
+    align-items: stretch; /* Estirar las tarjetas para que tengan la misma altura */
+    gap: 15px; /* Espaciado entre tarjetas */
   }
   
   .dia {
-    border: 1px solid rgb(231, 231, 231);
-    flex: 1 1 calc(20% - 20px); /* Usar flexbox para definir el ancho */
-    height: 40vh; /* Altura mínima para los días */
-    max-width: 30vh; /* Ancho máximo */
-    display: flex;
+    flex: 1 1 calc(20% - 20px); /* Ocupa 20% del ancho disponible */
     flex-direction: column;
+    justify-content: space-between; /* Distribuye el contenido uniformemente */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    text-align: center;
-    overflow-y: auto; /* Permitir desplazamiento si el contenido excede el tamaño */
+    border: 1px solid rgb(231, 231, 231);
+    overflow: auto; /* Evita desbordamientos de contenido */
+    min-height: 40vh;
   }
 
 
@@ -120,44 +118,54 @@
 
 
   
+/* Contenedor de productos asignados */
 .producto-container {
+  display: flex; /* Alinear elementos en una línea horizontal */
+  align-items: center; /* Centrar verticalmente los elementos */
+  justify-content: space-between; /* Espacio entre elementos */
   background: #1976d2;
-  color: rgb(255, 255, 255);
-  margin-bottom: 1px;
-  padding: 10px;
-  font-size: small;
-  display: flex;
-  align-items: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  color: white;
+  padding: 10px; /* Espaciado interno */
+  margin-bottom: 10px;
+  border-radius: 8px; /* Bordes redondeados */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
   transition: transform 0.2s ease, box-shadow 0.2s ease;
-  width: 100%;
-  height: auto;
-  overflow: hidden;
 }
 
-/* Asignar anchos específicos a los elementos */
+.producto-container img {
+  width: 60px; /* Ancho fijo para imágenes */
+  height: 60px; /* Altura fija para imágenes */
+  object-fit: cover; /* Asegura que la imagen se recorte para llenar el espacio sin deformarse */
+  border-radius: 5px; /* Bordes redondeados */
+  margin-right: 10px; /* Espaciado entre la imagen y el texto */
+}
+
 .producto-nombre {
-  flex: 5; /* 70% del ancho total */
-  text-align: left; /* Alinear a la izquierda */
-  font-size: x-small;
+  flex-grow: 1; /* Permite que el texto ocupe el espacio disponible */
+  text-align: left; /* Alinea el texto a la izquierda */
+  font-size: 0.9em; /* Tamaño de fuente moderado */
+  white-space: nowrap; /* Evita que el texto salte de línea */
+  overflow: hidden; /* Oculta texto que exceda el ancho */
+  text-overflow: ellipsis; /* Muestra "..." si el texto es demasiado largo */
 }
 
+/* Cantidad del producto */
 .producto-cantidad {
-  flex: 4; /* 20% del ancho total */
-  text-align: right; /* Alinear a la derecha */
-  font-size: xx-small;
+  flex: 4;
+  text-align: right;
+  font-size: small;
 }
-
 
 /* Botón quitar (puedes ajustar el tamaño también si es necesario) */
 .quitar-btn {
-  color: #003b72;
-  font-size: large;
-  flex: 1; /* 10% del ancho total */
-  background: transparent; /* Sin fondo */
-  border: none; /* Sin borde */
-  cursor: pointer; /* Cambiar el cursor a puntero */
+  color: white;
+  background: transparent;
+  border: none;
+  font-size: 1.2em; /* Tamaño del botón */
+  cursor: pointer; /* Cambia el cursor al pasar por el botón */
+  flex-shrink: 0; /* Evita que el botón se redimensione */
 }
+
 
 
 /* Ajuste en la etiqueta del producto */
@@ -170,16 +178,14 @@
 }
 /* Efecto de hover para interacción */
 .producto-container:hover {
-    background-color: #0058ab;
-    transform: translateY(-3px); /* Mueve ligeramente el contenedor hacia arriba */
-    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Aumenta la sombra en hover */
+  background-color: #0058ab; /* Cambia el color de fondo al pasar el ratón */
+  transform: translateY(-2px); /* Eleva el contenedor ligeramente */
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra más grande */
 }
-
   
-  .quitar-btn:hover {
-    opacity: 0.7;           /* Efecto de hover */
-    
-  }
+.quitar-btn:hover {
+  opacity: 0.8; /* Botón ligeramente más transparente al pasar el ratón */
+}
 
 
   
@@ -286,19 +292,47 @@ input {
   max-width: 50%;
   height: auto;
   display: block;
-  opacity: 0.5; /* Ajusta este valor para cambiar la opacidad */
-  filter: blur(2px); /* Ajusta el valor para cambiar la cantidad de desenfoque */
   margin: 0 auto; /* Esto centra la imagen */
+  
+  /* Animación */
+  animation: heartbeat 5s infinite;
 }
+
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
+  }
+  30% {
+    transform: scale(1.1);
+  }
+  50% {
+    transform: scale(1);
+  }
+}
+
 .dia-text {
-  margin-top: 10px;
-  font-weight: bold; /* Puedes cambiar el grosor de la fuente si lo deseas */
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 5px; /* Espacio entre el título y la fecha */
+}
+
+
+.dia-header {
+  position: sticky; /* Fija el contenedor */
+  top: 0; /* Se pega al borde superior */
+  z-index: 10; /* Asegura que esté sobre el contenido */
+  background-color: white; /* Fondo blanco para visibilidad */
+  padding: 10px; /* Espaciado interno */
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
+  border-bottom: 1px solid #ccc; /* Línea inferior para separar */
+  display: flex;
+  flex-direction: column; /* Alinea el contenido verticalmente */
+  align-items: center; /* Centra el texto horizontalmente */
 }
 
 .fecha-text {
-  font-size: 0.7em; /* Ajusta el tamaño de la fecha como desees */
-  color: gray; /* Cambia el color si lo deseas */
-  margin-bottom: 10px;
+  font-size: 0.9em; /* Ajusta el tamaño según sea necesario */
+  color: gray;
 }
 
 .no-hay-text{

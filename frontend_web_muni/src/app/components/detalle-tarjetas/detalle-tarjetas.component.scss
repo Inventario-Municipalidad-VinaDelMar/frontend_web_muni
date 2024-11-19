@@ -256,8 +256,15 @@ h2 {
   border-radius: 6px;
   display: inline-block;
 }
-
+.status-sin-cargar {
+  background-color: #fff3cd; /* Amarillo claro */
+  color: #856404;
+}
 .status-cargando {
+  background-color: #fff3cd; /* Amarillo claro */
+  color: #856404;
+}
+.status-completa {
   background-color: #fff3cd; /* Amarillo claro */
   color: #856404;
 }

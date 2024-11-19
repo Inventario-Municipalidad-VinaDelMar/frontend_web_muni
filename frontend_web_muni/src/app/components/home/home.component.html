@@ -52,16 +52,18 @@
   
 
   <div class="col-6">
-    <div class="contenido planificacion " *ngIf="planningData">
+    <div class="contenido planificacion">
+      <!-- Encabezado -->
       <div class="planificacion-header">
-        <h2 class="planificacion-title">Planificación del Día {{ selectedDayName }}</h2>
+        <h2 class="planificacion-title">Planificación del Día {{ translateDay(selectedDayName) }}</h2>
         <div class="calendar-icon">
-          <h1>{{ planningData?.fecha | date: 'd' }}</h1>
-          <p>{{ translateMonth(planningData?.fecha | date: 'MMMM') }}</p>
+          <h1>{{ selectedDate | date: 'd' }}</h1>
+          <p>{{ translateMonth(selectedDate | date: 'MMMM') }}</p>
         </div>
       </div>
   
-      <div *ngIf="planningData && planningData.detalles?.length > 0; else noPlanificacion">
+      <!-- Detalles de Planificación -->
+      <div *ngIf="planningData?.detalles?.length > 0; else noPlanificacion">
         <div class="detalle-lista fade-in">
           <div *ngFor="let detalle of planningData.detalles" class="detalle-item fade-in">
             <div class="detalle-content">
@@ -82,15 +84,18 @@
         </div>
       </div>
   
+      <!-- Mensaje cuando no hay planificación -->
       <ng-template #noPlanificacion>
-        <p>No se encontró planificación para la fecha seleccionada.</p>
+        <p>No se encontró planificación para el día seleccionado.</p>
       </ng-template>
   
+      <!-- Botón para redirigir -->
       <button (click)="redirectToPlanificacion()" class="btn-redirect">
         <i class="bi bi-calendar-week"></i> Planificar
       </button>
     </div>
   </div>
+  
   
 
   

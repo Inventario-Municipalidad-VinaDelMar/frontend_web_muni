@@ -1,6 +1,14 @@
-export interface Detalle {
+export interface DetalleCompleto {
     productoId: string;
     cantidadPlanificada: number;
+    urlImagen:string;
+    
+  }
+  
+  export interface Detalle {
+    productoId: string;
+    cantidadPlanificada: number;
+    
   }
   
   export interface DiaPlanificacion {

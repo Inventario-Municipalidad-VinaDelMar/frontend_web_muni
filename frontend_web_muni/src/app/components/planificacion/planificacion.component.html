@@ -8,7 +8,7 @@
       </button>
 
       <div class="semana-info">
-        <span class="semana-text">Semana del {{ fechasSemana['lunes'] }} al {{ fechasSemana['viernes'] }}</span>
+        <span class="semana-text">Semana del {{ fechasSemana['lunes'] | date:'dd/MM/yyyy' }} al {{ fechasSemana['viernes'] | date:'dd/MM/yyyy' }}</span>
         <label for="calendar">Buscar por día:</label>
         <p-calendar id="calendar" [(ngModel)]="selectedDate" (onSelect)="updateWeek()" dateFormat="dd/mm/yy" [showIcon]="true"></p-calendar>
       </div>
@@ -83,17 +83,23 @@
         <div class="dia p-col" [id]="dia" (dragover)="allowDrop($event)" (drop)="drop($event, dia)">
           <div class="card">
             <strong class="dia-text">{{ dia.toUpperCase() }}</strong>
-            <span class="fecha-text">{{ fechasSemana[dia] }}</span>
+            <span class="fecha-text">{{ fechasSemana[dia] | date:'dd/MM/yyyy' }}</span>
             <div *ngIf="productosPorDia[dia]?.size === 0" class="no-productos-message">
-              <img src="assets/img/planificacion.jpeg" alt="No hay productos" class="no-productos-image" />
+              <img src="assets/img/empty.png" alt="No hay productos" class="no-productos-image" />
               <p class="no-hay-text">No hay productos asignados para este día.</p>
             </div>
             <div *ngFor="let producto of productosPorDia[dia]" class="producto-container">
-              
-              <span class="producto-nombre" (click)="showProductoDetails(producto)">{{ producto.nombre }}</span>
-              <span class="producto-cantidad" (click)="showProductoDetails(producto)">{{"Cantidad: "+ producto.cantidadPlanificada }}</span>
+              <!-- Mostrar imagen del producto -->
+              <img class="producto-img" [src]="producto.urlImagen" alt="{{ producto.nombre }}" />
+
+            
+              <!-- Nombre del producto -->
+              <span class="producto-nombre">{{ producto.nombre }}</span>
+            
+              <!-- Botón para quitar -->
               <button class="quitar-btn" (click)="quitarDeDia(producto, dia)">×</button>
             </div>
+            
             
           </div>
         </div>

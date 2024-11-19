@@ -25,6 +25,12 @@
     <h2 class="section-title">
       Estado del Inventario de Productos 
       <span *ngIf="estadoFiltroActual">- {{ obtenerTituloFiltro(estadoFiltroActual) }}</span>
+      <!-- Botón para ver mermas -->
+<!-- Botón para ver mermas -->
+<button type="button" class="btn btn-warning d-flex align-items-center gap-2" (click)="abrirDialogoMermas()">
+  <i class="bi bi-bar-chart"></i> Ver Mermas
+</button>
+
     </h2>
     <div class="search-container">
       <span class="search-icon">
@@ -79,7 +85,10 @@
               </td>
               <td>{{ calcularCantidadTotal(producto) }}</td>
               <td>{{ calcularCantidadPorVencer(producto) }}</td>
-              <td>{{ calcularFechaProxima(producto) }}</td>
+              <td>
+                {{ calcularFechaProxima(producto) === 'N/A' ? 'No Aplica' : (calcularFechaProxima(producto) | date: 'dd/MM/yyyy') }}
+              </td>
+              
               <td class="actions-cell">
                 <button class="boton-expandir" (click)="toggleExpansion(producto.id)">
                   {{ expandedRows[producto.id] ? 'Minimizar' : 'Expandir' }}
@@ -409,3 +418,32 @@
 
 
 </div>
+<p-dialog [(visible)]="mostrarDialogoMermas" [modal]="true" [draggable]="false" header="Mermas" class="text-center" [style]="{ width: '500px', maxWidth: '90vw' }">
+  <div *ngIf="isLoadingMermas" class="text-center">
+    <p>Cargando mermas...</p>
+  </div>
+  <div *ngIf="!isLoadingMermas && mermas.length > 0">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>Producto</th>
+          <th>Cantidad Retirada</th>
+          <th>Fecha</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let merma of mermas">
+          <td>{{ merma.producto }}</td>
+          <td>{{ merma.cantidadRetirada }}</td>
+          <td>{{ merma.fecha | date: 'dd/MM/yyyy' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div *ngIf="!isLoadingMermas && mermas.length === 0" class="text-center">
+    <p>No se encontraron mermas en el rango de fechas seleccionado.</p>
+  </div>
+  <p-footer>
+    <button type="button" class="btn btn-secondary" (click)="mostrarDialogoMermas = false">Cerrar</button>
+  </p-footer>
+</p-dialog>

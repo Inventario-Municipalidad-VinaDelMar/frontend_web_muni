@@ -8,11 +8,18 @@
     <div class="date-search-wrapper">
       <mat-form-field appearance="fill" class="date-field">
         <mat-label>Fecha</mat-label>
-        <input matInput [matDatepicker]="picker" [(ngModel)]="selectedDate" (dateChange)="buscarEnvios()" placeholder="dd/MM/yyyy">
+        <input 
+          matInput 
+          [matDatepicker]="picker" 
+          [(ngModel)]="selectedDate" 
+          (dateChange)="buscarEnvios()" 
+          placeholder="dd/MM/yyyy"> <!-- Ajusta el placeholder para coincidir -->
         <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
         <mat-datepicker #picker></mat-datepicker>
       </mat-form-field>
     </div>
+    
+    
   </div>
 
   <!-- Contenedor de envíos recibidos -->
@@ -22,30 +29,31 @@
       <div *ngIf="enviosList.length > 0" class="card-container">
         <div *ngFor="let envio of enviosList" class="card" (click)="goToDetalle(envio.id)">
           
+          <!-- Status y Hora de Creación -->
           <div class="status" [ngClass]="getStatusClass(envio.status)">
             {{ envio.status }}
+            <p class="hora-creacion"><strong>Creado:</strong> {{ formatISOTime(envio.horaCreacion) }}</p>
           </div>
-    
+          
+      
           <!-- Círculo superior derecho con el icono del camión -->
           <div class="status-container">
             <div class="circle-icon">
-              <img src="assets/img/camion.png" alt="Camión de envío" />
+              <img [src]="getStatusImage(envio.status)" [alt]="envio.status" />
             </div>
           </div>
-    
+      
           <!-- Contenido de la tarjeta -->
           <div class="card-header">
             <div class="info-header">
               <p><strong>Autorizado por:</strong> {{ envio.autorizante }}</p>
-              <p><strong>Fecha de creación:</strong> {{ getFormattedDate(envio.fecha) }}</p>
-              <p><strong>Hora de inicio:</strong> {{ formatHour(envio.horaInicioEnvio) }}</p>
-              <p><strong>Hora de última actualización:</strong> {{ formatHour(envio.ultimaActualizacion) }}</p>
-              <p><strong>Hora de término:</strong> {{ envio.horaFinalizacion ? formatHour(envio.horaFinalizacion) : 'No disponible' }}</p>
-              <p><strong>Status:</strong> {{ envio.status }}</p>
+              <p><strong>Tiempo en envío:</strong> {{ getTiempoEnEnvio(envio.horaInicioEnvio) }}</p>
+              <p><strong>Hora de última actualización:</strong> {{ formatISOTime(envio.ultimaActualizacion) }}</p>
+              <p><strong>Hora de término:</strong> {{ envio.horaFinalizacion ? formatISOTime(envio.horaFinalizacion) : 'No disponible' }}</p>
               <p><strong>Solicitante:</strong> {{ envio.solicitante }}</p>
             </div>
           </div>
-    
+      
           <!-- Lista de productos o mensaje de "No hay productos cargados" -->
           <div class="products-container">
             <ng-container *ngIf="envio.productos.length > 0; else noProducts">
@@ -57,11 +65,13 @@
               <p class="no-products-message">No hay productos cargados.</p>
             </ng-template>
           </div>
+      
+          <!-- Incidentes -->
           <div *ngIf="envio.incidentes && envio.incidentes.length > 0" class="warning-icon">!</div>
         
         </div>
-        
       </div>
+      
       
     
       <!-- Mensaje si no hay envíos -->

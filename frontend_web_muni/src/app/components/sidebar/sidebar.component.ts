@@ -3,7 +3,7 @@ import { Router, NavigationEnd } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { PlanificacionSocketService } from '../../services/Sockets/planificacion.socket.service';
 import { SocketInventarioService } from '../../services/Sockets/socket-inventario.service';
-import { EnviosSocketService } from '../../services/envios.service';
+import { EnviosSocketService } from '../../services/Sockets/envios.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -56,6 +56,8 @@ export class SidebarComponent {
       category = 'bodegas';
     } else if (route.includes('/inventario')) {
       category = 'inventario';
+    } else if (route.includes('/envios')) {
+      category = 'envios';
     } else if (route === '/') {
       category = 'home';
     }

@@ -4,22 +4,24 @@ import { FormsModule } from '@angular/forms';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MAT_DATE_LOCALE, MAT_DATE_FORMATS, DateAdapter, MatNativeDateModule } from '@angular/material/core';
 import { MatInputModule } from '@angular/material/input';
-import { EnviosSocketService } from '../../services/envios.service';
+import { EnviosSocketService } from '../../services/Sockets/envios.service';
 import { Router } from '@angular/router';
 import { Envio } from '../../models/envio.model';
 import { Subscription } from 'rxjs';
 
-export const MY_DATE_FORMATS = {
+export const CUSTOM_DATE_FORMATS = {
   parse: {
-    dateInput: 'DD/MM/YYYY',
+    dateInput: 'DD/MM/YYYY', // Este formato se usa para analizar fechas ingresadas por el usuario
   },
   display: {
-    dateInput: 'DD/MM/YYYY',
-    monthYearLabel: 'MMMM YYYY',
-    dateA11yLabel: 'LL',
-    monthYearA11yLabel: 'MMMM YYYY'
+    dateInput: 'dd/MM/yyyy', // Este formato se usa para mostrar la fecha
+    monthYearLabel: 'MMMM yyyy', // Etiqueta de mes y año en el calendario
+    dateA11yLabel: 'LL', // Accesibilidad
+    monthYearA11yLabel: 'MMMM yyyy', // Accesibilidad
   },
 };
+
+
 
 @Component({
   selector: 'app-envios',
@@ -28,7 +30,7 @@ export const MY_DATE_FORMATS = {
   styleUrls: ['./envios.component.scss'],
   providers: [
     { provide: MAT_DATE_LOCALE, useValue: 'es-ES' },
-    { provide: MAT_DATE_FORMATS, useValue: MY_DATE_FORMATS } // Configura el idioma español en este componente
+    { provide: MAT_DATE_FORMATS, useValue: CUSTOM_DATE_FORMATS } // Configura el idioma español en este componente
   ],
   imports: [
     CommonModule,
@@ -55,6 +57,8 @@ export class EnviosComponent implements OnInit, OnDestroy {
   ) {}
 
   ngOnInit() {
+    this.adapter.setLocale('es-ES'); // Configura el idioma a español
+    this.setWeekStartMonday();
     this.selectedDate = new Date();
     this.selectedDate.setHours(0, 0, 0, 0);
     this.buscarEnvios();
@@ -71,18 +75,31 @@ export class EnviosComponent implements OnInit, OnDestroy {
     );
   }
 
-  getFormattedDate(date: Date | string): string {
-    if (typeof date === 'string') {
-      const [year, month, day] = date.split('-').map(Number);
-      date = new Date(year, month - 1, day);
+  getFormattedDate(dateInput: Date | string): string {
+    if (!dateInput) return 'Fecha no disponible';
+  
+    let date: Date;
+  
+    if (typeof dateInput === 'string') {
+      // Divide el string de fecha en partes para evitar problemas de zona horaria
+      const [year, month, day] = dateInput.split('T')[0].split('-').map(Number);
+      date = new Date(year, month - 1, day); // Crea un objeto Date en la zona horaria local sin ajustes
+    } else {
+      date = dateInput;
     }
+  
+    const day = date.getDate().toString().padStart(2, '0'); // Día con 2 dígitos
+    const month = (date.getMonth() + 1).toString().padStart(2, '0'); // Mes con 2 dígitos
+    const year = date.getFullYear(); // Año completo
+  
+    return `${day}/${month}/${year}`; // Formato deseado
+  }
+  
+  
 
-    const dayName = this.daysOfWeek[date.getDay()];
-    const day = date.getDate();
-    const monthName = this.monthsOfYear[date.getMonth()];
-    const year = date.getFullYear();
-
-    return `${dayName}, ${day} ${monthName} ${year}`;
+  setWeekStartMonday() {
+    // Configura el inicio de la semana en lunes
+    this.adapter.getFirstDayOfWeek = () => 1; // 1 significa lunes
   }
 
   buscarEnvios() {
@@ -126,8 +143,17 @@ export class EnviosComponent implements OnInit, OnDestroy {
         }
       }
     }
-    this.cdr.detectChanges(); // Forzar la detección de cambios para cada actualización
+  
+    // Ordenar los envíos por fecha de creación
+    this.enviosList.sort((a, b) => {
+      const dateA = new Date(a.fecha).getTime();
+      const dateB = new Date(b.fecha).getTime();
+      return dateB - dateA; // Orden descendente: más recientes primero
+    });
+  
+    this.cdr.detectChanges(); // Actualizar la vista
   }
+  
 
   formatDate(date: Date): string {
     return date.toISOString().split('T')[0];
@@ -150,6 +176,18 @@ export class EnviosComponent implements OnInit, OnDestroy {
     return `${hour12}:${minutes} ${period}`;
   }
 
+  formatISOTime(isoDate: string): string {
+    if (!isoDate) return 'Hora no disponible';
+  
+    const date = new Date(isoDate); // Convierte la cadena ISO a un objeto Date
+    let hours = date.getHours(); // Obtiene la hora en formato 24 horas
+    const minutes = date.getMinutes().toString().padStart(2, '0'); // Minutos con 2 dígitos
+    const ampm = hours >= 12 ? 'PM' : 'AM'; // Determina si es AM o PM
+  
+    return `${hours}:${minutes} ${ampm}`; // Formato deseado
+  }
+  
+
   ngOnDestroy() {
     if (this.subscription) {
       this.subscription.unsubscribe(); // Liberar suscripción en `ngOnDestroy`
@@ -163,6 +201,39 @@ export class EnviosComponent implements OnInit, OnDestroy {
       return 'status-finalizado';
     }
     return ''; // No aplica ninguna clase adicional si es "sin cargar"
+  }
+  getStatusImage(status: string): string {
+    switch (status.toLowerCase()) {
+      case 'sin cargar':
+        return 'assets/img/cargar.gif';
+      case 'cargando':
+        return 'assets/img/cargando.gif';
+      case 'carga completa':
+        return 'assets/img/completa3.gif';
+      case 'en envio':
+        return 'assets/img/camiones3.gif';
+      default:
+        return 'assets/img/default.png'; // Imagen por defecto si no hay estado válido
+    }
+  }
+  getTiempoEnEnvio(horaInicio: string): string {
+    if (!horaInicio) {
+      return 'No disponible';
+    }
+  
+    const inicio = new Date(horaInicio);
+    const ahora = new Date();
+  
+    const diferenciaMs = ahora.getTime() - inicio.getTime();
+  
+    if (diferenciaMs < 0) {
+      return 'Pendiente'; // En caso de que la hora de inicio sea futura
+    }
+  
+    const horas = Math.floor(diferenciaMs / (1000 * 60 * 60));
+    const minutos = Math.floor((diferenciaMs % (1000 * 60 * 60)) / (1000 * 60));
+  
+    return `${horas}h ${minutos}m`;
   }
   
   

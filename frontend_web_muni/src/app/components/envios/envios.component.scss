@@ -78,10 +78,14 @@
 
 .card-container {
   display: flex;
-  flex-wrap: wrap;
-  gap: 15px; /* Espacio entre tarjetas */
-  justify-content: center;
+  flex-wrap: nowrap; /* Evita que las tarjetas salten a una nueva fila */
+  gap: 20px; /* Espacio entre tarjetas */
+  justify-content: flex-start; /* Alinea las tarjetas desde el principio */
+  overflow-x: auto; /* Permite el desplazamiento horizontal si las tarjetas no caben */
+  padding: 20px;
+  width: 100%; /* Ocupa todo el ancho disponible */
 }
+
 
 /* Encabezado de la tarjeta */
 .card-header {
@@ -147,8 +151,8 @@
 }
 
 .circle-icon img {
-  width: 40px;
-  height: 40px;
+  width: 70px;
+  height: 70px;
 }
 
 
@@ -174,13 +178,16 @@
   position: absolute;
   top: 10px;
   left: 10px;
-  padding: 5px;
+  padding: 5px 10px; /* Espaciado adicional para mejorar la apariencia */
   border-radius: 5px;
   font-weight: bold;
   z-index: 1;
   background-color: #fff3cd; /* Amarillo claro */
   color: #856404;
-  
+  display: flex; /* Flexbox para alinear los elementos */
+  flex-direction: column; /* Alinear los elementos verticalmente */
+  align-items: flex-start; /* Alinear elementos a la izquierda */
+  gap: 3px; /* Espaciado entre el estado y "Creado:" */
 }
 
 /* Estilo para el estado "en envio" */
@@ -341,4 +348,10 @@
   border-radius: 50%;
   z-index: 2;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2); /* Sombra para darle profundidad */
+}
+.status p.hora-creacion {
+  font-size: 12px; /* Tamaño más pequeño para diferenciar del estado */
+  font-weight: normal; /* Menos peso para "Creado:" */
+  color: #666; /* Color más tenue */
+  margin: 0; /* Elimina márgenes para evitar separaciones indeseadas */
 }

@@ -224,7 +224,7 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
 
 
   private asignarProductosPorDia(planificacion: any[]) {
-    //console.log("Planificación:", JSON.stringify(planificacion, null, 2));
+    console.log("Planificación:", JSON.stringify(planificacion, null, 2));
 
     // Limpiar los datos de productosPorDia antes de asignar nuevos productos
     this.productosPorDia = {
@@ -255,15 +255,15 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
         // Recorremos los detalles de la planificación
         plan.detalles.forEach((detalle: any) => {
           console.log( typeof(detalle.producto.nombre)==="string")
-            const producto: Producto = {
-              id: detalle.productoId, // Cambiar a productoId
-              nombre: detalle.producto, // Asumiendo que el detalle tiene un campo 'producto'
-              urlImagen: detalle.urlImagen, // Incluyendo la URL de la imagen
-              cantidadPlanificada: detalle.cantidadPlanificada // Incluyendo la cantidad planificada
-              ,
-              barcode: null,
-              descripcion: ''
-            };
+          const producto: Producto = {
+            id: detalle.productoId, 
+            nombre: typeof detalle.producto === 'string' ? detalle.producto : detalle.producto.nombre, 
+            urlImagen: detalle.urlImagen, 
+            cantidadPlanificada: detalle.cantidadPlanificada,
+            barcode: null,
+            descripcion: ''
+        };
+        
             // Añadir el producto al Set del día correspondiente
             this.productosPorDia[dia].add(producto);
         });
@@ -271,6 +271,7 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
     console.log({productos:this.productosPorDia['lunes']});
     // Log para ver el resultado final de productosPorDia
     console.log("Productos por día:", this.productosPorDia);
+    this.cdr.detectChanges();
 }
 
 
@@ -307,21 +308,21 @@ filterProductos() {
   guardarProductos() {
     const diasPlanificacion: DiasPlanificacion = { dias: [] };
     const diasDeLaSemana = ['lunes', 'martes', 'miercoles', 'jueves', 'viernes'];
-
+  
     // Llenar los días de planificación
     for (const dia of diasDeLaSemana) {
       const fecha = this.fechasSemana[dia];
-      const tandas = this.productosPorDia[dia];
+      const productos = this.productosPorDia[dia];
       if (fecha) {
         const diaPlanificacion: DiaPlanificacion = {
           fecha: fecha,
           detalles: [],
         };
-        if (tandas.size > 0) {
-          tandas.forEach((producto: Producto) => {
+        if (productos.size > 0) {
+          productos.forEach((producto: Producto) => {
             const detalle: Detalle = {
-              productoId: producto.id,
-              cantidadPlanificada: 10, // Aquí la cantidad planificada
+              productoId: producto.id, // Incluye solo las propiedades esperadas
+              cantidadPlanificada: producto.cantidadPlanificada || 0 // Usar la cantidad planificada
             };
             diaPlanificacion.detalles.push(detalle);
           });
@@ -329,9 +330,9 @@ filterProductos() {
         diasPlanificacion.dias.push(diaPlanificacion);
       }
     }
-
+  
     const token = this.tokenService.getToken();
-
+  
     this.enviarService.setPlanificacion(token!, diasPlanificacion).subscribe(
       (response) => {
         this.messageService.add({ severity: 'success', summary: 'Éxito', detail: 'Planificación guardada con éxito.' });
@@ -342,6 +343,7 @@ filterProductos() {
       }
     );
   }
+  
   
   confirm() {
     this.confirmationService.confirm({
@@ -363,7 +365,9 @@ filterProductos() {
           detail: 'No se guardó la planificación'
         });
       }
+      
     });
+    this.cdr.detectChanges();
   }
 
   

@@ -18,7 +18,7 @@
                 <p><strong>Producto:</strong> {{ movimiento.producto }}</p>
                 <p><strong>Cantidad Retirada:</strong> {{ movimiento.cantidadRetirada }}</p>
                 <p><strong>Fecha:</strong> {{ movimiento.fecha | date: 'dd/MM/yyyy' }}</p>
-                <p><strong>Hora:</strong> {{ formatHoraConMilisegundos(movimiento.hora) }}</p>
+                <p><strong>Hora:</strong> {{formatTime(movimiento.hora)}}</p>
               </div>
             </div>
           </p-accordionTab>
@@ -32,21 +32,17 @@
 
     <!-- Detalle del Envío -->
     <main class="detalle-section">
-      <div class="section-header">Detalle del Envío</div>
-      <div class="detalle-envio-content" *ngIf="envioData">
-        <p><strong>ID:</strong> {{ envioData.id }}</p>
-        <p><strong>Fecha:</strong> {{ envioData.fecha | date: 'dd/MM/yyyy' }}</p>
-        
-        <p><strong>Hora de Creación:</strong> {{ formatFechaCompleta(envioData.horaCreacion) }}</p>
-        <p><strong>Última Actualización:</strong> {{ formatFechaCompleta(envioData.ultimaActualizacion) }}</p>
-        <p><strong>Hora de Inicio:</strong> {{ formatFechaCompleta(envioData.horaInicioEnvio) || 'No disponible' }}</p>
-        <p><strong>Hora de Finalización:</strong> {{ formatFechaCompleta(envioData.horaFinalizacion) || 'Pendiente' }}</p>
       
+      <div class="section-header">Detalle del Envío</div>
+      
+      <div class="detalle-envio-content" *ngIf="envioData">
         <p>
           <strong>Status:</strong>
           <span class="status-text" 
                 [ngClass]="{
-                  'status-cargando': envioData.status === 'Sin cargar',
+                  'status-sin-cargar': envioData.status === 'Sin cargar',
+                  'status-cargando': envioData.status === 'Cargando',
+                  'status-completa': envioData.status === 'Carga completa',
                   'status-en-envio': envioData.status === 'En envio',
                   'status-pendiente': envioData.status === 'Pendiente',
                   'status-finalizado': envioData.status === 'Finalizado'
@@ -54,6 +50,15 @@
             {{ envioData.status || 'Sin estado' }}
           </span>
         </p>
+        <p><strong>Fecha:</strong> {{ envioData.fecha | date: 'dd/MM/yyyy' }}</p>
+        
+        <p><strong>Hora de Creación:</strong> {{ formatFechaCompleta(envioData.horaCreacion) }}</p>
+        <p><strong>Última Actualización:</strong> {{ formatFechaCompleta(envioData.ultimaActualizacion) }}</p>
+        <p><strong>Tiempo en Envío:</strong> {{ getTiempoEnEnvio(envioData.horaInicioEnvio) }}</p>
+
+        <p><strong>Hora de Finalización:</strong> {{ formatFechaCompleta(envioData.horaFinalizacion) || 'Pendiente' }}</p>
+      
+       
       
         <p *ngIf="envioData.autorizante">
           <strong>Autorizante:</strong> {{ envioData.autorizante }}
@@ -99,8 +104,8 @@
         <div class="incidentes-container">
           <div *ngFor="let incidente of envioData.incidentes" class="incidente-card">
             <div class="incidente-header">
-              <p class="incidente-fecha"><strong>Fecha:</strong> {{ incidente.fecha | date: 'dd/MM/yyyy' }}</p>
-              <p class="incidente-hora"><strong>Hora:</strong> {{ formatFechaCompleta(incidente.hora) }}</p>
+              <p class="incidente-fecha"> {{ incidente.fecha | date: 'dd/MM/yyyy' }}</p>
+              <p class="incidente-hora"> {{ formatTime(incidente.hora) }}</p>
             </div>
             <div class="incidente-content">
               <p class="incidente-descripcion"><strong>Descripción:</strong> {{ incidente.descripcion }}</p>
@@ -138,7 +143,7 @@
       <h3 class="section-header">Entregas</h3>
       <p-accordion *ngIf="envioData.entregas && envioData.entregas.length > 0; else noEntregas">
         <p-accordionTab *ngFor="let entrega of envioData.entregas" 
-                        [header]="'Entrega del ' + (entrega.fecha | date: 'dd/MM/yyyy') + ' a las ' + formatHoraConMilisegundos(entrega.hora)">
+                        [header]="'Entrega del ' + (entrega.fecha | date: 'dd/MM/yyyy') + ' a las ' + formatTime(entrega.hora)">
           <div class="entrega-details">
             <p><strong>Comedor Solidario:</strong> {{ entrega.comedorSolidario }}</p>
             <p><strong>Dirección:</strong> {{ entrega.comedorDireccion }}</p>
