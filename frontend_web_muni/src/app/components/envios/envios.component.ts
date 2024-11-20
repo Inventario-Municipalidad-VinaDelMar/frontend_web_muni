@@ -213,7 +213,7 @@ export class EnviosComponent implements OnInit, OnDestroy {
       case 'en envio':
         return 'assets/img/camiones3.gif';
       default:
-        return 'assets/img/default.png'; // Imagen por defecto si no hay estado válido
+        return 'assets/img/finalizado.gif'; // Imagen por defecto si no hay estado válido
     }
   }
   getTiempoEnEnvio(horaInicio: string): string {
