@@ -225,54 +225,66 @@ export class PlanificacionComponent implements OnInit, OnDestroy {
 
   private asignarProductosPorDia(planificacion: any[]) {
     console.log("Planificación:", JSON.stringify(planificacion, null, 2));
-
+  
     // Limpiar los datos de productosPorDia antes de asignar nuevos productos
     this.productosPorDia = {
-        lunes: new Set<Producto>(),
-        martes: new Set<Producto>(),
-        miercoles: new Set<Producto>(),
-        jueves: new Set<Producto>(),
-        viernes: new Set<Producto>()
+      lunes: new Set<Producto>(),
+      martes: new Set<Producto>(),
+      miercoles: new Set<Producto>(),
+      jueves: new Set<Producto>(),
+      viernes: new Set<Producto>(),
     };
-
-    // Recorremos cada elemento de la planificación
+  
+    // Recorrer cada elemento de la planificación
     planificacion.forEach((plan: any) => {
-        const fechaProducto = new Date(plan.fecha + 'T00:00:00');
-        const diaSemana = fechaProducto.getDay(); // Obtener el día de la semana (0 = domingo, 1 = lunes, ...)
-
-        let dia: string;
-
-        // Mapear el número de día a un nombre de día de la semana
-        switch (diaSemana) {
-            case 1: dia = 'lunes'; break;
-            case 2: dia = 'martes'; break;
-            case 3: dia = 'miercoles'; break;
-            case 4: dia = 'jueves'; break;
-            case 5: dia = 'viernes'; break;
-            default: return; // Ignorar fines de semana (0 = domingo)
-        }
-
-        // Recorremos los detalles de la planificación
-        plan.detalles.forEach((detalle: any) => {
-          console.log( typeof(detalle.producto.nombre)==="string")
-          const producto: Producto = {
-            id: detalle.productoId, 
-            nombre: typeof detalle.producto === 'string' ? detalle.producto : detalle.producto.nombre, 
-            urlImagen: detalle.urlImagen, 
-            cantidadPlanificada: detalle.cantidadPlanificada,
-            barcode: null,
-            descripcion: ''
+      const fechaProducto = new Date(plan.fecha + 'T00:00:00');
+      const diaSemana = fechaProducto.getDay(); // Obtener el día de la semana (0 = domingo, 1 = lunes, ...)
+  
+      let dia: string;
+  
+      // Mapear el número de día a un nombre de día de la semana
+      switch (diaSemana) {
+        case 1:
+          dia = 'lunes';
+          break;
+        case 2:
+          dia = 'martes';
+          break;
+        case 3:
+          dia = 'miercoles';
+          break;
+        case 4:
+          dia = 'jueves';
+          break;
+        case 5:
+          dia = 'viernes';
+          break;
+        default:
+          return; // Ignorar fines de semana (0 = domingo)
+      }
+  
+      // Recorremos los detalles de la planificación
+      plan.detalles.forEach((detalle: any) => {
+        const producto: Producto = {
+          id: detalle.productoId,
+          nombre: typeof detalle.producto === 'string' ? detalle.producto : detalle.producto.nombre,
+          urlImagen: detalle.urlImagen,
+          cantidadPlanificada: detalle.cantidadPlanificada,
+          barcode: null,
+          descripcion: '',
         };
-        
-            // Añadir el producto al Set del día correspondiente
-            this.productosPorDia[dia].add(producto);
-        });
+  
+        // Validar que el producto no esté ya en el día antes de agregarlo
+        if (!Array.from(this.productosPorDia[dia]).some((p) => p.id === producto.id)) {
+          this.productosPorDia[dia].add(producto);
+        }
+      });
     });
-    console.log({productos:this.productosPorDia['lunes']});
-    // Log para ver el resultado final de productosPorDia
+  
     console.log("Productos por día:", this.productosPorDia);
     this.cdr.detectChanges();
-}
+  }
+  
 
 
 
@@ -434,29 +446,37 @@ dropToMainList(event: DragEvent) {
 // Cambiar el método drop para evitar duplicados en productosPorDia
 drop(event: DragEvent, dia: string) {
   event.preventDefault();
-  const productoId = event.dataTransfer?.getData('text');
-  const producto = this.productosFiltrado.find(p => p.id === productoId);
+  const productoId = event.dataTransfer?.getData('text'); // Obtener el ID del producto desde el drag
+  const producto = this.productosFiltrado.find(p => p.id === productoId); // Buscar el producto en la lista
 
-  if (producto && !this.productosPorDia[dia].has(producto)) {
-    // Agregar el producto al día específico
+  if (producto) {
+    // Verificar si ya existe un producto del mismo tipo (basado en `nombre` u otro criterio)
+    const existeProductoDelMismoTipo = Array.from(this.productosPorDia[dia]).some(
+      (p) => p.nombre === producto.nombre // Aquí puedes usar `nombre` u otra propiedad relevante
+    );
+
+    if (existeProductoDelMismoTipo) {
+      // Mostrar un mensaje de advertencia si ya existe un producto del mismo tipo
+      this.messageService.add({
+        severity: 'warn',
+        summary: 'Producto duplicado',
+        detail: `El producto del tipo "${producto.nombre}" ya está planificado para ${dia}.`
+      });
+      return; // Salir sin agregar el producto
+    }
+
+    // Si no está duplicado, agregar el producto al día
     this.productosPorDia[dia].add(producto);
-
-    // Remover el producto de la lista principal
-    this.productosFiltrado = this.productosFiltrado.filter(p => p.id !== productoId);
   }
 }
+
+
 
 
 // Para quitar de un día, usamos delete para el Set
 quitarDeDia(producto: Producto, dia: string) {
   // Eliminar el producto del día específico
   this.productosPorDia[dia].delete(producto);
-
-  // Reagregar el producto a la lista principal en la posición correcta de orden
-  const nearestExpiry = this.getNearestExpiry(producto);
-  let index = this.productosFiltrado.findIndex(p => this.getNearestExpiry(p) > nearestExpiry);
-  if (index === -1) index = this.productosFiltrado.length;
-  this.productosFiltrado.splice(index, 0, producto);
 }
 
 private getNearestExpiry(producto: Producto): number {

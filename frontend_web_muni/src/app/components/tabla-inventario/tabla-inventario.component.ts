@@ -11,7 +11,6 @@ import { DialogModule } from 'primeng/dialog';
 import { ConfirmationService } from 'primeng/api'; 
 import { ConfirmDialogModule } from 'primeng/confirmdialog';
 import { HttpClient, HttpClientModule, HttpHeaders } from '@angular/common/http';
-import { TokenService } from '../../services/auth-token.service';
 
 @Component({
   selector: 'app-tabla-inventario',

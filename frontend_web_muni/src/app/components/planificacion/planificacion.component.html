@@ -20,26 +20,28 @@
 
     <div class="productos-container">
       
-      <div class="buscador text-center">Productos para planificar</div>
+      <div class="buscador text-center custom-buscador">PRODUCTOS PARA PLANIFICAR</div>
+
+      
       <div class="color-legend">
         <div class="legend-item">
-          <span class="color-box vencido"></span>Productos con tandas Vencidas
+          <span class="color-box vencido"></span>Tandas vencidas
         </div>
         <div class="legend-item">
-          <span class="color-box porvencer1"></span> Productos con tandas Por vencer (1-2 días)
+          <span class="color-box porvencer1"></span> Tandas por vencer (1-2 días)
         </div>
         <div class="legend-item">
-          <span class="color-box porvencer2"></span>Productos con tandas Por vencer (3-7 días)
+          <span class="color-box porvencer2"></span>Tandas por vencer (3-7 días)
         </div>
         <div class="legend-item">
-          <span class="color-box seguro"></span>Productos con tandas Seguras
+          <span class="color-box seguro"></span>Tandas Seguras
         </div>
         <div class="legend-item">
-          <span class="color-box null"></span> Productos con tandas Sin fecha
+          <span class="color-box null"></span> Tandas sin fecha
         </div>
       </div>
       
-      <div class="productos-container-scroll" id="productos" (dragover)="allowDrop($event)" (drop)="dropToMainList($event)">
+      <div class="productos-container-scroll" id="productos" (dragover)="allowDrop($event)">
         <div class="producto" 
              *ngFor="let producto of productosFiltrado" 
              [attr.id]="producto.id" 
@@ -55,6 +57,9 @@
         <div class="no-coincidencias" *ngIf="productosFiltrado.length === 0">
           No hay coincidencias.
         </div>
+      </div>
+      <div class="alerta-descripcion">
+        *Estas alertas son asociadas a que existen productos con tandas (lotes) con alguna fecha pronta a vencer
       </div>
       
 
@@ -79,29 +84,26 @@
     <hr class="divider" />
 
     <div class="dias-semana-container p-grid">
-      <ng-container *ngFor="let dia of ['lunes', 'martes', 'miercoles', 'jueves', 'viernes']">
+      <ng-container class="ng-container" *ngFor="let dia of ['lunes', 'martes', 'miercoles', 'jueves', 'viernes']">
         <div class="dia p-col" [id]="dia" (dragover)="allowDrop($event)" (drop)="drop($event, dia)">
           <div class="card">
-            <strong class="dia-text">{{ dia.toUpperCase() }}</strong>
-            <span class="fecha-text">{{ fechasSemana[dia] | date:'dd/MM/yyyy' }}</span>
+            <div class="card-header">
+              <strong class="dia-text">{{ dia.toUpperCase() }}</strong>
+              <span class="fecha-text">{{ fechasSemana[dia] | date:'dd/MM/yyyy' }}</span>
+            </div>
             <div *ngIf="productosPorDia[dia]?.size === 0" class="no-productos-message">
               <img src="assets/img/empty.png" alt="No hay productos" class="no-productos-image" />
               <p class="no-hay-text">No hay productos asignados para este día.</p>
             </div>
+            
             <div *ngFor="let producto of productosPorDia[dia]" class="producto-container">
               <!-- Mostrar imagen del producto -->
               <img class="producto-img" [src]="producto.urlImagen" alt="{{ producto.nombre }}" />
-
-            
-              <!-- Nombre del producto -->
               <span class="producto-nombre">{{ producto.nombre }}</span>
-            
-              <!-- Botón para quitar -->
               <button class="quitar-btn" (click)="quitarDeDia(producto, dia)">×</button>
             </div>
-            
-            
           </div>
+          
         </div>
       </ng-container>
     </div>

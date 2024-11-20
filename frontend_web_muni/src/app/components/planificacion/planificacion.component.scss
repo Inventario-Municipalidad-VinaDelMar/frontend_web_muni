@@ -38,6 +38,17 @@
   .productos-container {
     text-align: start; /* Añadido margen para separar de la sección superior */
   }
+
+  .custom-buscador {
+    font-size: 20px; /* Cambia el tamaño de la fuente */
+    font-weight: bold; /* Texto en negrita */
+    color: #333; /* Cambia el color del texto */
+    margin-bottom: 20px; /* Espaciado inferior */
+  }
+
+  
+  
+  
   
 /* Ajuste en el contenedor del buscador */
 .buscador-container {
@@ -93,6 +104,7 @@
   /* Contenedor de los días de la semana */
   /* Ajustar tamaño del contenedor principal de planificación */
   .dias-semana-container {
+    
     display: flex;
     flex-wrap: wrap; /* Permitir que las tarjetas salten de línea si es necesario */
     justify-content: space-between; /* Espaciar uniformemente las tarjetas */
@@ -105,9 +117,9 @@
     flex-direction: column;
     justify-content: space-between; /* Distribuye el contenido uniformemente */
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
-    border: 1px solid rgb(231, 231, 231);
     overflow: auto; /* Evita desbordamientos de contenido */
     min-height: 40vh;
+    margin-bottom: 10px;
   }
 
 
@@ -125,7 +137,7 @@
   justify-content: space-between; /* Espacio entre elementos */
   background: #1976d2;
   color: white;
-  padding: 10px; /* Espaciado interno */
+  padding: 5px 10px; /* Espaciado interno */
   margin-bottom: 10px;
   border-radius: 8px; /* Bordes redondeados */
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
@@ -133,12 +145,14 @@
 }
 
 .producto-container img {
-  width: 60px; /* Ancho fijo para imágenes */
-  height: 60px; /* Altura fija para imágenes */
-  object-fit: cover; /* Asegura que la imagen se recorte para llenar el espacio sin deformarse */
-  border-radius: 5px; /* Bordes redondeados */
-  margin-right: 10px; /* Espaciado entre la imagen y el texto */
+  width: 45; /* Ancho fijo para imágenes */
+  height: 45px; /* Altura fija para imágenes */
+  border-radius: 50%; /* Cambiar a borde circular */
 }
+.producto-container:last-child {
+  margin-bottom: 30px; /* Espaciado adicional debajo del último producto */
+}
+
 
 .producto-nombre {
   flex-grow: 1; /* Permite que el texto ocupe el espacio disponible */
@@ -166,6 +180,12 @@
   flex-shrink: 0; /* Evita que el botón se redimensione */
 }
 
+.alerta-descripcion {
+  font-size: 14px;
+  color: #555;
+  margin-bottom: 20px;
+  text-align: center; /* Centra el texto horizontalmente */
+}
 
 
 /* Ajuste en la etiqueta del producto */
@@ -179,7 +199,6 @@
 /* Efecto de hover para interacción */
 .producto-container:hover {
   background-color: #0058ab; /* Cambia el color de fondo al pasar el ratón */
-  transform: translateY(-2px); /* Eleva el contenedor ligeramente */
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Sombra más grande */
 }
   
@@ -285,17 +304,32 @@ input {
   justify-content: center; /* Centrar horizontalmente */
 }
 
-.card{
-  border:none;
+.card {
+  height: 100%; /* Asegura que las tarjetas se extiendan igual */
+  display: flex;
+  flex-direction: column; /* Coloca los elementos en columna */
+  background-color: #bfe2f4; /* Fondo blanco para la tarjeta */
+  overflow: hidden; /* Evita desbordamientos */
+  border-radius: 0px;
+  
 }
+
 .no-productos-image {
-  max-width: 50%;
-  height: auto;
-  display: block;
-  margin: 0 auto; /* Esto centra la imagen */
+  width: 100px; /* Tamaño de la imagen */
+  height: auto; /* Mantener proporción */
+  margin-bottom: 10px; /* Espaciado entre la imagen y el texto */
   
   /* Animación */
   animation: heartbeat 5s infinite;
+}
+.no-productos-message {
+  display: flex; /* Activa Flexbox */
+  flex-direction: column; /* Alinea los elementos verticalmente */
+  justify-content: center; /* Centra verticalmente */
+  align-items: center; /* Centra horizontalmente */
+  height: 100%; /* Asegura que ocupe toda la altura del contenedor */
+  text-align: center; /* Centra el texto */
+  color: #333; /* Ajusta el color del texto si es necesario */
 }
 
 @keyframes heartbeat {
@@ -311,6 +345,7 @@ input {
 }
 
 .dia-text {
+  margin:10px;
   font-weight: bold;
   font-size: 1.1em;
   margin-bottom: 5px; /* Espacio entre el título y la fecha */
@@ -321,7 +356,6 @@ input {
   position: sticky; /* Fija el contenedor */
   top: 0; /* Se pega al borde superior */
   z-index: 10; /* Asegura que esté sobre el contenido */
-  background-color: white; /* Fondo blanco para visibilidad */
   padding: 10px; /* Espaciado interno */
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
   border-bottom: 1px solid #ccc; /* Línea inferior para separar */
@@ -330,9 +364,11 @@ input {
   align-items: center; /* Centra el texto horizontalmente */
 }
 
+
+
 .fecha-text {
+  padding-bottom: 10px;
   font-size: 0.9em; /* Ajusta el tamaño según sea necesario */
-  color: gray;
 }
 
 .no-hay-text{
